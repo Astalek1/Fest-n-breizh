@@ -1,34 +1,81 @@
 
+* {
+    margin: 0px;
+    padding:10px;
+    font-family: "Encode Sans", sans-serif;
+}
+
+
 body {
     background-color:white;
 }
 
-header {
+header{
     background-image: url(../images/ascreb.png);
     background-size: cover;
     background-position-x:center;
     background-position-y: 10%;
     background-size: cover;
+    padding-bottom: 35px;
 }
 
-.page {
+.menu a:hover {
+    box-shadow:0px 1px 2px #CCC;
+    background-color:rgba(200,200,200, 0.1);
+}
+
+nav {
+    display:flex;
+    justify-content: space-between;
     text-align: right;
-    background-color: rgba(128, 128, 128, 0.438);
-
-
-
 }
+
+nav a {
+    color:white;
+}
+
 
 .logo {
-    width: 20%;
-    height: 20%;
+    width: 15%;
+    height: auto;
 }
 
 h1 {
     /*Typo du titre temporaire. à voir plus tard si je doit la changer*/
     font-family: "Lexend", sans-serif;
+    padding: 20px;
+    margin: 20px;
 }
 
 p {
-    font-family: "Encode Sans", sans-serif;
+    font-size:1.2em ;
+    padding:20px;
+    margin: 20px;
+}
+
+footer {
+    background-color: white;
+    margin-top: 100px;
+}
+
+footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-noir {
+    width: 9%;
+    height: auto;
+}
+
+
+.lien-icone{
+    width: 50px;
+    height: 50px;
+}
+
+.lien-icone:hover {
+ opacity: 0.5;
 }
