@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <title>Accueil Fest'n Breizh</title>
         <link rel="stylesheet" href="../CSS/general.css"/>
-        <link rel="stylesheet" href="../CSS/general.css"/>
+        <link rel="stylesheet" href="../CSS/menu_deroulant.css"/>
+        <script src="../JAVASCRIPT/menu.js" defer></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100..900" rel="stylesheet">
@@ -12,16 +13,27 @@
     </head>
 
     <body>
-        <header>
+        <header> 
             <nav>
-                <img  class="logo" src="../images/logo-Blanc.png" alt="fest'n breizh"/>
+                <img class="logo" src="../images/logo-Blanc.png" alt="fest'n breizh"/>
                 <div class="menu">
                     <a href="accueil.html">Accueil</a>
                     <a href="qui-sommes-nous.html"> Qui sommes nous?</a>
-                    <a href="2018.html">Edition 2018</a>
-                    <a href="2019.html">Edition 2019</a>
-                    <a href="2020.html">Edition 2020</a>
-                    <a href="2024.html">Edition 2024</a>
+                    <ul>
+                        <li class="menu-item">
+                            <a href="javascript:void(0);" onclick="toggleMenu()">
+                                Les éditions
+                            </a>
+                            <div id="sousMenuA" class="sousMenu">
+                                <ul>
+                                    <li><a href="2018.html">2018</a></li>
+                                    <li><a href="2019.html">2019</a></li> 
+                                    <li><a href="2020.html">2020</a></li>
+                                    <li><a href="2024.html">2024</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul> 
                     <a href="videos.html">interviews</a>
                     <a href="affiches.html">affiches</a>
                     <a href="photos.html">Photos</a>
