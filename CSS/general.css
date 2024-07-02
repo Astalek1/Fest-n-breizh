@@ -1,11 +1,13 @@
  * {
-    margin: 10px;
-    padding: 10px;
     font-family: "Encode Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     background-color: white;
+    
 }
 
 header {
@@ -14,7 +16,11 @@ header {
     background-position-x: center;
     background-position-y: 10%;
     position: relative;
-    padding-bottom: 50px;
+    max-height: 17em;
+    max-width: 100%;
+    /*test*/
+    margin:50px;
+    padding: 50px;
 }
 
 .menu {
@@ -25,6 +31,8 @@ header {
     position: relative;
     top: -50px;
     left: 50px;
+    line-height: 5%;
+    align-items: center;
 }
 
 .menu a:hover {
@@ -36,15 +44,20 @@ header {
 nav {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 nav a {
     color: white; 
+
+    text-decoration: none;
+    padding: 10px;
+    margin: 0;
 }
 
 .logo {
     width: 15%;
-    height: auto;
+    height: 15%;
     display: flex;
     position: relative;
     top: -50px;
@@ -53,14 +66,16 @@ nav a {
 
 h1 {
     font-family: "Lexend", sans-serif;
+   
+    margin:50px;
     padding: 20px;
-    margin: 20px;
 }
+
 
 p {
     font-size: 1.2em;
+    margin:50px;
     padding: 20px;
-    margin: 20px;
 }
 
 footer {
@@ -70,6 +85,8 @@ footer {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    margin:50px;
+    padding: 50px;
 }
 
 .logo-noir {

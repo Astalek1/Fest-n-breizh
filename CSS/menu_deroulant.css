@@ -4,7 +4,10 @@
     display: flex;
     float: left;
     margin-bottom: auto;
-    top: -40px; 
+    /*test*/
+    margin: 0;
+    padding: 0;
+
 }
 
 
@@ -13,16 +16,18 @@
     position: absolute;
     top: 100%; /* Place le menu directement sous le bouton */
     left:0;
-    background-color: white;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    width: 100px; /* Ajustez la largeur selon vos besoins */
+    width:100px; /* Ajustez la largeur selon vos besoins */
+    box-shadow:  0px 1px 2px   #CCC;
+    background-color: rgba(200, 200, 200, 0.13);
+    text-decoration:underline;
+    
 }
 
 .sousMenu ul {
     list-style: none;
-    padding: 0;
-    margin: 0;
+    margin: 10px;
+    line-height:15px;
 }
 
 .sousMenu ul li {
@@ -31,7 +36,7 @@
 
 .sousMenu ul li a {
     text-decoration: none;
-    color: black;
+    color: rgb(255, 255, 255);
 }
 
 .sousMenu.active {
