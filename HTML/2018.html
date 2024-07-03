@@ -1,36 +1,55 @@
-<!DOCTYPE html>
-<html lang="fr">
-    <head>
-        <meta charset="utf-8">
-        <title>Edition 2018</title>
-        <link rel="stylesheet" href="../CSS/general.css"/>
-        <link rel="stylesheet" href="../CSS/general.css"/>
-        <link rel="stylesheet" href="../CSS/general.css"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100..900" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
-    </head>
-
-    <body>
-        <header>
-            <nav>
-                <img  class="logo" src="../images/logo-Blanc.png" alt="fest'n breizh"/>
-                <div class="menu">
-                    <a href="accueil.html">Accueil</a>
-                    <a href="qui-sommes-nous.html"> Qui sommes nous?</a>
-                    <a href="2018.html">Edition 2018</a>
-                    <a href="2019.html">Edition 2019</a>
-                    <a href="2020.html">Edition 2020</a>
-                    <a href="2024.html">Edition 2024</a>
-                    <a href="videos.html">interviews</a>
-                    <a href="affiches.html">affiches</a>
-                    <a href="photos.html">Photos</a>
-                    <a href="liens.html">liens</a>
-                    <a href="contact.html">Contact</a>
-                </div>
-            </nav>
-        </header>
+<head>
+    <meta charset="utf-8">
+    <title>Accueil Fest'n Breizh</title>
+    <link rel="stylesheet" href="../CSS/general.css"/>
+    <link rel="stylesheet" href="../CSS/menu_deroulant.css"/>
+    <script src="../JAVASCRIPT/menu.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100..900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header> 
+        <nav>
+            <img class="logo" src="../images/logo-Blanc.png" alt="fest'n breizh"/>
+            <div class="menu">
+                <a href="accueil.html">Accueil</a>
+                <a href="qui-sommes-nous.html"> Qui sommes nous?</a>
+                <ul>
+                    <li class="menu-item" id="parentEditions">
+                        <a href="javascript:void(0)" onclick="toggleMenu('sousMenuA','parentEditions')">
+                            Les éditions
+                        </a>
+                        <div id="sousMenuA" class="sousMenu">
+                            <ul>
+                                <li><a href="2018.html">Edition_2018</a></li>
+                                <li><a href="2019.html">Edition_2019</a></li> 
+                                <li><a href="2020.html">Edition_2020</a></li>
+                                <li><a href="2024.html">Edition_2024</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul> 
+                <a href="videos.html">interviews</a>
+                <ul>
+                    <li class="menu-item" id="parentGalerie">
+                        <a href="javascipt:void(0)" onclick="toggleMenu('sousMenuB','parentGalerie')">
+                            Galerie
+                        </a>
+                        <div id="sousMenuB" class="sousMenu">
+                            <ul>
+                                <li><a href="affiches.html">Affiches</a></li>
+                                <li><a href="photos.html">Photos</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+                <a href="liens.html">liens</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+    </header>
         <main>
             <h1>Edition 2018</h1>
 
