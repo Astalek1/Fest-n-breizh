@@ -76,6 +76,25 @@ p {
     padding: 20px;
 }
 
+/*taille des affiches*/
+.affiches  {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.affiches a {
+    display: block; /* Assure que les liens sont des blocs pour contrôler la taille des images */
+    margin: 10px; /* Marge autour des images */
+}
+
+.affiches img  {
+    width: auto; /* Définir la largeur souhaitée */
+    height: 450px; /* Définir la hauteur souhaitée */
+    object-fit: cover; /* Assure que l'image couvre l'espace sans distorsion */
+}
+
+
 footer {
     background-color: white;
     margin-top: 100px;
