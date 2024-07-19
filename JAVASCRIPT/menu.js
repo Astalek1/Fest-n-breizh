@@ -8,5 +8,3 @@ function toggleMenu(menuId, parentId) {
         sousMenu.style.witdh = `${parent.offsetWidth}px`;
     }
 }
-
-
