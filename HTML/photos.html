@@ -10,6 +10,60 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100..900" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+        <style>
+            /*taille des affiches*/
+        .affiches  {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin:80px;
+            padding: 50px;
+        }
+
+        .affiches a {
+            display: block; /* Assure que les liens sont des blocs pour contrôler la taille des images */
+            margin: 10px; /* Marge autour des images */
+        }
+
+        .affiches img  {
+            width: 300px; /* Définir la largeur souhaitée */
+            height: 450px; /* Définir la hauteur souhaitée */
+            object-fit: cover; /* Assure que l'image couvre l'espace sans distorsion */
+            border : 2px solid #00000065;
+        }
+        /**/
+
+        /* Styles pour le modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.897);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            position:relative;
+            overflow:hidden;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Classe pour bloquer le défilement */
+        .no-scroll {
+            overflow: hidden;
+        }
+        /**/
+        </style>
     </head>
     <body>
         <header> 
@@ -54,6 +108,17 @@
         </header>
         <main>
             <h1>les Photos</h1>
+            <p>Nous vous présentons ici une galerie de photos issues de nos différents événements.</p>
+
+
+
+        <!-- Modal pour afficher l'image en grand -->
+        <div id="myModal" class="modal">
+            <span class="close" onclick="closeModal()"></span>
+            <div class="modal-content">
+                <img id="modalImg" src="">
+            </div>
+        </div>       
         </main>
         <footer>
             <img  class="logo-noir" src="../images/logo_FNB_noir.png" alt="fest'n breizh"/>
@@ -64,7 +129,39 @@
                 <a target="blank" href="https://www.facebook.com/profile.php?id=100067739030441&locale=fr_FR" >
                     <img src="../IMAGES/logoFB.png" alt=" logo Facebook" class="lien-icone">
                 </a>
+                <a target="blank" href="https://www.youtube.com/@festnbreizh2300/featured">
+                    <img src="../IMAGES/youtube.png" alt="logo youtube" class="lien-icone">
+                </a>
             </div>
         </footer>
+        <script>
+            // Fonction pour afficher le modal avec l'image agrandie
+            document.querySelectorAll('.affiches a').forEach(item => {
+                item.addEventListener('click', event => {
+                    event.preventDefault();
+                    const imgSrc = item.getAttribute('href');
+                    const modal = document.getElementById('myModal');
+                    const modalImg = document.getElementById('modalImg');
+                    modal.style.display = "block";
+                    modalImg.src = imgSrc;
+                    document.body.classList.add('no-scroll'); // Bloque le défilement
+                });
+            });
+
+            // Fonction pour fermer le modal
+            function closeModal() {
+                document.getElementById('myModal').style.display = "none";
+                document.body.classList.remove('no-scroll'); // Débloque le défilement
+            }
+
+            // Ferme le modal lorsqu'on clique en dehors de l'image
+            window.onclick = function(event) {
+                const modal = document.getElementById('myModal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                    document.body.classList.remove('no-scroll'); // Débloque le défilement
+                }
+            };
+        </script>
     </body>
 </html>
