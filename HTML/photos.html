@@ -12,7 +12,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
         <style>
             /*taille des affiches*/
-        .affiches  {
+        .photos  {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -20,12 +20,12 @@
             padding: 50px;
         }
 
-        .affiches a {
+        .photos figure {
             display: block; /* Assure que les liens sont des blocs pour contrôler la taille des images */
             margin: 10px; /* Marge autour des images */
         }
 
-        .affiches img  {
+        .photos img  {
             width: 300px; /* Définir la largeur souhaitée */
             height: 450px; /* Définir la hauteur souhaitée */
             object-fit: cover; /* Assure que l'image couvre l'espace sans distorsion */
@@ -35,34 +35,38 @@
 
         /* Styles pour le modal */
         .modal {
-            display: none;
+            display: none; /* Masquer le modal par défaut */
             position: fixed;
-            z-index: 1;
+            z-index: 1000; /* Assurez-vous que le modal est au-dessus de tout le reste */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.897);
+            background-color:  rgba(0, 0, 0, 0.897); /* Fond semi-transparent */
+            overflow: auto; /* Permet le défilement si nécessaire */
+            justify-content: center;
+            align-items: center; /* Centrer le contenu verticalement */
         }
+
         .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            position:relative;
-            overflow:hidden;
+            max-width: 90vw; /* Limiter la largeur maximale à 90% de la vue */
+            max-height: 90vh; /* Limiter la hauteur maximale à 90% de la vue */
+            background-color: #fff; /* Fond blanc pour le contenu du modal */
+            overflow: hidden; /* Masquer les débordements */
         }
+
         .modal-content img {
-            width: 100%;
-            height: auto;
+            max-width: 90vw; /* Limiter la largeur maximale à 90% de la vue */
+            max-height: 90vh; /* Limiter la hauteur maximale à 90% de la vue */
+            background-color: #fff; /* Fond blanc pour le contenu du modal */
+            overflow: hidden; /* Masquer les débordements */
         }
 
         /* Classe pour bloquer le défilement */
         .no-scroll {
             overflow: hidden;
         }
-        /**/
+
         </style>
     </head>
     <body>
@@ -109,12 +113,304 @@
         <main>
             <h1>les Photos</h1>
             <p>Nous vous présentons ici une galerie de photos issues de nos différents événements.</p>
+        <div class="photos">
+            <figure>
+                <a href="..\PHOTOS\1.jpg">
+                    <img src="..\PHOTOS\1-reduit.jpg" alt="initiation à la danse bretonne" title="initiation danse"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
 
+            <figure>
+                <a href="..\PHOTOS\2.jpg">
+                    <img src="..\PHOTOS\2-reduit.jpg" alt="initiation à la danse bretonne" title="initiation danse"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
 
+            <figure>
+                <a href="..\PHOTOS\dixit.jpg">
+                    <img src="..\PHOTOS\dixit-reduit.jpg" alt="goupe Dixit" title="Dixit"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\3.jpg">
+                    <img src="..\PHOTOS\3-reduit.jpg" alt="Klervi Piel - Dixit" title="Klervi Piel - Bombarde (dixit)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\4.jpg">
+                    <img src="..\PHOTOS\4-reduit.jpg" alt="Sterenn Toscer - Dixit" title=" Sterenn Toscer - Violon (dixit)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\5.jpg">
+                    <img src="..\PHOTOS\5-reduit.jpg" alt="Morgane Gregory - dixit" title="Morgane Gregory - Harpe Celtique (dixit)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\6.jpg">
+                    <img src="..\PHOTOS\6-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\7.jpg">
+                    <img src="..\PHOTOS\7-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\8.jpg">
+                    <img src="..\PHOTOS\8-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\9.jpg">
+                    <img src="..\PHOTOS\9-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\10.jpg">
+                    <img src="..\PHOTOS\10-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\11.jpg">
+                    <img src="..\PHOTOS\11-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Rozé-Lebreton.jpg">
+                    <img src="..\PHOTOS\Rozé-Lebreton-reduit.jpg" alt="Rozé-Lebreton" title="duo Rozé-Lebreton"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\12.jpg">
+                    <img src="..\PHOTOS\12-reduit.jpg" alt="Matthieu Lebreton - Rozé-Lebreton" title="Matthieu Lebreton - Guitare (Rozé-Lebreton)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\13.jpg">
+                    <img src="..\PHOTOS\13-reduit.jpg" alt="Nicolas Rozé - Rozé-Lebreton" title="Nicolas Rozé - Accordéon (Rozé-Lebreton)"></a>
+                    <figcaption>Photo par : Jean Maurice Colombel</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\14.jpg">
+                    <img src="..\PHOTOS\14-reduit.jpg" alt="Matthieu Lebreton - Rozé-Lebreton" title="Matthieu Lebreton - Guitare (Rozé-Lebreton)"></a>
+                    <figcaption>Photo par : Jean Maurice Colombel</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\15.jpg">
+                    <img src="..\PHOTOS\15-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\16.jpg">
+                    <img src="..\PHOTOS\16-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+            
+            <figure>
+                <a href="..\PHOTOS\Plantec.jpg">
+                    <img src="..\PHOTOS\Plantec-reduit.jpg" alt=" groupe Plantec" title="Plantec"></a>
+                    <figcaption>Photo par : Jean Maurice Colombel</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\17.jpg">
+                    <img src="..\PHOTOS\17-reduit.jpg" alt="Yannick Plantec - Plantec" title="Yannick Plantec - Guitare (Plantec)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\18.jpg">
+                    <img src="..\PHOTOS\18-reduit.jpg" alt="DjiBriL - Plantec" title="DjiBriL - Machines (Plantec)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\19.jpg">
+                    <img src="..\PHOTOS\19-reduit.jpg" alt="Odran Plantec - Plantec" title="Odran Plantec - Bombarde (Plantec)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Gabriel-Milena.jpg">
+                    <img src="..\PHOTOS\Gabriel-Milena-reduit.jpg" alt="Gabriel-milena" title="duo Leclere-Chiapello "></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Gabriel-Milena2.jpg">
+                    <img src="..\PHOTOS\Gabriel-Milena2-reduit.jpg" alt="Gabriel Chiapello et Milena Leclere" title=" Gabriel Chiapello et Milena Leclere (Duo Leclere-Chiapello)"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\20.jpg">
+                    <img src="..\PHOTOS\20-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\triskill.jpg">
+                    <img src="..\PHOTOS\triskill-reduit.jpg" alt="groupe Triskill" title="Triskill"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\21.jpg">
+                    <img src="..\PHOTOS\21-reduit.jpg" alt="Moran Le Touze - Triskill" title="Moran Le Touze - Guitare"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\22.jpg">
+                    <img src="..\PHOTOS\22-reduit.jpg" alt="Nicolas Foltête - Triskill" title="Nicolas Foltête - Batterie"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\23.jpg">
+                    <img src="..\PHOTOS\23-reduit.jpg" alt="Matthieu Foltête - Triskill" title="Matthieu Foltête - Accordéon"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\24.jpg">
+                    <img src="..\PHOTOS\24-reduit.jpg" alt="Lucas Belaunde - Triskill" title="Lucas Belaunde - Basse"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\25.jpg">
+                    <img src="..\PHOTOS\25-reduit.jpg" alt="Victor Laffargue - Triskill" title="Victor Laffargue - Violon"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\triskill2.jpg">
+                    <img src="..\PHOTOS\triskill2-reduit.jpg" alt="groupe Triskill" title="Triskill"></a>
+                    <figcaption>Photo par : Regard d'harmonie</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\triskill3.jpg">
+                    <img src="..\PHOTOS\triskill3-reduit.jpg" alt="groupe Triskill" title="Triskill"></a>
+                    <figcaption>Photo par : Cédric Fuhs</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\26.jpg">
+                    <img src="..\PHOTOS\26-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Cédric Fuhs</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\27.jpg">
+                    <img src="..\PHOTOS\27-reduit.jpg" alt="Danseurs" title="Danseurs"></a>
+                    <figcaption>Photo par : Jean Maurice Colombel</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\regie.jpe">
+                    <img src="..\PHOTOS\regie.jpe" alt="regie fes'nBreizh" title="Regie"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\an-tri-dipop.jpg">
+                    <img src="..\PHOTOS\an-tri-dipop.jpg" alt="groupe An-tri-dipop" title="An-tri-dipop"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\ba.fnu.jpg">
+                    <img src="..\PHOTOS\ba.fnu-reduit.jpg" alt="groupe Ba.fnu" title="Ba.fnu"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\danseurs.jpg">
+                    <img src="..\PHOTOS\danseurs-reduit.jpg" alt="danseurs" title="danseurs"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\danseurs2.jpe">
+                    <img src="..\PHOTOS\danseurs2.jpe" alt="danseurs" title="danseurs"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\danseurs3.jpe">
+                    <img src="..\PHOTOS\danseurs3.jpe" alt="danseurs" title="danseurs"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\da-zansal.jpg">
+                    <img src="..\PHOTOS\da-zansal.jpg" alt="groupe Da-zansal" title="Da-zansal"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\da-zansal2.jpg">
+                    <img src="..\PHOTOS\da-zansal2-reduit.jpg" alt="roupe Da-zansal" title="Da-zansal"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Lodenn-darn1.jpg">
+                    <img src="..\PHOTOS\Lodenn-darn1-reduit.jpg" alt="Alan Tymen - Lodenn-darn" title="Alan Tymen - Guitarde (Lodenn Darn)"></a>
+                    <figcaption>photo par: Solène Vandroy</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Lodenn-darn2.jpg">
+                    <img src="..\PHOTOS\Lodenn-darn2-reduit.jpg" alt="Quentin Begaud - Lodenn-darn" title="Quentin Begaud - Flûte tarversière (Lodenn darn)"></a>
+                    <figcaption>photo par: Solène Vandroy</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Maela-hag-Anouk.jpg">
+                    <img src="..\PHOTOS\Maela-hag-Anouk-reduit.jpg" alt="duo Maela hag Anouk" title="Maela Gilet-janes et Anouk Couee-vicente (Maela hag Anouk)"></a>
+                    <figcaption>photo par: Solène Vandroy</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\Mamilena.jpg">
+                    <img src="..\PHOTOS\Mamilena-reduit.jpg" alt="Mamilena" title="Milena Leclere (Mamilena) "></a>
+                    <figcaption>photo par: Solène Vandroy</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\ourawen.jpg">
+                    <img src="..\PHOTOS\ourawen.jpg" alt="groupe ourawen" title="Ourawen"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+
+            <figure>
+                <a href="..\PHOTOS\skarn.jpe">
+                    <img src="..\PHOTOS\skarn.jpe" alt=" groupe Skarn" title="Skarn"></a>
+                    <figcaption>photo par : équipe de Fest'n breizh</figcaption>
+            </figure>
+        </div>
 
         <!-- Modal pour afficher l'image en grand -->
         <div id="myModal" class="modal">
-            <span class="close" onclick="closeModal()"></span>
             <div class="modal-content">
                 <img id="modalImg" src="">
             </div>
@@ -135,14 +431,15 @@
             </div>
         </footer>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
             // Fonction pour afficher le modal avec l'image agrandie
-            document.querySelectorAll('.affiches a').forEach(item => {
+            document.querySelectorAll('.photos a').forEach(item => {
                 item.addEventListener('click', event => {
                     event.preventDefault();
                     const imgSrc = item.getAttribute('href');
                     const modal = document.getElementById('myModal');
                     const modalImg = document.getElementById('modalImg');
-                    modal.style.display = "block";
+                    modal.style.display = "flex";
                     modalImg.src = imgSrc;
                     document.body.classList.add('no-scroll'); // Bloque le défilement
                 });
@@ -158,10 +455,10 @@
             window.onclick = function(event) {
                 const modal = document.getElementById('myModal');
                 if (event.target == modal) {
-                    modal.style.display = "none";
-                    document.body.classList.remove('no-scroll'); // Débloque le défilement
+                    closeModal();
                 }
             };
+        });
         </script>
     </body>
 </html>

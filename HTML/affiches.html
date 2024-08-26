@@ -20,7 +20,7 @@
             padding: 50px;
         }
 
-        .affiches a {
+        .affiches figure {
             display: block; /* Assure que les liens sont des blocs pour contrôler la taille des images */
             margin: 10px; /* Marge autour des images */
         }
@@ -33,29 +33,40 @@
         }
         /**/
 
+        /* légende*/
+        figcaption{
+            font-size: 12px;
+            line-height:10px;
+        }
+        
+
         /* Styles pour le modal */
         .modal {
-            display: none;
+            display: none; /* Masquer le modal par défaut */
             position: fixed;
-            z-index: 1;
+            z-index: 1000; /* Assurez-vous que le modal est au-dessus de tout le reste */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.897);
+            background-color:  rgba(0, 0, 0, 0.897); /* Fond semi-transparent */
+            overflow: auto; /* Permet le défilement si nécessaire */
+            justify-content: center;
+            align-items: center; /* Centrer le contenu verticalement */
         }
+
         .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            position:relative;
-            overflow:hidden;
+            max-width: 90vw; /* Limiter la largeur maximale à 90% de la vue */
+            max-height: 90vh; /* Limiter la hauteur maximale à 90% de la vue */
+            background-color: #fff; /* Fond blanc pour le contenu du modal */
+            overflow: hidden; /* Masquer les débordements */
         }
+
         .modal-content img {
-            width: 100%;
-            height: auto;
+            max-width: 90vw; /* Limiter la largeur maximale à 90% de la vue */
+            max-height: 90vh; /* Limiter la hauteur maximale à 90% de la vue */
+            background-color: #fff; /* Fond blanc pour le contenu du modal */
+            overflow: hidden; /* Masquer les débordements */
         }
 
         /* Classe pour bloquer le défilement */
@@ -112,32 +123,83 @@
                 Voici les affiches de toutes les éditions de Fest'n breizh depuis son commencement en 2009.
             </p>
                 <div class="affiches">
-                    <a href="../IMAGES/affiches/2009_zoom.jpg">
-                        <img src="../IMAGES/affiches/2009.jpg" alt="Affiche de Fest'n Breizh 2009" title="Affiche 2009"></a>
-                    <a href="../IMAGES/affiches/2010_zoom.jpg">
-                        <img src="../IMAGES/affiches/2010.jpg" alt="Affiche de Fest'n Breizh 2010" title="Affiche 2010"></a>
-                    <a href="../IMAGES/affiches/2011_zoom.jpg">
-                        <img src="../IMAGES/affiches/2011.jpg" alt="Affiche de Fest'n Breizh 2011" title="Affiche 2011"></a>
+                    <figure>
+                        <a href="../IMAGES/affiches/2009_zoom.jpg">
+                            <img src="../IMAGES/affiches/2009.jpg" alt="Affiche de Fest'n Breizh 2009" title="Affiche 2009"></a>
+                            <figcaption>FnB 2009 (1ere édition)</figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2010_zoom.jpg">
+                            <img src="../IMAGES/affiches/2010.jpg" alt="Affiche de Fest'n Breizh 2010" title="Affiche 2010"></a>
+                            <figcaption>FnB 2010 (2e édition) - Graphisme : Amélie Rondineau</figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2011_zoom.jpg">
+                            <img src="../IMAGES/affiches/2011.jpg" alt="Affiche de Fest'n Breizh 2011" title="Affiche 2011"></a>
+                            <figcaption>FnB 2011 (3e édition) - Graphisme : Adrien Rocher</figcaption>
+                    </figure>
+
+                    <figure>
                     <a href="../IMAGES/affiches/2012_zoom.jpg">
                         <img src="../IMAGES/affiches/2012.jpg" alt="Affiche de Fest'n Breizh 2012" title="Affiche 2012"></a>
-                    <a href="../IMAGES/affiches/2013_zoom.jpg">
-                        <img src="../IMAGES/affiches/2013.jpg" alt="Affiche de Fest'n Breizh 2013" title="Affiche 2013"></a>
-                    <a href="../IMAGES/affiches/2014_zoom.jpg">
-                        <img src="../IMAGES/affiches/2014.jpg" alt="Affiche de Fest'n Breizh 2014" title="Affiche 2014"></a>
-                    <a href="../IMAGES/affiches/2015_zoom.jpg">
-                        <img src="../IMAGES/affiches/2015.jpg" alt="Affiche de Fest'n Breizh 2015" title="Affiche 2015"></a>
-                    <a href="../IMAGES/affiches/2016_zoom.jpg">
-                        <img src="../IMAGES/affiches/2016.jpg" alt="Affiche de Fest'n Breizh 2016" title="Affiche 2016"></a>
-                    <a href="../IMAGES/affiches/2017_zoom.jpg">
-                        <img src="../IMAGES/affiches/2017.jpg" alt="Affiche de Fest'n Breizh 2017" title="Affiche 2017"></a>
-                    <a href="../IMAGES/affiches/2018_zoom.jpg">
-                        <img src="../IMAGES/affiches/2018.jpg" alt="Affiche de Fest'n Breizh 2018" title="Affiche 2018"></a>
-                    <a href="../IMAGES/affiches/2019_zoom.jpg">
-                        <img src="../IMAGES/affiches/2019.jpg" alt="Affiche de Fest'n Breizh 2019" title="Affiche 2019"></a>
-                    <a href="../IMAGES/affiches/2020_zoom.jpg">
-                        <img src="../IMAGES/affiches/2020.jpg" alt="Affiche de Fest'n Breizh 2020" title="Affiche 2020"></a>
-                    <a href="../IMAGES/affiches/2024_zoom.jpg">
-                        <img src="../IMAGES/affiches/2024.jpg" alt="Affiche de Fest'n Breizh 2024" title="Affiche 2024"></a>
+                        <figcaption>FnB 2012 (4e édition) - Graphisme : Tonin Jégou</figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2013_zoom.jpg">
+                            <img src="../IMAGES/affiches/2013.jpg" alt="Affiche de Fest'n Breizh 2013" title="Affiche 2013"></a>
+                            <figcaption>FnB (5e édition) - Graphisme : Benjamin Juhel </figcaption>
+                    </figure>
+
+                    <figure>            
+                        <a href="../IMAGES/affiches/2014_zoom.jpg">
+                            <img src="../IMAGES/affiches/2014.jpg" alt="Affiche de Fest'n Breizh 2014" title="Affiche 2014"></a>
+                            <figcaption>FnB 2014 (6e édition) - llustration : Gayiel Spade</figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2015_zoom.jpg">
+                            <img src="../IMAGES/affiches/2015.jpg" alt="Affiche de Fest'n Breizh 2015" title="Affiche 2015"></a>
+                            <figcaption>FnB 2015 (7e édition) - Ilustration : Mathilde André </figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2016_zoom.jpg">
+                            <img src="../IMAGES/affiches/2016.jpg" alt="Affiche de Fest'n Breizh 2016" title="Affiche 2016"></a>
+                            <figcaption>FnB 2016 (8e édition) - Photographie : Inès Kozic</figcaption>
+                    </figure>
+
+                    <figure>    
+                        <a href="../IMAGES/affiches/2017_zoom.jpg">
+                            <img src="../IMAGES/affiches/2017.jpg" alt="Affiche de Fest'n Breizh 2017" title="Affiche 2017"></a>
+                            <figcaption>FnB 2017 (9e édition) - Illustration : Dénoël André</figcaption>
+                    </figure>
+
+                    <figure>    
+                        <a href="../IMAGES/affiches/2018_zoom.jpg">
+                            <img src="../IMAGES/affiches/2018.jpg" alt="Affiche de Fest'n Breizh 2018" title="Affiche 2018"></a>
+                            <figcaption>FnB 2018 (10e édition) - Illustration : Marion Glédel</figcaption>
+                    </figure>
+
+                    <figure>  
+                        <a href="../IMAGES/affiches/2019_zoom.jpg">
+                            <img src="../IMAGES/affiches/2019.jpg" alt="Affiche de Fest'n Breizh 2019" title="Affiche 2019"></a>
+                            <figcaption>FnB 2019 (11e édition) - Illustration : Marion Glédel</figcaption>
+                    </figure>
+
+                    <figure>
+                        <a href="../IMAGES/affiches/2020_zoom.jpg">
+                            <img src="../IMAGES/affiches/2020.jpg" alt="Affiche de Fest'n Breizh 2020" title="Affiche 2020"></a>
+                            <figcaption>FnB 2020 (12e édition) - Illustration : Marion Glédel</figcaption>
+                    </figure>
+                    
+                    <figure>
+                        <a href="../IMAGES/affiches/2024_zoom.jpg">
+                            <img src="../IMAGES/affiches/2024.jpg" alt="Affiche de Fest'n Breizh 2024" title="Affiche 2024"></a>
+                            <figcaption>FnB 2024 (13e édition) - Illustration : Marion Glédel</figcaption>
+                    </figure>
                 </div>
             <!-- Modal pour afficher l'image en grand -->
             <div id="myModal" class="modal">
@@ -162,6 +224,7 @@
             </div>
         </footer>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
             // Fonction pour afficher le modal avec l'image agrandie
             document.querySelectorAll('.affiches a').forEach(item => {
                 item.addEventListener('click', event => {
@@ -169,7 +232,7 @@
                     const imgSrc = item.getAttribute('href');
                     const modal = document.getElementById('myModal');
                     const modalImg = document.getElementById('modalImg');
-                    modal.style.display = "block";
+                    modal.style.display = "flex";
                     modalImg.src = imgSrc;
                     document.body.classList.add('no-scroll'); // Bloque le défilement
                 });
@@ -185,10 +248,10 @@
             window.onclick = function(event) {
                 const modal = document.getElementById('myModal');
                 if (event.target == modal) {
-                    modal.style.display = "none";
-                    document.body.classList.remove('no-scroll'); // Débloque le défilement
+                    closeModal();
                 }
             };
+        });
         </script>
     </body>
 </html>
