@@ -1,0 +1,40 @@
+main{
+    margin: 100px;
+    padding: auto;
+}
+
+h1 {
+	font-family: Snell Roundhand, cursive;
+    font-weight: 700; 
+    margin: 0;
+}
+
+
+h2 {
+	font-weight: bold;
+	text-decoration:underline;
+}
+
+
+
+h3 { 
+	font-weight: bold;
+	text-decoration:underline;
+}
+
+
+.conteneur li { 
+    font-weight: bold;
+  }
+
+img {
+    width: 250px; 
+    height:auto; 
+}
+
+.invitées {
+    display:flex;
+    flex-direction:row;
+    justify-content: right;
+
+}
