@@ -1,40 +1,77 @@
 main{
-    margin: 100px;
+    margin: 100px ;
     padding: auto;
+    display:flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-h1 {
-	font-family: Snell Roundhand, cursive;
-    font-weight: 700; 
-    margin: 0;
+h1{
+    font-size: 2.5em;
+    text-decoration: underline;
 }
 
-
-h2 {
+h2{
 	font-weight: bold;
 	text-decoration:underline;
+    font-size: 2em;
 }
 
-
-
-h3 { 
-	font-weight: bold;
-	text-decoration:underline;
+ section ul, section li {
+    list-style: none;
+    padding-top: 50px;
+    margin-bottom: 70px;
 }
 
+ul li strong {
+    display: block; /* Force le titre à être sur sa propre ligne */
+    margin-bottom: 5px; /* Ajuste l'espace entre le titre et le paragraphe */
+}
 
-.conteneur li { 
-    font-weight: bold;
-  }
+ul li p {
+    margin-top: 0; /* Enlève la marge supérieure par défaut du paragraphe */
+    margin-bottom: 0px; /* Ajuste l'espace en bas du paragraphe si nécessaire */
+}
+
 
 img {
     width: 250px; 
     height:auto; 
 }
 
-.invitées {
-    display:flex;
-    flex-direction:row;
-    justify-content: right;
+a img {
+    width: 150px;
+    height: auto;
+}
 
+section strong { 
+    font-weight: bold;
+    font-size: 1.3em;
+  }
+
+.conteneur-gauche {
+    display: flex;
+    width: 45%;
+    flex-direction: column;
+}
+
+.conteneur-gauche > section{
+    margin-bottom: 0;
+}
+
+.conteneur-gauche, .invitées{
+    margin:0;
+}
+    
+.info, .prog{
+    margin-bottom: 20px;
+    padding:20px;
+    
+}
+
+.invitées {
+    width:50%;
+    position:relative;
+    top:200px;
+    padding:20px;
 }
