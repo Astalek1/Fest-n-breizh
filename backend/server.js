@@ -17,6 +17,11 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "festn-breizh-api" });
 });
 
+//route test API
+app.get("/test", (req,res) => {
+  res.json({"message": "API Fest'n Breizh active "})
+})
+
 // Démarrage serveur
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
