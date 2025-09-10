@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.get("/health", (req, res) => {
 app.get("/test", (req,res) => {
   res.json({"message": "API Fest'n Breizh active "})
 })
+
+connectDB();
 
 // Démarrage serveur
 const PORT = process.env.PORT || 4000;
