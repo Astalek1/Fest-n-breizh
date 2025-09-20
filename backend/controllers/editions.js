@@ -57,6 +57,15 @@ export const updateEdition = async (req, res) => {
         }
         };
 
+        // Vérification : au moins un artiste requis//
+        if (
+        filteredData.artistes &&
+        Array.isArray(filteredData.artistes) &&
+        filteredData.artistes.length < 1
+        ) {
+        return res.status(400).json("Une édition doit contenir au moins un artiste.");
+        }
+
         const newDataEdition = await Edition.findByIdAndUpdate(
         req.params.id,
         filteredData,
