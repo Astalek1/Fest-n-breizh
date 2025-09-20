@@ -3,11 +3,11 @@ import path from "path";
 
 // Tailles max par type (à ajuster plus tard si besoin)
 const SIZE_PRESETS = {
-    photo:   { width: 1600, height: 1600 },
-    affiche: { width: 1200, height: 1800 },
-    logo:    { width: 600,  height: 600  },
-    annonce: { width: 1000, height: 1000 },
-    default: { width: 1200, height: 1200 },
+  photo: { width: 1600, height: 1600 },
+  affiche: { width: 1200, height: 1800 },
+  logo: { width: 600, height: 600 },
+  annonce: { width: 1000, height: 1000 },
+  default: { width: 1200, height: 1200 },
 };
 
 export default async (req, res, next) => {
@@ -30,7 +30,7 @@ export default async (req, res, next) => {
     const optimizedBuffer = await sharp(req.file.buffer)
       .resize(preset.width, preset.height, {
         fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
       })
       .toFormat("webp", { quality: 80 }) // compression WebP
       .toBuffer();
