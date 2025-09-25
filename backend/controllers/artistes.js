@@ -44,7 +44,7 @@ export const getOneArtiste = async (req, res) => {
   try {
     const artiste = await Artiste.findById(req.params.id);
     if (!artiste) {
-      return res.status(404).json("Artiste non trouvée");
+      return res.status(404).json("Artiste non trouvé");
     }
     res.status(200).json(artiste);
   } catch (error) {
@@ -93,7 +93,7 @@ export const updateArtiste = async (req, res) => {
   }
 };
 
-// Supprimer un artiste
+// Supprimer un artiste //
 export const deleteArtiste = async (req, res) => {
   try {
     const artiste = await Artiste.findById(req.params.id);

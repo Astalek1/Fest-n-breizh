@@ -1,6 +1,6 @@
 import Edition from "../models/Editions";
 import Artiste from "../models/Artistes.js";
-import Invite from "../models/Invites.js";
+import Guest from "../models/Guests.js";
 import imagekit from "../config/imageKit";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
@@ -12,7 +12,7 @@ export const createEdition = async (req, res) => {
     const newEdition = new Edition({
       title: editionData.title,
       affiche: editionData.affiche,
-      invites: editionData.invites,
+      guests: editionData.guests,
       artistes: editionData.artistes,
     });
     await newEdition.save();
@@ -48,7 +48,7 @@ export const getOneEdition = async (req, res) => {
 //modifier une édition//
 export const updateEdition = async (req, res) => {
   try {
-    const allowedFields = ["title", "affiche", "invites", "artistes"];
+    const allowedFields = ["title", "affiche", "guests", "artistes"];
 
     const filteredData = {};
     for (const field of allowedFields) {
@@ -97,7 +97,7 @@ export const deleteEdition = async (req, res) => {
     }
 
     const artistesIds = edition.artistes || [];
-    const invitesIds = edition.invites || [];
+    const guestsIds = edition.guests || [];
 
     await Edition.findByIdAndDelete(req.params.id);
 
@@ -113,12 +113,12 @@ export const deleteEdition = async (req, res) => {
     }
 
     // Nettoyer invités
-    for (const inviteId of invitesIds) {
-      const stillUsed = await Edition.findOne({ invites: inviteId });
+    for (const guestId of guestsIds) {
+      const stillUsed = await Edition.findOne({ guests: guestId });
       if (!stillUsed) {
-        const invite = await Invite.findByIdAndDelete(inviteId);
-        if (invite?.mediaFileId && !(await isFileInUse(invite.mediaFileId))) {
-          await imagekit.deleteFile(invite.mediaFileId);
+        const guest = await Guest.findByIdAndDelete(guestId);
+        if (guest?.mediaFileId && !(await isFileInUse(guest.mediaFileId))) {
+          await imagekit.deleteFile(guest.mediaFileId);
         }
       }
     }
