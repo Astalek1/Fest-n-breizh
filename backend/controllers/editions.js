@@ -11,7 +11,7 @@ export const createEdition = async (req, res) => {
 
     const newEdition = new Edition({
       title: editionData.title,
-      affiche: editionData.affiche,
+      poster: editionData.poster,
       guests: editionData.guests,
       artistes: editionData.artistes,
     });
@@ -48,7 +48,7 @@ export const getOneEdition = async (req, res) => {
 //modifier une édition//
 export const updateEdition = async (req, res) => {
   try {
-    const allowedFields = ["title", "affiche", "guests", "artistes"];
+    const allowedFields = ["title", "poster", "guests", "artistes"];
 
     const filteredData = {};
     for (const field of allowedFields) {
