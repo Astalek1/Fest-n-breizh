@@ -19,7 +19,7 @@ export const newLink = async (req, res) => {
     const newLink = new Link({
       title: linkData.title,
       description: linkData.description,
-      url: linkData.url || null,
+      url: linkData.url || null, // facultatif
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
     });
@@ -74,6 +74,7 @@ export const updateLink = async (req, res) => {
       }
     }
 
+    // Gestion du logo si mis à jour
     if (req.file || req.body.logo) {
       const cleanName = (filteredData.title || existingLink.title)
         .replace(/\s+/g, "-")
@@ -87,6 +88,7 @@ export const updateLink = async (req, res) => {
       );
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
+      // Supprimer l'ancien logo si plus utilisé
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
         if (!inUse) {
