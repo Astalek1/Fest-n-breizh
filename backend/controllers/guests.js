@@ -12,7 +12,7 @@ export const newGuest = async (req, res) => {
     const mediaResult = await resolveMedia(
       guestData.media,
       req.file,
-      "/fest_breizh/guests",
+      "/festn_breizh/invités",
       cleanName
     );
 
@@ -70,7 +70,7 @@ export const updateGuest = async (req, res) => {
       const newMedia = await resolveMedia(
         filteredData.media,
         req.file,
-        "/fest_breizh/guests",
+        "/festn_breizh/invités",
         cleanName
       );
 
