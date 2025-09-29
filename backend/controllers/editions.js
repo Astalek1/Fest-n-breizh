@@ -1,5 +1,5 @@
 import Edition from "../models/Editions";
-import Artiste from "../models/Artistes.js";
+import Artist from "../models/Artists.js";
 import Guest from "../models/Guests.js";
 import imagekit from "../config/imageKit";
 import { isFileInUse } from "../utils/isFileInUse.js";
@@ -13,7 +13,7 @@ export const createEdition = async (req, res) => {
       title: editionData.title,
       poster: editionData.poster,
       guests: editionData.guests,
-      artistes: editionData.artistes,
+      artists: editionData.artists,
     });
     await newEdition.save();
     res.status(201).json({ message: "Édition créée avec succès !" });
@@ -48,7 +48,7 @@ export const getOneEdition = async (req, res) => {
 //modifier une édition//
 export const updateEdition = async (req, res) => {
   try {
-    const allowedFields = ["title", "poster", "guests", "artistes"];
+    const allowedFields = ["title", "poster", "guests", "artists"];
 
     const filteredData = {};
     for (const field of allowedFields) {
@@ -64,12 +64,12 @@ export const updateEdition = async (req, res) => {
     }
 
     // Vérification : au moins un artiste doit rester après update
-    const finalArtistes =
-      filteredData.artistes !== undefined
-        ? filteredData.artistes
-        : existingEdition.artistes;
+    const finalArtists =
+      filteredData.artists !== undefined
+        ? filteredData.artists
+        : existingEdition.artists;
 
-    if (!Array.isArray(finalArtistes) || finalArtistes.length < 1) {
+    if (!Array.isArray(finalArtists) || finalArtists.length < 1) {
       return res
         .status(400)
         .json("Une édition doit contenir au moins un artiste.");
@@ -96,18 +96,18 @@ export const deleteEdition = async (req, res) => {
       return res.status(404).json("Édition non trouvée");
     }
 
-    const artistesIds = edition.artistes || [];
+    const artistsIds = edition.artists || [];
     const guestsIds = edition.guests || [];
 
     await Edition.findByIdAndDelete(req.params.id);
 
     // Nettoyer artistes
-    for (const artisteId of artistesIds) {
-      const stillUsed = await Edition.findOne({ artistes: artisteId });
+    for (const artistId of artistsIds) {
+      const stillUsed = await Edition.findOne({ artists: artistId });
       if (!stillUsed) {
-        const artiste = await Artiste.findByIdAndDelete(artisteId);
-        if (artiste?.mediaFileId && !(await isFileInUse(artiste.mediaFileId))) {
-          await imagekit.deleteFile(artiste.mediaFileId);
+        const artist = await Artist.findByIdAndDelete(artistId);
+        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
+          await imagekit.deleteFile(artist.mediaFileId);
         }
       }
     }
