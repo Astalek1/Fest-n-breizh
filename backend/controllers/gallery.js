@@ -10,6 +10,11 @@ export const newPoster = async (req, res) => {
   try {
     const posterData = JSON.parse(req.body.poster);
 
+    // Vérification obligatoire de alt
+    if (!posterData.alt) {
+      return res.status(400).json("Le champ alt est obligatoire");
+    }
+
     const cleanName = posterData.title.replace(/\s+/g, "-").toLowerCase();
     const newMedia = await resolveMedia(
       posterData.media,
@@ -78,6 +83,10 @@ export const updatePoster = async (req, res) => {
         filteredData[field] = posterData[field];
     }
 
+    if (filteredData.alt !== undefined && !filteredData.alt) {
+      return res.status(400).json("Le champ alt ne peut pas être vide");
+    }
+
     if (req.file || posterData.media) {
       const cleanName = (posterData.title || existingPoster.title)
         .replace(/\s+/g, "-")
@@ -140,6 +149,10 @@ export const deletePoster = async (req, res) => {
 export const newPhoto = async (req, res) => {
   try {
     const photoData = JSON.parse(req.body.photo);
+
+    if (!photoData.alt) {
+      return res.status(400).json("Le champ alt est obligatoire");
+    }
 
     const cleanName = photoData.title.replace(/\s+/g, "-").toLowerCase();
     const newMedia = await resolveMedia(
@@ -204,6 +217,10 @@ export const updatePhoto = async (req, res) => {
     for (const field of allowedFields) {
       if (photoData[field] !== undefined)
         filteredData[field] = photoData[field];
+    }
+
+    if (filteredData.alt !== undefined && !filteredData.alt) {
+      return res.status(400).json("Le champ alt ne peut pas être vide");
     }
 
     if (req.file || photoData.media) {
