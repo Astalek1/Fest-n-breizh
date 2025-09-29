@@ -17,7 +17,7 @@ export const newPartner = async (req, res) => {
     );
 
     const newPartner = new Partner({
-      title: partnerData.title,
+      name: partnerData.name,
       description: partnerData.description,
       url: partnerData.url || null, // facultatif
       logo: mediaResult.url,
@@ -65,7 +65,7 @@ export const updatePartner = async (req, res) => {
       return res.status(404).json("partenaire non trouvée");
     }
 
-    const allowedFields = ["title", "url", "description"];
+    const allowedFields = ["name", "url", "description"];
 
     const filteredData = {};
     for (const field of allowedFields) {
@@ -75,7 +75,7 @@ export const updatePartner = async (req, res) => {
     }
     // Gestion du logo si mis à jour
     if (req.file || req.body.logo) {
-      const cleanName = (filteredData.title || existingPartner.title)
+      const cleanName = (filteredData.name || existingPartner.name)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
