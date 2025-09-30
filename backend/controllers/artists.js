@@ -16,11 +16,23 @@ export const newArtist = async (req, res) => {
       cleanName
     );
 
+    let logoResult = null;
+    if (artistData.logo) {
+      logoResult = await resolveMedia(
+        artistData.logo,
+        null,
+        "/festn_breizh/logos",
+        `${cleanName}-logo`
+      );
+    }
+
     const newArtist = new Artist({
       name: artistData.name,
       description: artistData.description,
       media: mediaResult.url,
       mediaFileId: mediaResult.fileId,
+      logo: logoResult ? logoResult.url : null,
+      logoFileId: logoResult ? logoResult.fileId : null,
     });
     await newArtist.save();
     res.status(201).json({ message: "Artiste ajouté avec succès !" });
@@ -82,6 +94,29 @@ export const updateArtist = async (req, res) => {
       filteredData.media = newMedia.url;
       filteredData.mediaFileId = newMedia.fileId;
     }
+
+    if (req.body.logo) {
+      const cleanName = (filteredData.name || artist.name)
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
+      const newLogo = await resolveMedia(
+        req.body.logo,
+        null,
+        "/festn_breizh/logos",
+        `${cleanName}-logo`
+      );
+
+      if (!newLogo?.url) return res.status(400).json("Logo invalide");
+
+      if (artist.logoFileId && newLogo.fileId) {
+        await imagekit.deleteFile(artist.logoFileId);
+      }
+
+      filteredData.logo = newLogo.url;
+      filteredData.logoFileId = newLogo.fileId;
+    }
+
     const updatedArtist = await Artist.findByIdAndUpdate(
       req.params.id,
       filteredData,
@@ -107,6 +142,13 @@ export const deleteArtist = async (req, res) => {
 
       if (!inUse) {
         await imagekit.deleteFile(artist.mediaFileId);
+      }
+    }
+
+    if (artist.logoFileId) {
+      const inUse = await isFileInUse(artist.logoFileId);
+      if (!inUse) {
+        await imagekit.deleteFile(artist.logoFileId);
       }
     }
 

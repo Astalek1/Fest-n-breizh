@@ -16,11 +16,23 @@ export const newGuest = async (req, res) => {
       cleanName
     );
 
+    let logoResult = null;
+    if (guestData.logo) {
+      logoResult = await resolveMedia(
+        guestData.logo,
+        null,
+        "/festn_breizh/logos",
+        `${cleanName}-logo`
+      );
+    }
+
     const newGuest = new Guest({
       name: guestData.name,
       description: guestData.description,
       media: mediaResult.url,
       mediaFileId: mediaResult.fileId,
+      logo: logoResult?.url || null,
+      logoFileId: logoResult?.fileId || null,
     });
     await newGuest.save();
     res.status(201).json({ message: "invité ajouté avec succès !" });
@@ -58,15 +70,17 @@ export const updateGuest = async (req, res) => {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json("Invité non trouvé");
 
-    const allowedFields = ["name", "description", "media"];
+    const allowedFields = ["name", "description", "media", "logo"];
     const filteredData = Object.fromEntries(
       Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
     );
-    if (req.file || filteredData.media) {
-      const cleanName = (filteredData.name || guest.name)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
 
+    const cleanName = (filteredData.name || guest.name)
+      .replace(/\s+/g, "-")
+      .toLowerCase();
+
+    // Gestion du média principal
+    if (req.file || filteredData.media) {
       const newMedia = await resolveMedia(
         filteredData.media,
         req.file,
@@ -79,14 +93,36 @@ export const updateGuest = async (req, res) => {
       if (guest.mediaFileId && newMedia.fileId) {
         await imagekit.deleteFile(guest.mediaFileId);
       }
+
       filteredData.media = newMedia.url;
       filteredData.mediaFileId = newMedia.fileId;
     }
+
+    // Gestion du logo (optionnel)
+    if (filteredData.logo) {
+      const newLogo = await resolveMedia(
+        filteredData.logo,
+        null,
+        "/festn_breizh/logos",
+        `${cleanName}-logo`
+      );
+
+      if (!newLogo?.url) return res.status(400).json("Logo invalide");
+
+      if (guest.logoFileId && newLogo.fileId) {
+        await imagekit.deleteFile(guest.logoFileId);
+      }
+
+      filteredData.logo = newLogo.url;
+      filteredData.logoFileId = newLogo.fileId;
+    }
+
     const updatedGuest = await Guest.findByIdAndUpdate(
       req.params.id,
       filteredData,
       { new: true, runValidators: true }
     );
+
     res.status(200).json(updatedGuest);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -106,6 +142,13 @@ export const deleteGuest = async (req, res) => {
 
       if (!inUse) {
         await imagekit.deleteFile(guest.mediaFileId);
+      }
+    }
+
+    if (guest.logoFileId) {
+      const inUse = await isFileInUse(guest.logoFileId);
+      if (!inUse) {
+        await imagekit.deleteFile(guest.logoFileId);
       }
     }
 
