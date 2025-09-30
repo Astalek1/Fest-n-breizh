@@ -2,15 +2,17 @@ import express from "express";
 import auth from "../middleware/auth";
 import multer from "../middleware/multer";
 import resizeImage from "../middleware/resizeImage";
-import * as userCtrl from "../controllers/editions.js";
+import * as editionsCtrl from "../controllers/editions.js";
 
 const router = express.Router();
 
-router.get("/");
-router.get("/:id");
+router.get("/", editionsCtrl.getAllEditions);
+router.get("/:id", editionsCtrl.getOneEdition);
 
-router.post("/", auth, multer, resizeImage);
+router.post("/", auth, multer, resizeImage, editionsCtrl.createEdition);
 
-router.put("/:id", auth, multer, resizeImage);
+router.put("/:id", auth, multer, resizeImage, editionsCtrl.updateEdition);
 
-router.delete("/:id", auth);
+router.delete("/:id", auth, editionsCtrl.deleteEdition);
+
+export default router;
