@@ -19,7 +19,7 @@ export const newLink = async (req, res) => {
     const newLink = new Link({
       title: linkData.title,
       description: linkData.description,
-      url: linkData.url || null, // facultatif
+      url: linkData.url,
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
     });
