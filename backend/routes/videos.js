@@ -1,5 +1,5 @@
 import express from "express";
-import auth from "../middleware/auth";
+import auth from "../middleware/auth.js";
 import * as videosCtrl from "../controllers/videos.js";
 
 const router = express.Router();

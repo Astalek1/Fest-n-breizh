@@ -1,7 +1,7 @@
 import express from "express";
-import auth from "../middleware/auth";
-import multer from "../middleware/multer";
-import resizeImage from "../middleware/resizeImage";
+import auth from "../middleware/auth.js";
+import multer from "../middleware/multer.js";
+import resizeImage from "../middleware/resizeImage.js";
 import * as editionsCtrl from "../controllers/editions.js";
 
 const router = express.Router();
