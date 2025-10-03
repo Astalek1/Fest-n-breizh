@@ -1,6 +1,6 @@
 import Link from "../models/Links.js";
-import imagekit from "../config/imageKit";
-import { resolveMedia } from "../utils/resolveMedia";
+import imagekit from "../config/imageKit.js";
+import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
 // créer un nouveau lien //

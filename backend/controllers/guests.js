@@ -1,7 +1,7 @@
-import Guest from "../models/Guests";
-import imagekit from "../config/imageKit";
-import { resolveMedia } from "../utils/resolveMedia";
-import { isFileInUse } from "../utils/isFileInUse";
+import Guest from "../models/Guests.js";
+import imagekit from "../config/imageKit.js";
+import { resolveMedia } from "../utils/resolveMedia.js";
+import { isFileInUse } from "../utils/isFileInUse.js";
 
 //créer un nouvel invité//
 export const newGuest = async (req, res) => {

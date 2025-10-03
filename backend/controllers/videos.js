@@ -1,4 +1,4 @@
-import Video from "../models/Video.js";
+import Video from "../models/Videos.js";
 
 // créée une nouvelle vidéo //
 export const newVideo = async (req, res) => {

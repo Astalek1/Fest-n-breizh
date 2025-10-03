@@ -1,7 +1,7 @@
-import Edition from "../models/Editions";
+import Edition from "../models/Editions.js";
 import Artist from "../models/Artists.js";
 import Guest from "../models/Guests.js";
-import imagekit from "../config/imageKit";
+import imagekit from "../config/imageKit.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
 //créer une nouvelle edition//

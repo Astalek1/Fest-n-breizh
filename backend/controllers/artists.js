@@ -1,7 +1,7 @@
-import Artist from "../models/Artists";
-import imagekit from "../config/imageKit";
-import { resolveMedia } from "../utils/resolveMedia";
-import { isFileInUse } from "../utils/isFileInUse";
+import Artist from "../models/Artists.js";
+import imagekit from "../config/imageKit.js";
+import { resolveMedia } from "../utils/resolveMedia.js";
+import { isFileInUse } from "../utils/isFileInUse.js";
 
 //créer un nouvel artistes//
 export const newArtist = async (req, res) => {
