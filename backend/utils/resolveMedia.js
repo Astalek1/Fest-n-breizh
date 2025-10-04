@@ -1,10 +1,10 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  //  1. Cas : URL externe directe
+  // 1️ Cas : l’utilisateur fournit directement une URL externe
   if (typeof media === "string") {
     try {
-      new URL(media); // vérifie que c'est une URL valide
+      new URL(media); // Vérifie si c’est une URL valide
       return {
         url: media,
         urlSmall: null,
@@ -12,13 +12,32 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
         fileIdSmall: null,
       };
     } catch {
-      // ce n'est pas une URL valide → on passe à l'upload
+      // Pas une URL valide → on passe à l’upload
     }
   }
 
-  //  2. Cas : upload d’un fichier envoyé via Sharp
+  // 2️ Cas : upload via Sharp → on vérifie si le fichier existe déjà
   if (file) {
-    // Si Sharp a généré deux versions (photo/poster)
+    // Vérifie si un fichier portant le même nom existe déjà dans le dossier
+    const existingFiles = await imagekit.listFiles({
+      searchQuery: `name="${cleanName}" AND path="${folder}"`,
+      limit: 2,
+    });
+
+    if (existingFiles.length > 0) {
+      // 🔹 Si déjà présent → on réutilise les URLs existantes
+      const large = existingFiles.find((f) => f.name.includes("large"));
+      const small = existingFiles.find((f) => f.name.includes("small"));
+
+      return {
+        url: large ? large.url : small?.url || null,
+        urlSmall: small ? small.url : null,
+        fileId: large ? large.fileId : small?.fileId || null,
+        fileIdSmall: small ? small.fileId : null,
+      };
+    }
+
+    // 3️ Upload si le fichier n’existe pas encore
     if (file.bufferSmall && file.bufferLarge) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
@@ -41,7 +60,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // Sinon → version unique (logos, annonces, etc.)
+    // Sinon → upload simple (logos, annonces, etc.)
     if (file.buffer) {
       const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
@@ -58,7 +77,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  //  3. Rien d'exploitable
+  // 4️Aucun média exploitable
   return {
     url: null,
     urlSmall: null,
