@@ -1,20 +1,24 @@
 import imagekit from "../config/imageKit.js";
 
-// Fonction pour résoudre le média (URL externe ou upload ImageKit) //
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  // 1️ Cas : l’utilisateur fournit directement une URL
+  //  1. Cas : URL externe directe
   if (typeof media === "string") {
     try {
-      new URL(media); // Vérifie si c’est une vraie URL
-      return { url: media, fileId: null }; // Pas besoin d’upload
+      new URL(media); // vérifie que c'est une URL valide
+      return {
+        url: media,
+        urlSmall: null,
+        fileId: null,
+        fileIdSmall: null,
+      };
     } catch {
-      // Pas une URL valide → on continue
+      // ce n'est pas une URL valide → on passe à l'upload
     }
   }
 
-  // 2️ Cas : upload d’une image envoyée via req.file (photo, affiche, logo, etc.)
+  //  2. Cas : upload d’un fichier envoyé via Sharp
   if (file) {
-    // Si Sharp a créé deux versions → upload les deux
+    // Si Sharp a généré deux versions (photo/poster)
     if (file.bufferSmall && file.bufferLarge) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
@@ -30,25 +34,35 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       ]);
 
       return {
+        url: largeUpload.url,
         urlSmall: smallUpload.url,
+        fileId: largeUpload.fileId,
         fileIdSmall: smallUpload.fileId,
-        urlLarge: largeUpload.url,
-        fileIdLarge: largeUpload.fileId,
       };
     }
 
-    // Sinon, version unique (logos, annonces, etc.)
+    // Sinon → version unique (logos, annonces, etc.)
     if (file.buffer) {
-      const uploadResult = await imagekit.upload({
+      const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
         fileName: file.filename || `${cleanName}-${Date.now()}.webp`,
         folder,
       });
 
-      return { url: uploadResult.url, fileId: uploadResult.fileId };
+      return {
+        url: upload.url,
+        urlSmall: null,
+        fileId: upload.fileId,
+        fileIdSmall: null,
+      };
     }
   }
 
-  //  3 Rien d’exploitable
-  return { url: null, fileId: null };
+  //  3. Rien d'exploitable
+  return {
+    url: null,
+    urlSmall: null,
+    fileId: null,
+    fileIdSmall: null,
+  };
 };
