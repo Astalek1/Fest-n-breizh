@@ -3,8 +3,14 @@ import path from "path";
 
 // Tailles max par type (à ajuster plus tard si besoin)
 const SIZE_PRESETS = {
-  photo: { width: 1600, height: 1600 },
-  affiche: { width: 1200, height: 1800 },
+  photo: {
+    small: { width: 600, height: 600 },
+    large: { width: 1600, height: 1600 },
+  },
+  affiche: {
+    small: { width: 800, height: 1200 },
+    large: { width: 1200, height: 1800 },
+  },
   logo: { width: 600, height: 600 },
   annonce: { width: 1000, height: 1000 },
   default: { width: 1200, height: 1200 },
@@ -21,22 +27,50 @@ export default async (req, res, next) => {
     .replace(/[^\w\-]/g, "")
     .toLowerCase();
 
-  // récupère le preset demandé (par défaut : photo)
-  const preset = SIZE_PRESETS[req.body.type] || SIZE_PRESETS.photo;
-
-  const filename = `${safeName}-${Date.now()}.webp`;
+  const type = req.body.type;
+  const preset = SIZE_PRESETS[type] || SIZE_PRESETS.photo;
 
   try {
-    const optimizedBuffer = await sharp(req.file.buffer)
-      .resize(preset.width, preset.height, {
-        fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
-      })
-      .toFormat("webp", { quality: 80 }) // compression WebP
-      .toBuffer();
+    // Si photo ou affiche → deux versions
+    if (preset.small && preset.large) {
+      // petite version
+      const smallBuffer = await sharp(req.file.buffer)
+        .resize(preset.small.width, preset.small.height, {
+          fit: "contain",
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .toFormat("webp", { quality: 75 })
+        .toBuffer();
 
-    req.file.buffer = optimizedBuffer;
-    req.file.filename = filename;
+      // grande version
+      const largeBuffer = await sharp(req.file.buffer)
+        .resize(preset.large.width, preset.large.height, {
+          fit: "contain",
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .toFormat("webp", { quality: 85 })
+        .toBuffer();
+
+      req.file = {
+        bufferSmall: smallBuffer,
+        filenameSmall: `${safeName}-small-${Date.now()}.webp`,
+        bufferLarge: largeBuffer,
+        filenameLarge: `${safeName}-large-${Date.now()}.webp`,
+        mimetype: "image/webp",
+      };
+    } else {
+      // Sinon → version unique
+      const optimizedBuffer = await sharp(req.file.buffer)
+        .resize(preset.width, preset.height, {
+          fit: "contain",
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
+        .toFormat("webp", { quality: 80 })
+        .toBuffer();
+
+      req.file.buffer = optimizedBuffer;
+      req.file.filename = `${safeName}-${Date.now()}.webp`;
+    }
 
     next();
   } catch (error) {
