@@ -84,7 +84,7 @@ export const updatePoster = async (req, res) => {
     });
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
-    const posterData = req.body;
+    const posterData = req.body.poster ? JSON.parse(req.body.poster) : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
@@ -144,16 +144,15 @@ export const deletePoster = async (req, res) => {
     });
     if (!poster) return res.status(404).json("Affiche non trouvée");
 
-    if (
-      poster.mediaFileIdLarge &&
-      !(await isFileInUse(poster.mediaFileIdLarge))
-    )
-      await imagekit.deleteFile(poster.mediaFileIdLarge);
-    if (
-      poster.mediaFileIdSmall &&
-      !(await isFileInUse(poster.mediaFileIdSmall))
-    )
-      await imagekit.deleteFile(poster.mediaFileIdSmall);
+    if (poster.mediaFileIdLarge) {
+      const stillUsed = await isFileInUse(poster.mediaFileIdLarge);
+      if (!stillUsed) await imagekit.deleteFile(poster.mediaFileIdLarge);
+    }
+
+    if (poster.mediaFileIdSmall) {
+      const stillUsed = await isFileInUse(poster.mediaFileIdSmall);
+      if (!stillUsed) await imagekit.deleteFile(poster.mediaFileIdSmall);
+    }
 
     res.status(200).json("Affiche supprimée avec succès");
   } catch (error) {
@@ -165,7 +164,6 @@ export const deletePoster = async (req, res) => {
 // ===============         PHOTOS         =================
 // ========================================================
 
-// Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
   try {
     const photoData = JSON.parse(req.body.photoData);
@@ -209,7 +207,6 @@ export const newPhoto = async (req, res) => {
   }
 };
 
-// Récupérer toutes les photos
 export const getAllPhotos = async (req, res) => {
   try {
     const photos = await Gallery.find({ type: "photo" });
@@ -219,7 +216,6 @@ export const getAllPhotos = async (req, res) => {
   }
 };
 
-// Récupérer une photo
 export const getOnePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOne({ _id: req.params.id, type: "photo" });
@@ -230,7 +226,6 @@ export const getOnePhoto = async (req, res) => {
   }
 };
 
-// Modifier une photo
 export const updatePhoto = async (req, res) => {
   try {
     const existingPhoto = await Gallery.findOne({
@@ -239,7 +234,9 @@ export const updatePhoto = async (req, res) => {
     });
     if (!existingPhoto) return res.status(404).json("Photo non trouvée");
 
-    const photoData = req.body;
+    const photoData = req.body.photoData
+      ? JSON.parse(req.body.photoData)
+      : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
@@ -290,7 +287,6 @@ export const updatePhoto = async (req, res) => {
   }
 };
 
-// Supprimer une photo
 export const deletePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOneAndDelete({
@@ -299,10 +295,15 @@ export const deletePhoto = async (req, res) => {
     });
     if (!photo) return res.status(404).json("Photo non trouvée");
 
-    if (photo.mediaFileIdLarge && !(await isFileInUse(photo.mediaFileIdLarge)))
-      await imagekit.deleteFile(photo.mediaFileIdLarge);
-    if (photo.mediaFileIdSmall && !(await isFileInUse(photo.mediaFileIdSmall)))
-      await imagekit.deleteFile(photo.mediaFileIdSmall);
+    if (photo.mediaFileIdLarge) {
+      const stillUsed = await isFileInUse(photo.mediaFileIdLarge);
+      if (!stillUsed) await imagekit.deleteFile(photo.mediaFileIdLarge);
+    }
+
+    if (photo.mediaFileIdSmall) {
+      const stillUsed = await isFileInUse(photo.mediaFileIdSmall);
+      if (!stillUsed) await imagekit.deleteFile(photo.mediaFileIdSmall);
+    }
 
     res.status(200).json("Photo supprimée avec succès");
   } catch (error) {

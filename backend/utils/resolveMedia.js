@@ -1,7 +1,7 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  // Cas 1 : URL externe
+  // 1. Si c’est une URL directe (non upload)
   if (typeof media === "string") {
     try {
       new URL(media);
@@ -12,23 +12,25 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
         fileIdSmall: null,
       };
     } catch {
-      // pas une URL → on continue
+      // pas une URL valide → on continue
     }
   }
 
-  // Cas 2 : upload (Sharp a créé une ou deux versions)
+  // 2. Upload depuis req.file (Sharp)
   if (file) {
-    // deux versions (photo / poster)
+    // Si Sharp a généré deux versions
     if (file.bufferSmall && file.bufferLarge) {
+      const timestamp = Date.now();
+
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),
-          fileName: file.filenameSmall,
+          fileName: `${cleanName}-small-${timestamp}.webp`,
           folder,
         }),
         imagekit.upload({
           file: file.bufferLarge.toString("base64"),
-          fileName: file.filenameLarge,
+          fileName: `${cleanName}-large-${timestamp}.webp`,
           folder,
         }),
       ]);
@@ -41,11 +43,11 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // une seule version (logo / annonce)
+    // Sinon, image unique (logos, annonces, etc.)
     if (file.buffer) {
       const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
-        fileName: file.filename || `${cleanName}-${Date.now()}.webp`,
+        fileName: `${cleanName}-${Date.now()}.webp`,
         folder,
       });
 
@@ -58,7 +60,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  // Cas 3 : aucun média valide
+  // 3. Rien d’exploitable
   return {
     url: null,
     urlSmall: null,
