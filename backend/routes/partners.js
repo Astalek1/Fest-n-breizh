@@ -9,9 +9,21 @@ const router = express.Router();
 router.get("/", partnersCtrl.getAllPartners);
 router.get("/:id", partnersCtrl.getOnePartner);
 
-router.post("/", auth, multer, resizeImage, partnersCtrl.newPartner);
+router.post(
+  "/",
+  auth,
+  multer.single("media"),
+  resizeImage,
+  partnersCtrl.newPartner
+);
 
-router.put("/:id", auth, multer, resizeImage, partnersCtrl.updatePartner);
+router.put(
+  "/:id",
+  auth,
+  multer.single("media"),
+  resizeImage,
+  partnersCtrl.updatePartner
+);
 
 router.delete("/:id", auth, partnersCtrl.deletePartner);
 

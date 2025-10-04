@@ -9,9 +9,21 @@ const router = express.Router();
 router.get("/", editionsCtrl.getAllEditions);
 router.get("/:id", editionsCtrl.getOneEdition);
 
-router.post("/", auth, multer, resizeImage, editionsCtrl.createEdition);
+router.post(
+  "/",
+  auth,
+  multer.single("media"),
+  resizeImage,
+  editionsCtrl.createEdition
+);
 
-router.put("/:id", auth, multer, resizeImage, editionsCtrl.updateEdition);
+router.put(
+  "/:id",
+  auth,
+  multer.single("media"),
+  resizeImage,
+  editionsCtrl.updateEdition
+);
 
 router.delete("/:id", auth, editionsCtrl.deleteEdition);
 

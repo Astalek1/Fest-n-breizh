@@ -1,29 +1,56 @@
 import express from "express";
-import auth from "../middleware/auth.js";
+import {
+  newPoster,
+  getAllPosters,
+  getOnePoster,
+  updatePoster,
+  deletePoster,
+  newPhoto,
+  getAllPhotos,
+  getOnePhoto,
+  updatePhoto,
+  deletePhoto,
+} from "../controllers/gallery.js";
 import multer from "../middleware/multer.js";
-import resizeImage from "../middleware/resizeImage.js";
-import * as galleryCtrl from "../controllers/gallery.js";
 
 const router = express.Router();
 
-// *********** ROUTES PHOTOS *********** //
-router.get("/photos", galleryCtrl.getAllPhotos);
-router.get("/photos/:id", galleryCtrl.getOnePhoto);
+// ========================================================
+// ===============        AFFICHES        =================
+// ========================================================
 
-router.post("/photos", auth, multer, resizeImage, galleryCtrl.newPhoto);
+// Créer une nouvelle affiche
+router.post("/posters", multer.single("media"), newPoster);
 
-router.put("/photos/:id", auth, multer, resizeImage, galleryCtrl.updatePhoto);
+// Récupérer toutes les affiches
+router.get("/posters", getAllPosters);
 
-router.delete("/photos/:id", auth, galleryCtrl.deletePhoto);
+// Récupérer une affiche spécifique
+router.get("/posters/:id", getOnePoster);
 
-// *********** ROUTES POSTERS *********** //
-router.get("/posters", galleryCtrl.getAllPosters);
-router.get("/posters/:id", galleryCtrl.getOnePoster);
+// Modifier une affiche
+router.put("/posters/:id", multer.single("media"), updatePoster);
 
-router.post("/posters", auth, multer, resizeImage, galleryCtrl.newPoster);
+// Supprimer une affiche
+router.delete("/posters/:id", deletePoster);
 
-router.put("/posters/:id", auth, multer, resizeImage, galleryCtrl.updatePoster);
+// ========================================================
+// ===============         PHOTOS         =================
+// ========================================================
 
-router.delete("/posters/:id", auth, galleryCtrl.deletePoster);
+// Créer une nouvelle photo
+router.post("/photos", multer.single("media"), newPhoto);
+
+// Récupérer toutes les photos
+router.get("/photos", getAllPhotos);
+
+// Récupérer une photo spécifique
+router.get("/photos/:id", getOnePhoto);
+
+// Modifier une photo
+router.put("/photos/:id", multer.single("media"), updatePhoto);
+
+// Supprimer une photo
+router.delete("/photos/:id", deletePhoto);
 
 export default router;

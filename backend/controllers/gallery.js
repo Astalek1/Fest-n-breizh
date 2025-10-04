@@ -14,7 +14,6 @@ export const newPoster = async (req, res) => {
     if (!posterData.alt)
       return res.status(400).json("Le champ alt est obligatoire");
 
-    // Vérifie si une affiche du même titre existe déjà
     const existing = await Gallery.findOne({
       title: posterData.title,
       type: "poster",
@@ -112,7 +111,6 @@ export const updatePoster = async (req, res) => {
       if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
 
-      // 🧹 Supprime les anciennes versions
       if (existingPoster.mediaFileIdLarge)
         await imagekit.deleteFile(existingPoster.mediaFileIdLarge);
       if (existingPoster.mediaFileIdSmall)
@@ -137,7 +135,7 @@ export const updatePoster = async (req, res) => {
   }
 };
 
-//  Supprimer une affiche
+// Supprimer une affiche
 export const deletePoster = async (req, res) => {
   try {
     const poster = await Gallery.findOneAndDelete({
@@ -166,6 +164,7 @@ export const deletePoster = async (req, res) => {
 // ========================================================
 // ===============         PHOTOS         =================
 // ========================================================
+
 // Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
   try {
@@ -173,7 +172,6 @@ export const newPhoto = async (req, res) => {
     if (!photoData.alt)
       return res.status(400).json("Le champ alt est obligatoire");
 
-    // Vérifie si une photo du même titre existe déjà
     const existing = await Gallery.findOne({
       title: photoData.title,
       type: "photo",
@@ -207,12 +205,11 @@ export const newPhoto = async (req, res) => {
     await newPhoto.save();
     res.status(201).json({ message: "Photo créée avec succès !" });
   } catch (error) {
-    console.error("❌ ERREUR newPhoto :", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-//  Récupérer toutes les photos
+// Récupérer toutes les photos
 export const getAllPhotos = async (req, res) => {
   try {
     const photos = await Gallery.find({ type: "photo" });
@@ -222,7 +219,7 @@ export const getAllPhotos = async (req, res) => {
   }
 };
 
-//  Récupérer une photo
+// Récupérer une photo
 export const getOnePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOne({ _id: req.params.id, type: "photo" });
@@ -233,7 +230,7 @@ export const getOnePhoto = async (req, res) => {
   }
 };
 
-//  Modifier une photo
+// Modifier une photo
 export const updatePhoto = async (req, res) => {
   try {
     const existingPhoto = await Gallery.findOne({
@@ -269,7 +266,6 @@ export const updatePhoto = async (req, res) => {
       if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
 
-      // 🧹 Supprime les anciennes versions
       if (existingPhoto.mediaFileIdLarge)
         await imagekit.deleteFile(existingPhoto.mediaFileIdLarge);
       if (existingPhoto.mediaFileIdSmall)
@@ -294,7 +290,7 @@ export const updatePhoto = async (req, res) => {
   }
 };
 
-//  Supprimer une photo
+// Supprimer une photo
 export const deletePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOneAndDelete({

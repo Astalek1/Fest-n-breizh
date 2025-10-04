@@ -1,9 +1,17 @@
 import multer from "multer";
 
-// stockage en mémoire uniquement
+// Utilisation de memoryStorage pour Sharp
 const storage = multer.memoryStorage();
 
-const upload = multer({ storage });
+// Filtre simple (facultatif, mais recommandé)
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Seules les images sont autorisées"), false);
+  }
+};
 
-// accepte tous les fichiers envoyés
-export default upload.single("media");
+const upload = multer({ storage, fileFilter });
+
+export default upload;
