@@ -269,6 +269,7 @@ export const getOnePhoto = async (req, res) => {
 };
 
 // Modifier une photo
+// Modifier une photo
 export const updatePhoto = async (req, res) => {
   try {
     const existingPhoto = await Gallery.findOne({
@@ -288,56 +289,39 @@ export const updatePhoto = async (req, res) => {
         filteredData[field] = photoData[field];
     }
 
+    // === Si une nouvelle image est envoyée ===
     if (req.file || photoData.media) {
       const cleanName = (photoData.title || existingPhoto.title)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-      console.log("Tentative suppression anciennes images...");
+      // 🔥 Correction : toujours tester les 3 variantes possibles
+      const possibleLargeIds = [
+        existingPhoto.mediaFileIdLarge,
+        existingPhoto.mediaFileId,
+        existingPhoto.fileId, // ancienne clé possible
+      ].filter(Boolean);
 
-      console.log(" Vérif fichiers existants :", {
-        large: existingPhoto.mediaFileIdLarge,
-        small: existingPhoto.mediaFileIdSmall,
-      });
+      const possibleSmallIds = [
+        existingPhoto.mediaFileIdSmall,
+        existingPhoto.fileIdSmall,
+      ].filter(Boolean);
 
-      if (existingPhoto.mediaFileIdLarge) {
-        console.log("Suppression LARGE :", existingPhoto.mediaFileIdLarge);
-        await imagekit
-          .deleteFile(existingPhoto.mediaFileIdLarge)
-          .then(() =>
-            console.log(
-              "Image large supprimée :",
-              existingPhoto.mediaFileIdLarge
-            )
-          )
-          .catch((err) =>
-            console.log("Erreur suppression large :", err.message)
-          );
+      // 🔄 Suppression des anciennes images si elles existent
+      for (const id of possibleLargeIds) {
+        await imagekit.deleteFile(id).catch(() => {});
+      }
+      for (const id of possibleSmallIds) {
+        await imagekit.deleteFile(id).catch(() => {});
       }
 
-      if (existingPhoto.mediaFileIdSmall) {
-        console.log(" Suppression SMALL :", existingPhoto.mediaFileIdSmall);
-        await imagekit
-          .deleteFile(existingPhoto.mediaFileIdSmall)
-          .then(() =>
-            console.log(
-              "Image small supprimée :",
-              existingPhoto.mediaFileIdSmall
-            )
-          )
-          .catch((err) =>
-            console.log("Erreur suppression small :", err.message)
-          );
-      }
-
-      console.log("Upload du nouveau média...");
+      // 📤 Upload du nouveau média
       const newMedia = await resolveMedia(
         photoData.media,
         req.file,
         "festn_breizh/photos",
         cleanName
       );
-      console.log("Upload terminé :", newMedia);
 
       if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
