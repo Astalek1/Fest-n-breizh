@@ -75,7 +75,7 @@ export const getOnePoster = async (req, res) => {
   }
 };
 
-// Modifier une affiche
+//modifier une affiche
 export const updatePoster = async (req, res) => {
   try {
     const existingPoster = await Gallery.findOne({
@@ -85,6 +85,7 @@ export const updatePoster = async (req, res) => {
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
     const posterData = req.body.poster ? JSON.parse(req.body.poster) : req.body;
+
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
@@ -93,14 +94,24 @@ export const updatePoster = async (req, res) => {
         filteredData[field] = posterData[field];
     }
 
-    if (filteredData.alt !== undefined && !filteredData.alt)
-      return res.status(400).json("Le champ alt ne peut pas être vide");
-
     if (req.file || posterData.media) {
       const cleanName = (posterData.title || existingPoster.title)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
+      // Supprimer les anciennes images AVANT upload
+      if (existingPoster.mediaFileIdLarge) {
+        const stillUsed = await isFileInUse(existingPoster.mediaFileIdLarge);
+        if (!stillUsed)
+          await imagekit.deleteFile(existingPoster.mediaFileIdLarge);
+      }
+      if (existingPoster.mediaFileIdSmall) {
+        const stillUsed = await isFileInUse(existingPoster.mediaFileIdSmall);
+        if (!stillUsed)
+          await imagekit.deleteFile(existingPoster.mediaFileIdSmall);
+      }
+
+      // Uploader la nouvelle image
       const newMedia = await resolveMedia(
         posterData.media,
         req.file,
@@ -110,11 +121,6 @@ export const updatePoster = async (req, res) => {
 
       if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
-
-      if (existingPoster.mediaFileIdLarge)
-        await imagekit.deleteFile(existingPoster.mediaFileIdLarge);
-      if (existingPoster.mediaFileIdSmall)
-        await imagekit.deleteFile(existingPoster.mediaFileIdSmall);
 
       filteredData.url = newMedia.urlLarge || newMedia.url;
       filteredData.urlSmall = newMedia.urlSmall || null;
@@ -245,14 +251,24 @@ export const updatePhoto = async (req, res) => {
         filteredData[field] = photoData[field];
     }
 
-    if (filteredData.alt !== undefined && !filteredData.alt)
-      return res.status(400).json("Le champ alt ne peut pas être vide");
-
     if (req.file || photoData.media) {
       const cleanName = (photoData.title || existingPhoto.title)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
+      // Supprimer d'abord les anciennes images AVANT upload
+      if (existingPhoto.mediaFileIdLarge) {
+        const stillUsed = await isFileInUse(existingPhoto.mediaFileIdLarge);
+        if (!stillUsed)
+          await imagekit.deleteFile(existingPhoto.mediaFileIdLarge);
+      }
+      if (existingPhoto.mediaFileIdSmall) {
+        const stillUsed = await isFileInUse(existingPhoto.mediaFileIdSmall);
+        if (!stillUsed)
+          await imagekit.deleteFile(existingPhoto.mediaFileIdSmall);
+      }
+
+      // Ensuite uploader la nouvelle image
       const newMedia = await resolveMedia(
         photoData.media,
         req.file,
@@ -262,11 +278,6 @@ export const updatePhoto = async (req, res) => {
 
       if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
-
-      if (existingPhoto.mediaFileIdLarge)
-        await imagekit.deleteFile(existingPhoto.mediaFileIdLarge);
-      if (existingPhoto.mediaFileIdSmall)
-        await imagekit.deleteFile(existingPhoto.mediaFileIdSmall);
 
       filteredData.url = newMedia.urlLarge || newMedia.url;
       filteredData.urlSmall = newMedia.urlSmall || null;
