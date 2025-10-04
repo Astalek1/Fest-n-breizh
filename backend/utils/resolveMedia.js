@@ -1,7 +1,7 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  // 1️⃣ Cas : URL externe
+  // Cas 1 : URL externe
   if (typeof media === "string") {
     try {
       new URL(media);
@@ -11,46 +11,25 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
         fileId: null,
         fileIdSmall: null,
       };
-    } catch {}
+    } catch {
+      // pas une URL → on continue
+    }
   }
 
-  // 2️⃣ Vérifie si une image portant le même "cleanName" existe déjà
-  const existingFiles = await imagekit.listFiles({
-    searchQuery: `name="${cleanName}" AND path="${folder}"`,
-    limit: 2,
-  });
-
-  if (existingFiles.length > 0) {
-    const large = existingFiles.find((f) => f.name.includes("large"));
-    const small = existingFiles.find((f) => f.name.includes("small"));
-
-    return {
-      url: large ? large.url : small?.url || null,
-      urlSmall: small ? small.url : null,
-      fileId: large ? large.fileId : small?.fileId || null,
-      fileIdSmall: small ? small.fileId : null,
-    };
-  }
-
-  // 3️⃣ Upload si le fichier n’existe pas déjà
+  // Cas 2 : upload (Sharp a créé une ou deux versions)
   if (file) {
+    // deux versions (photo / poster)
     if (file.bufferSmall && file.bufferLarge) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),
-          fileName: `${cleanName}-small.webp`,
+          fileName: file.filenameSmall,
           folder,
-          useUniqueFileName: false, // 🔹 Empêche ImageKit d’ajouter un suffixe
-          tags: ["photo", "small"],
-          customMetadata: { title: cleanName },
         }),
         imagekit.upload({
           file: file.bufferLarge.toString("base64"),
-          fileName: `${cleanName}-large.webp`,
+          fileName: file.filenameLarge,
           folder,
-          useUniqueFileName: false,
-          tags: ["photo", "large"],
-          customMetadata: { title: cleanName },
         }),
       ]);
 
@@ -62,14 +41,12 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // Sinon version unique (logos, annonces)
+    // une seule version (logo / annonce)
     if (file.buffer) {
       const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
-        fileName: `${cleanName}.webp`,
+        fileName: file.filename || `${cleanName}-${Date.now()}.webp`,
         folder,
-        useUniqueFileName: false,
-        customMetadata: { title: cleanName },
       });
 
       return {
@@ -81,7 +58,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  // 4️⃣ Fallback
+  // Cas 3 : aucun média valide
   return {
     url: null,
     urlSmall: null,
