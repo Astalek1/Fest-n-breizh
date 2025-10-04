@@ -148,6 +148,9 @@ export const deletePoster = async (req, res) => {
 // Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
   try {
+    console.log("req.file :", req.file);
+    console.log("req.body :", req.body);
+
     const photoData = JSON.parse(req.body.photoData);
 
     if (!photoData.alt) {
