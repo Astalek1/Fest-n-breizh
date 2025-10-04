@@ -3,14 +3,15 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// ******************* Affiches ******************* //
+// ========================================================
+// ===============        AFFICHES        =================
+// ========================================================
 
 // Créer une nouvelle affiche
 export const newPoster = async (req, res) => {
   try {
     const posterData = JSON.parse(req.body.poster);
 
-    // Vérification obligatoire de alt
     if (!posterData.alt) {
       return res.status(400).json("Le champ alt est obligatoire");
     }
@@ -23,12 +24,15 @@ export const newPoster = async (req, res) => {
       cleanName
     );
 
-    if (!newMedia?.url) return res.status(400).json("Média invalide");
+    if (!newMedia?.url && !newMedia?.urlLarge) {
+      return res.status(400).json("Média invalide");
+    }
 
     const newPoster = new Gallery({
       title: posterData.title,
-      url: newMedia.url,
-      mediaFileId: newMedia.fileId,
+      url: newMedia.urlLarge || newMedia.url,
+      urlSmall: newMedia.urlSmall || null,
+      mediaFileId: newMedia.fileIdLarge || newMedia.fileId || null,
       alt: posterData.alt,
       caption: posterData.caption,
       type: "poster",
@@ -51,7 +55,7 @@ export const getAllPosters = async (req, res) => {
   }
 };
 
-// Trouver une seule affiche
+// Trouver une affiche
 export const getOnePoster = async (req, res) => {
   try {
     const poster = await Gallery.findOne({
@@ -99,23 +103,24 @@ export const updatePoster = async (req, res) => {
         cleanName
       );
 
-      if (!newMedia?.url) return res.status(400).json("Média invalide");
+      if (!newMedia?.url && !newMedia?.urlLarge) {
+        return res.status(400).json("Média invalide");
+      }
 
       if (existingPoster.mediaFileId && newMedia.fileId) {
         await imagekit.deleteFile(existingPoster.mediaFileId);
       }
 
-      filteredData.url = newMedia.url;
-      filteredData.mediaFileId = newMedia.fileId;
+      filteredData.url = newMedia.urlLarge || newMedia.url;
+      filteredData.urlSmall = newMedia.urlSmall || null;
+      filteredData.mediaFileId =
+        newMedia.fileIdLarge || newMedia.fileId || null;
     }
 
     const updatedPoster = await Gallery.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedPoster);
@@ -143,7 +148,9 @@ export const deletePoster = async (req, res) => {
   }
 };
 
-// ******************* PHOTOS ******************* //
+// ========================================================
+// ===============         PHOTOS         =================
+// ========================================================
 
 // Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
@@ -165,12 +172,15 @@ export const newPhoto = async (req, res) => {
       cleanName
     );
 
-    if (!newMedia?.url) return res.status(400).json("Média invalide");
+    if (!newMedia?.url && !newMedia?.urlLarge) {
+      return res.status(400).json("Média invalide");
+    }
 
     const newPhoto = new Gallery({
       title: photoData.title,
-      url: newMedia.url,
-      mediaFileId: newMedia.fileId,
+      url: newMedia.urlLarge || newMedia.url,
+      urlSmall: newMedia.urlSmall || null,
+      mediaFileId: newMedia.fileIdLarge || newMedia.fileId || null,
       alt: photoData.alt,
       caption: photoData.caption,
       type: "photo",
@@ -193,7 +203,7 @@ export const getAllPhotos = async (req, res) => {
   }
 };
 
-// Trouver une seule photo
+// Trouver une photo
 export const getOnePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOne({ _id: req.params.id, type: "photo" });
@@ -238,23 +248,24 @@ export const updatePhoto = async (req, res) => {
         cleanName
       );
 
-      if (!newMedia?.url) return res.status(400).json("Média invalide");
+      if (!newMedia?.url && !newMedia?.urlLarge) {
+        return res.status(400).json("Média invalide");
+      }
 
       if (existingPhoto.mediaFileId && newMedia.fileId) {
         await imagekit.deleteFile(existingPhoto.mediaFileId);
       }
 
-      filteredData.url = newMedia.url;
-      filteredData.mediaFileId = newMedia.fileId;
+      filteredData.url = newMedia.urlLarge || newMedia.url;
+      filteredData.urlSmall = newMedia.urlSmall || null;
+      filteredData.mediaFileId =
+        newMedia.fileIdLarge || newMedia.fileId || null;
     }
 
     const updatedPhoto = await Gallery.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedPhoto);
