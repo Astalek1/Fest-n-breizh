@@ -202,6 +202,7 @@ export const newPhoto = async (req, res) => {
     await newPhoto.save();
     res.status(201).json({ message: "Photo créée avec succès !" });
   } catch (error) {
+    console.error("❌ ERREUR newPhoto :", error);
     res.status(500).json({ error: error.message });
   }
 };
