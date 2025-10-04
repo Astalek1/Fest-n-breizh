@@ -11,10 +11,16 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 export const newPoster = async (req, res) => {
   try {
     const posterData = JSON.parse(req.body.poster);
-
-    if (!posterData.alt) {
+    if (!posterData.alt)
       return res.status(400).json("Le champ alt est obligatoire");
-    }
+
+    // Vérifie si une affiche du même titre existe déjà
+    const existing = await Gallery.findOne({
+      title: posterData.title,
+      type: "poster",
+    });
+    if (existing)
+      return res.status(400).json("Une affiche avec ce titre existe déjà");
 
     const cleanName = posterData.title.replace(/\s+/g, "-").toLowerCase();
 
@@ -25,9 +31,8 @@ export const newPoster = async (req, res) => {
       cleanName
     );
 
-    if (!newMedia?.urlLarge && !newMedia?.url) {
+    if (!newMedia?.urlLarge && !newMedia?.url)
       return res.status(400).json("Média invalide");
-    }
 
     const newPoster = new Gallery({
       title: posterData.title,
@@ -47,7 +52,7 @@ export const newPoster = async (req, res) => {
   }
 };
 
-// Récupérer toutes les affiches
+// Obtenir toutes les affiches
 export const getAllPosters = async (req, res) => {
   try {
     const posters = await Gallery.find({ type: "poster" });
@@ -57,7 +62,7 @@ export const getAllPosters = async (req, res) => {
   }
 };
 
-// Récupérer une affiche
+// Obtenir une affiche
 export const getOnePoster = async (req, res) => {
   try {
     const poster = await Gallery.findOne({
@@ -89,9 +94,8 @@ export const updatePoster = async (req, res) => {
         filteredData[field] = posterData[field];
     }
 
-    if (filteredData.alt !== undefined && !filteredData.alt) {
+    if (filteredData.alt !== undefined && !filteredData.alt)
       return res.status(400).json("Le champ alt ne peut pas être vide");
-    }
 
     if (req.file || posterData.media) {
       const cleanName = (posterData.title || existingPoster.title)
@@ -105,11 +109,10 @@ export const updatePoster = async (req, res) => {
         cleanName
       );
 
-      if (!newMedia?.urlLarge && !newMedia?.url) {
+      if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
-      }
 
-      // 🧹 Suppression des anciennes versions
+      // 🧹 Supprime les anciennes versions
       if (existingPoster.mediaFileIdLarge)
         await imagekit.deleteFile(existingPoster.mediaFileIdLarge);
       if (existingPoster.mediaFileIdSmall)
@@ -134,7 +137,7 @@ export const updatePoster = async (req, res) => {
   }
 };
 
-// Supprimer une affiche
+//  Supprimer une affiche
 export const deletePoster = async (req, res) => {
   try {
     const poster = await Gallery.findOneAndDelete({
@@ -146,15 +149,13 @@ export const deletePoster = async (req, res) => {
     if (
       poster.mediaFileIdLarge &&
       !(await isFileInUse(poster.mediaFileIdLarge))
-    ) {
+    )
       await imagekit.deleteFile(poster.mediaFileIdLarge);
-    }
     if (
       poster.mediaFileIdSmall &&
       !(await isFileInUse(poster.mediaFileIdSmall))
-    ) {
+    )
       await imagekit.deleteFile(poster.mediaFileIdSmall);
-    }
 
     res.status(200).json("Affiche supprimée avec succès");
   } catch (error) {
@@ -165,15 +166,20 @@ export const deletePoster = async (req, res) => {
 // ========================================================
 // ===============         PHOTOS         =================
 // ========================================================
-
 // Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
   try {
     const photoData = JSON.parse(req.body.photoData);
-
-    if (!photoData.alt) {
+    if (!photoData.alt)
       return res.status(400).json("Le champ alt est obligatoire");
-    }
+
+    // Vérifie si une photo du même titre existe déjà
+    const existing = await Gallery.findOne({
+      title: photoData.title,
+      type: "photo",
+    });
+    if (existing)
+      return res.status(400).json("Une photo avec ce titre existe déjà");
 
     const cleanName = photoData.title.replace(/\s+/g, "-").toLowerCase();
 
@@ -184,9 +190,8 @@ export const newPhoto = async (req, res) => {
       cleanName
     );
 
-    if (!newMedia?.urlLarge && !newMedia?.url) {
+    if (!newMedia?.urlLarge && !newMedia?.url)
       return res.status(400).json("Média invalide");
-    }
 
     const newPhoto = new Gallery({
       title: photoData.title,
@@ -207,7 +212,7 @@ export const newPhoto = async (req, res) => {
   }
 };
 
-// Récupérer toutes les photos
+//  Récupérer toutes les photos
 export const getAllPhotos = async (req, res) => {
   try {
     const photos = await Gallery.find({ type: "photo" });
@@ -217,7 +222,7 @@ export const getAllPhotos = async (req, res) => {
   }
 };
 
-// Récupérer une photo
+//  Récupérer une photo
 export const getOnePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOne({ _id: req.params.id, type: "photo" });
@@ -228,7 +233,7 @@ export const getOnePhoto = async (req, res) => {
   }
 };
 
-// Modifier une photo
+//  Modifier une photo
 export const updatePhoto = async (req, res) => {
   try {
     const existingPhoto = await Gallery.findOne({
@@ -246,9 +251,8 @@ export const updatePhoto = async (req, res) => {
         filteredData[field] = photoData[field];
     }
 
-    if (filteredData.alt !== undefined && !filteredData.alt) {
+    if (filteredData.alt !== undefined && !filteredData.alt)
       return res.status(400).json("Le champ alt ne peut pas être vide");
-    }
 
     if (req.file || photoData.media) {
       const cleanName = (photoData.title || existingPhoto.title)
@@ -262,11 +266,10 @@ export const updatePhoto = async (req, res) => {
         cleanName
       );
 
-      if (!newMedia?.urlLarge && !newMedia?.url) {
+      if (!newMedia?.urlLarge && !newMedia?.url)
         return res.status(400).json("Média invalide");
-      }
 
-      // 🧹 Suppression des anciennes versions
+      // 🧹 Supprime les anciennes versions
       if (existingPhoto.mediaFileIdLarge)
         await imagekit.deleteFile(existingPhoto.mediaFileIdLarge);
       if (existingPhoto.mediaFileIdSmall)
@@ -291,7 +294,7 @@ export const updatePhoto = async (req, res) => {
   }
 };
 
-// Supprimer une photo
+//  Supprimer une photo
 export const deletePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOneAndDelete({
@@ -300,18 +303,10 @@ export const deletePhoto = async (req, res) => {
     });
     if (!photo) return res.status(404).json("Photo non trouvée");
 
-    if (
-      photo.mediaFileIdLarge &&
-      !(await isFileInUse(photo.mediaFileIdLarge))
-    ) {
+    if (photo.mediaFileIdLarge && !(await isFileInUse(photo.mediaFileIdLarge)))
       await imagekit.deleteFile(photo.mediaFileIdLarge);
-    }
-    if (
-      photo.mediaFileIdSmall &&
-      !(await isFileInUse(photo.mediaFileIdSmall))
-    ) {
+    if (photo.mediaFileIdSmall && !(await isFileInUse(photo.mediaFileIdSmall)))
       await imagekit.deleteFile(photo.mediaFileIdSmall);
-    }
 
     res.status(200).json("Photo supprimée avec succès");
   } catch (error) {

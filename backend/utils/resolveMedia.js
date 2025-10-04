@@ -1,54 +1,56 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  // 1️ Cas : l’utilisateur fournit directement une URL externe
+  // 1️⃣ Cas : URL externe
   if (typeof media === "string") {
     try {
-      new URL(media); // Vérifie si c’est une URL valide
+      new URL(media);
       return {
         url: media,
         urlSmall: null,
         fileId: null,
         fileIdSmall: null,
       };
-    } catch {
-      // Pas une URL valide → on passe à l’upload
-    }
+    } catch {}
   }
 
-  // 2️ Cas : upload via Sharp → on vérifie si le fichier existe déjà
+  // 2️⃣ Vérifie si une image portant le même "cleanName" existe déjà
+  const existingFiles = await imagekit.listFiles({
+    searchQuery: `name="${cleanName}" AND path="${folder}"`,
+    limit: 2,
+  });
+
+  if (existingFiles.length > 0) {
+    const large = existingFiles.find((f) => f.name.includes("large"));
+    const small = existingFiles.find((f) => f.name.includes("small"));
+
+    return {
+      url: large ? large.url : small?.url || null,
+      urlSmall: small ? small.url : null,
+      fileId: large ? large.fileId : small?.fileId || null,
+      fileIdSmall: small ? small.fileId : null,
+    };
+  }
+
+  // 3️⃣ Upload si le fichier n’existe pas déjà
   if (file) {
-    // Vérifie si un fichier portant le même nom existe déjà dans le dossier
-    const existingFiles = await imagekit.listFiles({
-      searchQuery: `name="${cleanName}" AND path="${folder}"`,
-      limit: 2,
-    });
-
-    if (existingFiles.length > 0) {
-      // 🔹 Si déjà présent → on réutilise les URLs existantes
-      const large = existingFiles.find((f) => f.name.includes("large"));
-      const small = existingFiles.find((f) => f.name.includes("small"));
-
-      return {
-        url: large ? large.url : small?.url || null,
-        urlSmall: small ? small.url : null,
-        fileId: large ? large.fileId : small?.fileId || null,
-        fileIdSmall: small ? small.fileId : null,
-      };
-    }
-
-    // 3️ Upload si le fichier n’existe pas encore
     if (file.bufferSmall && file.bufferLarge) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),
-          fileName: file.filenameSmall,
+          fileName: `${cleanName}-small.webp`,
           folder,
+          useUniqueFileName: false, // 🔹 Empêche ImageKit d’ajouter un suffixe
+          tags: ["photo", "small"],
+          customMetadata: { title: cleanName },
         }),
         imagekit.upload({
           file: file.bufferLarge.toString("base64"),
-          fileName: file.filenameLarge,
+          fileName: `${cleanName}-large.webp`,
           folder,
+          useUniqueFileName: false,
+          tags: ["photo", "large"],
+          customMetadata: { title: cleanName },
         }),
       ]);
 
@@ -60,12 +62,14 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // Sinon → upload simple (logos, annonces, etc.)
+    // Sinon version unique (logos, annonces)
     if (file.buffer) {
       const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
-        fileName: file.filename || `${cleanName}-${Date.now()}.webp`,
+        fileName: `${cleanName}.webp`,
         folder,
+        useUniqueFileName: false,
+        customMetadata: { title: cleanName },
       });
 
       return {
@@ -77,7 +81,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  // 4️Aucun média exploitable
+  // 4️⃣ Fallback
   return {
     url: null,
     urlSmall: null,
