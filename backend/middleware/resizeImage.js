@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import path from "path";
 
-// Tailles max par type (à ajuster plus tard si besoin)
+// Tailles max par type (photo → 2 tailles)
 const SIZE_PRESETS = {
   photo: {
     small: { width: 600, height: 600 },
@@ -18,7 +18,7 @@ const SIZE_PRESETS = {
 
 export default async (req, res, next) => {
   if (!req.file || !req.file.buffer) {
-    return next(); // aucun fichier → on passe au suivant
+    return next(); // Aucun fichier → on passe
   }
 
   const originalName = path.parse(req.file.originalname).name;
@@ -27,12 +27,21 @@ export default async (req, res, next) => {
     .replace(/[^\w\-]/g, "")
     .toLowerCase();
 
-  const type = req.body.type;
-  const preset = SIZE_PRESETS[type] || SIZE_PRESETS.photo;
+  // Détection automatique selon la route
+  const routePath = req.originalUrl || "";
+  let preset = SIZE_PRESETS.default;
+
+  if (routePath.includes("/gallery/photos")) preset = SIZE_PRESETS.photo;
+  else if (routePath.includes("/gallery/posters"))
+    preset = SIZE_PRESETS.affiche;
+  else if (routePath.includes("/logos")) preset = SIZE_PRESETS.logo;
+  else if (routePath.includes("/announcements")) preset = SIZE_PRESETS.annonce;
 
   try {
-    // Si photo ou affiche → deux versions
+    // Cas photo ou affiche → deux versions (small + large)
     if (preset.small && preset.large) {
+      const timestamp = Date.now();
+
       // petite version
       const smallBuffer = await sharp(req.file.buffer)
         .resize(preset.small.width, preset.small.height, {
@@ -53,13 +62,13 @@ export default async (req, res, next) => {
 
       req.file = {
         bufferSmall: smallBuffer,
-        filenameSmall: `${safeName}-small-${Date.now()}.webp`,
+        filenameSmall: `${safeName}-small-${timestamp}.webp`,
         bufferLarge: largeBuffer,
-        filenameLarge: `${safeName}-large-${Date.now()}.webp`,
+        filenameLarge: `${safeName}-large-${timestamp}.webp`,
         mimetype: "image/webp",
       };
     } else {
-      // Sinon → version unique
+      // Autres médias → version unique
       const optimizedBuffer = await sharp(req.file.buffer)
         .resize(preset.width, preset.height, {
           fit: "contain",
