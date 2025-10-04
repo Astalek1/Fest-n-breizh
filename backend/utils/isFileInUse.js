@@ -3,6 +3,8 @@ import Guest from "../models/Guests.js";
 // Plus tard : Edition si besoin
 
 export const isFileInUse = async (fileId) => {
+  console.log("🧩 Vérif utilisation fichier :", fileId, "→", inUse);
+
   // Vérifie dans Artistes
   const artistUse = await Artist.findOne({ mediaFileId: fileId });
   if (artistUse) return true;
