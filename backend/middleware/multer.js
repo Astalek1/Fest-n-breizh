@@ -6,4 +6,4 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // accepte tous les fichiers envoyés
-export default upload.any();
+export default upload.single("media");
