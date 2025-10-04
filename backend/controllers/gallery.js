@@ -295,6 +295,11 @@ export const updatePhoto = async (req, res) => {
 
       console.log("Tentative suppression anciennes images...");
 
+      console.log("🧠 Vérif fichiers existants :", {
+        large: existingPhoto.mediaFileIdLarge,
+        small: existingPhoto.mediaFileIdSmall,
+      });
+
       if (existingPhoto.mediaFileIdLarge) {
         console.log("Suppression LARGE :", existingPhoto.mediaFileIdLarge);
         await imagekit
