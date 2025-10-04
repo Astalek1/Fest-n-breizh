@@ -85,7 +85,6 @@ export const updatePoster = async (req, res) => {
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
     const posterData = req.body.poster ? JSON.parse(req.body.poster) : req.body;
-
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
@@ -94,24 +93,23 @@ export const updatePoster = async (req, res) => {
         filteredData[field] = posterData[field];
     }
 
+    // Si un nouveau média est envoyé
     if (req.file || posterData.media) {
       const cleanName = (posterData.title || existingPoster.title)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-      // Supprimer les anciennes images AVANT upload
-      if (existingPoster.mediaFileIdLarge) {
-        const stillUsed = await isFileInUse(existingPoster.mediaFileIdLarge);
-        if (!stillUsed)
-          await imagekit.deleteFile(existingPoster.mediaFileIdLarge);
-      }
-      if (existingPoster.mediaFileIdSmall) {
-        const stillUsed = await isFileInUse(existingPoster.mediaFileIdSmall);
-        if (!stillUsed)
-          await imagekit.deleteFile(existingPoster.mediaFileIdSmall);
-      }
+      // Supprime toujours les anciennes images avant upload
+      if (existingPoster.mediaFileIdLarge)
+        await imagekit
+          .deleteFile(existingPoster.mediaFileIdLarge)
+          .catch(() => {});
+      if (existingPoster.mediaFileIdSmall)
+        await imagekit
+          .deleteFile(existingPoster.mediaFileIdSmall)
+          .catch(() => {});
 
-      // Uploader la nouvelle image
+      // Upload du nouveau média
       const newMedia = await resolveMedia(
         posterData.media,
         req.file,
@@ -251,24 +249,23 @@ export const updatePhoto = async (req, res) => {
         filteredData[field] = photoData[field];
     }
 
+    // Si une nouvelle image est envoyée
     if (req.file || photoData.media) {
       const cleanName = (photoData.title || existingPhoto.title)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-      // Supprimer d'abord les anciennes images AVANT upload
-      if (existingPhoto.mediaFileIdLarge) {
-        const stillUsed = await isFileInUse(existingPhoto.mediaFileIdLarge);
-        if (!stillUsed)
-          await imagekit.deleteFile(existingPhoto.mediaFileIdLarge);
-      }
-      if (existingPhoto.mediaFileIdSmall) {
-        const stillUsed = await isFileInUse(existingPhoto.mediaFileIdSmall);
-        if (!stillUsed)
-          await imagekit.deleteFile(existingPhoto.mediaFileIdSmall);
-      }
+      // Supprime toujours les anciennes versions avant upload
+      if (existingPhoto.mediaFileIdLarge)
+        await imagekit
+          .deleteFile(existingPhoto.mediaFileIdLarge)
+          .catch(() => {});
+      if (existingPhoto.mediaFileIdSmall)
+        await imagekit
+          .deleteFile(existingPhoto.mediaFileIdSmall)
+          .catch(() => {});
 
-      // Ensuite uploader la nouvelle image
+      // Upload du nouveau média
       const newMedia = await resolveMedia(
         photoData.media,
         req.file,
@@ -298,6 +295,7 @@ export const updatePhoto = async (req, res) => {
   }
 };
 
+//suprimé une photo
 export const deletePhoto = async (req, res) => {
   try {
     const photo = await Gallery.findOneAndDelete({
