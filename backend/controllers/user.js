@@ -6,15 +6,17 @@ export const signup = async (req, res) => {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
     const user = new User({
-      email: req.body.email,
+      username: req.body.username,
       password: hash,
     });
     await user.save();
     res.status(201).json({ message: "Utilisateur créé !" });
   } catch (error) {
     if (error.code === 11000) {
-      // Gestion email déjà utilisé
-      return res.status(400).json({ error: "Email déjà utilisé !" });
+      // Gestion user déjà utilisé
+      return res
+        .status(400)
+        .json({ error: "nom d'utilisateur déjà utilisé !" });
     }
     res.status(500).json({ error });
   }
@@ -22,7 +24,7 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ username: req.body.username });
     if (!user) {
       return res.status(401).json({ error: "Utilisateur non trouvé !" });
     }
