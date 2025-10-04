@@ -148,7 +148,7 @@ export const deletePoster = async (req, res) => {
 // Créer une nouvelle photo
 export const newPhoto = async (req, res) => {
   try {
-    const photoData = JSON.parse(req.body.photoData);
+    const photoData = JSON.parse(req.body.photos);
 
     if (!photoData.alt) {
       return res.status(400).json("Le champ alt est obligatoire");
