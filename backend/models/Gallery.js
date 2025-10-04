@@ -4,7 +4,7 @@ const gallerySchema = mongoose.Schema({
   title: { type: String, required: true },
   url: { type: String, required: true }, // version large
   urlSmall: { type: String }, // version petite
-  mediaFileId: { type: String, required: true }, // fileId de la version large
+  mediaFileId: { type: String }, // fileId de la version large
   mediaFileIdSmall: { type: String }, // fileId de la version petite
   alt: { type: String, required: true },
   caption: { type: String },
