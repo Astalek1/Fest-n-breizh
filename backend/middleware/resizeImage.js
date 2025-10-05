@@ -3,16 +3,16 @@ import sharp from "sharp";
 import path from "path";
 
 const PRESETS = {
-  photo: { small: { w: 600, h: 400 }, large: { w: 1600, h: 1400 } },
-  poster: { small: { w: 800, h: 1200 }, large: { w: 1200, h: 1800 } },
+  photo: { small: { w: 600 }, large: { w: 1600 } },
+  poster: { small: { w: 800 }, large: { w: 1200 } },
   logo: { one: { w: 600, h: 600 } },
-  default: { one: { w: 1600, h: 1400 } },
+  default: { one: { w: 1600 } },
 };
 
 const fieldTypeMap = {
-  media: "poster", // affiche d’édition
-  artistFiles: "photo", // photos artistes
-  guestFiles: "logo", // logos invités
+  media: "poster",
+  artistFiles: "photo",
+  guestFiles: "logo",
   photo: "photo",
   poster: "poster",
   logo: "logo",
@@ -32,17 +32,11 @@ async function makeDualVersions(buffer, base, { small, large }) {
 
   const [bufSmall, bufLarge] = await Promise.all([
     sharp(buffer)
-      .resize(small.w, small.h, {
-        fit: "cover",
-        position: "center",
-      })
+      .resize({ width: small.w, fit: "inside", withoutEnlargement: true })
       .toFormat("webp", { quality: 75 })
       .toBuffer(),
     sharp(buffer)
-      .resize(large.w, large.h, {
-        fit: "cover",
-        position: "center",
-      })
+      .resize({ width: large.w, fit: "inside", withoutEnlargement: true })
       .toFormat("webp", { quality: 85 })
       .toBuffer(),
   ]);
@@ -61,9 +55,11 @@ async function makeSingleVersion(buffer, base, { one }) {
   const filename = `${base}-${ts}.webp`;
 
   const out = await sharp(buffer)
-    .resize(one.w, one.h, {
-      fit: "cover",
-      position: "center",
+    .resize({
+      width: one.w,
+      height: one.h || null,
+      fit: one.h ? "contain" : "inside",
+      withoutEnlargement: true,
     })
     .toFormat("webp", { quality: 80 })
     .toBuffer();
@@ -74,38 +70,34 @@ async function makeSingleVersion(buffer, base, { one }) {
 function inferType(req, file) {
   if (req.body?.type && PRESETS[req.body.type]) return req.body.type;
   const byField = fieldTypeMap[file.fieldname];
-  return byField || "default";
+  return byField || "photo";
 }
 
 async function processOne(file, type) {
   const base = safeBase(file.originalname);
+
   if (type === "photo" || type === "poster") {
-    Object.assign(
-      file,
-      await makeDualVersions(file.buffer, base, PRESETS[type])
-    );
+    const dual = await makeDualVersions(file.buffer, base, PRESETS[type]);
+    Object.assign(file, dual);
   } else {
-    Object.assign(
-      file,
-      await makeSingleVersion(
-        file.buffer,
-        base,
-        PRESETS[type] || PRESETS.default
-      )
+    const single = await makeSingleVersion(
+      file.buffer,
+      base,
+      PRESETS[type] || PRESETS.default
     );
+    Object.assign(file, single);
   }
+
   file.mimetype = "image/webp";
 }
 
 export default async function resizeImage(req, res, next) {
   try {
-    // .single()
     if (req.file?.buffer) {
       await processOne(req.file, inferType(req, req.file));
       return next();
     }
 
-    // .fields()
     if (req.files && !Array.isArray(req.files)) {
       const all = [];
       for (const field of Object.keys(req.files)) {
@@ -117,13 +109,12 @@ export default async function resizeImage(req, res, next) {
       return next();
     }
 
-    // .any()
     if (Array.isArray(req.files) && req.files.length) {
       await Promise.all(req.files.map((f) => processOne(f, inferType(req, f))));
       return next();
     }
 
-    next();
+    return next();
   } catch (err) {
     console.error("Erreur Sharp :", err);
     res.status(500).json({ error: "Erreur lors du traitement de l’image." });
