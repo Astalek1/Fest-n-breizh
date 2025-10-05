@@ -281,30 +281,28 @@ export const deleteEdition = async (req, res) => {
 
     await Edition.findByIdAndDelete(req.params.id);
 
-    // Nettoyer artistes
+    //Nettoyer artistes
     for (const artistId of artistsIds) {
       const stillUsed = await Edition.findOne({ artists: artistId });
 
       if (!stillUsed) {
         const artist = await Artist.findById(artistId);
 
-        if (!artist) continue;
+        if (artist?.mediaFileId) {
+          const usedElsewhere = await Edition.findOne({
+            _id: { $ne: req.params.id },
+            artists: artistId,
+          });
 
-        console.log("🧹 Suppression artiste :", artist.name);
-        console.log("   mediaFileId :", artist.mediaFileId);
-
-        if (artist.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-          try {
+          if (!usedElsewhere) {
             await imagekit.deleteFile(artist.mediaFileId);
             console.log(
               "✅ Image supprimée sur ImageKit :",
               artist.mediaFileId
             );
-          } catch (err) {
-            console.error("❌ Erreur suppression ImageKit :", err.message);
+          } else {
+            console.log("⚠️ Image utilisée ailleurs :", artist.mediaFileId);
           }
-        } else {
-          console.log("⚠️ Aucun mediaFileId ou fichier encore utilisé");
         }
 
         await Artist.findByIdAndDelete(artistId);
