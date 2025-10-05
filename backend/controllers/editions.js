@@ -83,7 +83,7 @@ export const createEdition = async (req, res) => {
         const folder =
           guest.mediaType === "logo"
             ? "festn_breizh/logos"
-            : "festn_breizh/guests";
+            : "festn_breizh/invités";
 
         const uploaded = await resolveMedia(null, file, folder, cleanName);
 
@@ -238,7 +238,7 @@ export const updateEdition = async (req, res) => {
           const folder =
             guest.mediaType === "logo"
               ? "festn_breizh/logos"
-              : "festn_breizh/guests";
+              : "festn_breizh/invités";
 
           const uploaded = await resolveMedia(null, file, folder, cleanName);
 
