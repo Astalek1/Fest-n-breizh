@@ -44,7 +44,7 @@ export const createEdition = async (req, res) => {
       const newArtist = new Artist({
         name: artist.name,
         role: artist.role,
-        description: artist.description || "",
+        description: artist.description,
         media: mediaUrl,
         mediaFileId,
         link: artist.link || null,
@@ -173,7 +173,7 @@ export const updateEdition = async (req, res) => {
         artistDoc = new Artist({
           name: artist.name,
           role: artist.role,
-          description: artist.description || "",
+          description: artist.description,
           media: mediaUrl,
           mediaFileId,
           link: artist.link || null,
