@@ -80,12 +80,13 @@ export const createEdition = async (req, res) => {
 
       if (file) {
         const cleanName = guest.name.replace(/\s+/g, "-").toLowerCase();
-        const uploaded = await resolveMedia(
-          null,
-          file,
-          "festn_breizh/logos",
-          cleanName
-        );
+        const folder =
+          guest.mediaType === "logo"
+            ? "festn_breizh/logos"
+            : "festn_breizh/guests";
+
+        const uploaded = await resolveMedia(null, file, folder, cleanName);
+
         mediaUrl = uploaded.url;
         mediaFileId = uploaded.fileId;
       }
@@ -234,12 +235,13 @@ export const updateEdition = async (req, res) => {
 
         if (file) {
           const cleanName = guest.name.replace(/\s+/g, "-").toLowerCase();
-          const uploaded = await resolveMedia(
-            null,
-            file,
-            "festn_breizh/logos",
-            cleanName
-          );
+          const folder =
+            guest.mediaType === "logo"
+              ? "festn_breizh/logos"
+              : "festn_breizh/guests";
+
+          const uploaded = await resolveMedia(null, file, folder, cleanName);
+
           mediaUrl = uploaded.url;
           mediaFileId = uploaded.fileId;
         }
