@@ -5,12 +5,12 @@ import imagekit from "../config/imageKit.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 
-// === CRÉER UNE NOUVELLE ÉDITION ===
+// créer une nouvelle édition //
 export const createEdition = async (req, res) => {
   try {
     const editionData = JSON.parse(req.body.edition);
 
-    if (!editionData.artists?.length)
+    if (!editionData.artists || editionData.artists.length < 1)
       return res
         .status(400)
         .json("Une édition doit contenir au moins un artiste.");
@@ -21,21 +21,30 @@ export const createEdition = async (req, res) => {
         .json("Une affiche est obligatoire pour créer une édition.");
 
     const poster = editionData.poster;
-    const artistIds = [];
 
-    // --- Artistes ---
+    const artistIds = [];
+    let artistFileIdx = 0; // index séparé pour les fichiers artistes
+
     for (let i = 0; i < editionData.artists.length; i++) {
       const artist = editionData.artists[i];
-      let mediaUrl = artist.media || null;
-      let mediaFileId = null;
 
-      if (artist.mediaType === "image" && req.files?.artistFiles?.[i]) {
-        const file = req.files.artistFiles[i];
+      let mediaFileId = null;
+      let mediaUrl = artist.media || null;
+
+      // ne consomme un fichier que si l'artiste a mediaType=image
+      let file = null;
+      if (artist.mediaType === "image") {
+        file = req.files?.artistFiles?.[artistFileIdx] || null;
+        if (file) artistFileIdx += 1;
+      }
+
+      if (file) {
+        const cleanName = artist.name.replace(/\s+/g, "-").toLowerCase();
         const uploaded = await resolveMedia(
           null,
           file,
           "festn_breizh/artistes",
-          artist.name
+          cleanName
         );
         mediaUrl = uploaded.url;
         mediaFileId = uploaded.fileId;
@@ -49,25 +58,33 @@ export const createEdition = async (req, res) => {
         mediaFileId,
         link: artist.link || null,
       });
-
       await newArtist.save();
       artistIds.push(newArtist._id);
     }
 
-    // --- Invités ---
     const guestIds = [];
+    let guestFileIdx = 0; // index séparé pour les fichiers invités
+
     for (let i = 0; i < (editionData.guests || []).length; i++) {
       const guest = editionData.guests[i];
-      let mediaUrl = guest.media || null;
-      let mediaFileId = null;
 
-      if (guest.mediaType === "image" && req.files?.guestFiles?.[i]) {
-        const file = req.files.guestFiles[i];
+      let mediaFileId = null;
+      let mediaUrl = guest.media || null;
+
+      // ne consomme un fichier que si l'invité a mediaType=image
+      let file = null;
+      if (guest.mediaType === "image") {
+        file = req.files?.guestFiles?.[guestFileIdx] || null;
+        if (file) guestFileIdx += 1;
+      }
+
+      if (file) {
+        const cleanName = guest.name.replace(/\s+/g, "-").toLowerCase();
         const uploaded = await resolveMedia(
           null,
           file,
           "festn_breizh/logos",
-          guest.name
+          cleanName
         );
         mediaUrl = uploaded.url;
         mediaFileId = uploaded.fileId;
@@ -80,7 +97,6 @@ export const createEdition = async (req, res) => {
         media: mediaUrl,
         mediaFileId,
       });
-
       await newGuest.save();
       guestIds.push(newGuest._id);
     }
@@ -99,65 +115,84 @@ export const createEdition = async (req, res) => {
   }
 };
 
-// === TOUTES LES ÉDITIONS ===
+// trouver toute les éditions//
 export const getAllEditions = async (req, res) => {
   try {
     const editions = await Edition.find()
       .populate("artists")
       .populate("guests");
     res.status(200).json(editions);
-  } catch {
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// === UNE ÉDITION ===
+//trouver une seul édition//
 export const getOneEdition = async (req, res) => {
   try {
     const edition = await Edition.findById(req.params.id)
       .populate("artists")
       .populate("guests");
-    if (!edition) return res.status(404).json("Édition non trouvée");
+    if (!edition) {
+      return res.status(404).json("Édition non trouvée");
+    }
     res.status(200).json(edition);
-  } catch {
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// === MODIFIER UNE ÉDITION ===
+//modifier une édition//
 export const updateEdition = async (req, res) => {
   try {
     const editionData = req.body.edition
       ? JSON.parse(req.body.edition)
       : req.body;
-    const existingEdition = await Edition.findById(req.params.id);
-    if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
-    if (!editionData.artists?.length && !existingEdition.artists?.length)
+    const existingEdition = await Edition.findById(req.params.id);
+    if (!existingEdition) {
+      return res.status(404).json("Édition non trouvée");
+    }
+
+    if (
+      (!editionData.artists || editionData.artists.length < 1) &&
+      (!existingEdition.artists || existingEdition.artists.length < 1)
+    ) {
       return res
         .status(400)
         .json("Une édition doit contenir au moins un artiste.");
+    }
 
     const updatedArtistIds = [];
+    let artistFileIdx = 0; // index séparé pour fichiers artistes (update)
+
     for (let i = 0; i < (editionData.artists || []).length; i++) {
       const artist = editionData.artists[i];
       let artistDoc;
 
       if (artist._id) {
+        // mise à jour simple des champs textuels
         artistDoc = await Artist.findByIdAndUpdate(artist._id, artist, {
           new: true,
         });
       } else {
+        // nouvel artiste
         let mediaUrl = artist.media || null;
         let mediaFileId = null;
 
-        if (artist.mediaType === "image" && req.files?.artistFiles?.[i]) {
-          const file = req.files.artistFiles[i];
+        let file = null;
+        if (artist.mediaType === "image") {
+          file = req.files?.artistFiles?.[artistFileIdx] || null;
+          if (file) artistFileIdx += 1;
+        }
+
+        if (file) {
+          const cleanName = artist.name.replace(/\s+/g, "-").toLowerCase();
           const uploaded = await resolveMedia(
             null,
             file,
             "festn_breizh/artistes",
-            artist.name
+            cleanName
           );
           mediaUrl = uploaded.url;
           mediaFileId = uploaded.fileId;
@@ -173,11 +208,12 @@ export const updateEdition = async (req, res) => {
         });
         await artistDoc.save();
       }
-
       updatedArtistIds.push(artistDoc._id);
     }
 
     const updatedGuestIds = [];
+    let guestFileIdx = 0; // index séparé pour fichiers invités (update)
+
     for (let i = 0; i < (editionData.guests || []).length; i++) {
       const guest = editionData.guests[i];
       let guestDoc;
@@ -190,13 +226,19 @@ export const updateEdition = async (req, res) => {
         let mediaUrl = guest.media || null;
         let mediaFileId = null;
 
-        if (guest.mediaType === "image" && req.files?.guestFiles?.[i]) {
-          const file = req.files.guestFiles[i];
+        let file = null;
+        if (guest.mediaType === "image") {
+          file = req.files?.guestFiles?.[guestFileIdx] || null;
+          if (file) guestFileIdx += 1;
+        }
+
+        if (file) {
+          const cleanName = guest.name.replace(/\s+/g, "-").toLowerCase();
           const uploaded = await resolveMedia(
             null,
             file,
             "festn_breizh/logos",
-            guest.name
+            cleanName
           );
           mediaUrl = uploaded.url;
           mediaFileId = uploaded.fileId;
@@ -211,7 +253,6 @@ export const updateEdition = async (req, res) => {
         });
         await guestDoc.save();
       }
-
       updatedGuestIds.push(guestDoc._id);
     }
 
@@ -222,37 +263,43 @@ export const updateEdition = async (req, res) => {
 
     await existingEdition.save();
     res.status(200).json(existingEdition);
-  } catch {
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// === SUPPRIMER UNE ÉDITION ===
+// supprimer une édition //
 export const deleteEdition = async (req, res) => {
   try {
     const edition = await Edition.findById(req.params.id);
-    if (!edition) return res.status(404).json("Édition non trouvée");
+    if (!edition) {
+      return res.status(404).json("Édition non trouvée");
+    }
 
-    const artistIds = edition.artists || [];
-    const guestIds = edition.guests || [];
+    const artistsIds = edition.artists || [];
+    const guestsIds = edition.guests || [];
 
     await Edition.findByIdAndDelete(req.params.id);
 
-    for (const artistId of artistIds) {
+    // Nettoyer artistes
+    for (const artistId of artistsIds) {
       const stillUsed = await Edition.findOne({ artists: artistId });
       if (!stillUsed) {
         const artist = await Artist.findByIdAndDelete(artistId);
-        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId)))
+        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
           await imagekit.deleteFile(artist.mediaFileId);
+        }
       }
     }
 
-    for (const guestId of guestIds) {
+    // Nettoyer invités
+    for (const guestId of guestsIds) {
       const stillUsed = await Edition.findOne({ guests: guestId });
       if (!stillUsed) {
         const guest = await Guest.findByIdAndDelete(guestId);
-        if (guest?.mediaFileId && !(await isFileInUse(guest.mediaFileId)))
+        if (guest?.mediaFileId && !(await isFileInUse(guest.mediaFileId))) {
           await imagekit.deleteFile(guest.mediaFileId);
+        }
       }
     }
 
