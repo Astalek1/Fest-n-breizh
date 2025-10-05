@@ -1,7 +1,7 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
-  // 1️ Si c’est une URL (YouTube, site externe…)
+  // 1. Si c’est une URL directe (non upload)
   if (typeof media === "string") {
     try {
       new URL(media);
@@ -16,12 +16,23 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  // 2️ Upload depuis Sharp (buffer(s) déjà traités)
+  // 2. Upload depuis Sharp (req.file)
   if (file && (file.buffer || file.bufferSmall || file.bufferLarge)) {
     const timestamp = Date.now();
 
-    // Cas A — Sharp a généré deux tailles (photo, poster)
-    if (file.bufferSmall && file.bufferLarge) {
+    // Dossiers avec double version (small + large)
+    const dualVersionFolders = [
+      "festn_breizh/accueil",
+      "festn_breizh/affiches",
+      "festn_breizh/gallery",
+    ];
+
+    // Si Sharp a généré deux versions ET que le dossier le demande
+    if (
+      file.bufferSmall &&
+      file.bufferLarge &&
+      dualVersionFolders.includes(folder)
+    ) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),
@@ -43,12 +54,11 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // Cas B — Sharp a généré une seule image (logo, etc.)
-    const sourceBuffer = file.buffer || file.bufferLarge || file.bufferSmall; // fallback si un seul buffer existe
-
-    if (sourceBuffer) {
+    // Cas standard (artistes, invités, annonces, partenaires, etc.)
+    const buffer = file.bufferLarge || file.bufferSmall || file.buffer || null;
+    if (buffer) {
       const upload = await imagekit.upload({
-        file: sourceBuffer.toString("base64"),
+        file: buffer.toString("base64"),
         fileName: `${cleanName}-${timestamp}.webp`,
         folder,
       });
@@ -62,7 +72,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     }
   }
 
-  // 3️ Aucun fichier exploitable
+  // 3. Rien d’exploitable
   return {
     url: null,
     urlSmall: null,
