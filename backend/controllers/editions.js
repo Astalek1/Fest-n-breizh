@@ -75,6 +75,7 @@ export const createEdition = async (req, res) => {
       const newGuest = new Guest({
         name: guest.name,
         role: guest.role,
+        description: guest.description,
         media: mediaUrl,
         mediaFileId,
       });
@@ -212,6 +213,7 @@ export const updateEdition = async (req, res) => {
         guestDoc = new Guest({
           name: guest.name,
           role: guest.role,
+          description: guest.description,
           media: mediaUrl,
           mediaFileId,
         });
