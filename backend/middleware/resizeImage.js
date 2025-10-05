@@ -3,18 +3,16 @@ import sharp from "sharp";
 import path from "path";
 
 const PRESETS = {
-  photo: { small: { w: 600, h: 600 }, large: { w: 1600, h: 1600 } },
+  photo: { small: { w: 600, h: 400 }, large: { w: 1600, h: 1400 } },
   poster: { small: { w: 800, h: 1200 }, large: { w: 1200, h: 1800 } },
   logo: { one: { w: 600, h: 600 } },
-  default: { one: { w: 1200, h: 1200 } },
+  default: { one: { w: 1600, h: 1400 } },
 };
 
 const fieldTypeMap = {
-  // Editions
-  media: "poster",
-  artistFiles: "photo",
-  guestFiles: "logo",
-  // Gallery (selon champ utilisés ailleurs)
+  media: "poster", // affiche d’édition
+  artistFiles: "photo", // photos artistes
+  guestFiles: "logo", // logos invités
   photo: "photo",
   poster: "poster",
   logo: "logo",
@@ -35,15 +33,15 @@ async function makeDualVersions(buffer, base, { small, large }) {
   const [bufSmall, bufLarge] = await Promise.all([
     sharp(buffer)
       .resize(small.w, small.h, {
-        fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
+        fit: "cover",
+        position: "center",
       })
       .toFormat("webp", { quality: 75 })
       .toBuffer(),
     sharp(buffer)
       .resize(large.w, large.h, {
-        fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
+        fit: "cover",
+        position: "center",
       })
       .toFormat("webp", { quality: 85 })
       .toBuffer(),
@@ -61,10 +59,11 @@ async function makeDualVersions(buffer, base, { small, large }) {
 async function makeSingleVersion(buffer, base, { one }) {
   const ts = Date.now();
   const filename = `${base}-${ts}.webp`;
+
   const out = await sharp(buffer)
     .resize(one.w, one.h, {
-      fit: "contain",
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
+      fit: "cover",
+      position: "center",
     })
     .toFormat("webp", { quality: 80 })
     .toBuffer();
@@ -73,68 +72,60 @@ async function makeSingleVersion(buffer, base, { one }) {
 }
 
 function inferType(req, file) {
-  // 1) priorité à un 'type' explicite dans le body
   if (req.body?.type && PRESETS[req.body.type]) return req.body.type;
-
-  // 2) sinon d’après le nom de champ
   const byField = fieldTypeMap[file.fieldname];
-  if (byField) return byField;
-
-  // 3) fallback (compatibilité gallery photos)
-  return "photo";
+  return byField || "default";
 }
 
 async function processOne(file, type) {
   const base = safeBase(file.originalname);
   if (type === "photo" || type === "poster") {
-    const dual = await makeDualVersions(file.buffer, base, PRESETS[type]);
-    // on enrichit l’objet file (compatible avec resolveMedia)
-    Object.assign(file, dual);
-  } else {
-    const single = await makeSingleVersion(
-      file.buffer,
-      base,
-      PRESETS[type] || PRESETS.default
+    Object.assign(
+      file,
+      await makeDualVersions(file.buffer, base, PRESETS[type])
     );
-    Object.assign(file, single);
+  } else {
+    Object.assign(
+      file,
+      await makeSingleVersion(
+        file.buffer,
+        base,
+        PRESETS[type] || PRESETS.default
+      )
+    );
   }
   file.mimetype = "image/webp";
 }
 
 export default async function resizeImage(req, res, next) {
   try {
-    // Cas 1 : un seul fichier (multer.single)
+    // .single()
     if (req.file?.buffer) {
-      const type = inferType(req, req.file);
-      await processOne(req.file, type);
+      await processOne(req.file, inferType(req, req.file));
       return next();
     }
 
-    // Cas 2a : .fields() -> req.files est un OBJET { fieldName: [files...] }
+    // .fields()
     if (req.files && !Array.isArray(req.files)) {
       const all = [];
       for (const field of Object.keys(req.files)) {
         for (const f of req.files[field]) {
-          const t = inferType(req, f);
-          all.push(processOne(f, t));
+          all.push(processOne(f, inferType(req, f)));
         }
       }
       await Promise.all(all);
       return next();
     }
 
-    // Cas 2b : .any() -> req.files est un ARRAY
+    // .any()
     if (Array.isArray(req.files) && req.files.length) {
       await Promise.all(req.files.map((f) => processOne(f, inferType(req, f))));
       return next();
     }
 
-    // Aucun fichier → on passe
-    return next();
+    next();
   } catch (err) {
     console.error("Erreur Sharp :", err);
-    return res
-      .status(500)
-      .json({ error: "Erreur lors du traitement de l’image." });
+    res.status(500).json({ error: "Erreur lors du traitement de l’image." });
   }
 }
