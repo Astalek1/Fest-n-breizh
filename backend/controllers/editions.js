@@ -288,12 +288,25 @@ export const deleteEdition = async (req, res) => {
       if (!stillUsed) {
         const artist = await Artist.findById(artistId);
 
-        // Supprimer d’abord le fichier sur ImageKit
-        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-          await imagekit.deleteFile(artist.mediaFileId);
+        if (!artist) continue;
+
+        console.log("🧹 Suppression artiste :", artist.name);
+        console.log("   mediaFileId :", artist.mediaFileId);
+
+        if (artist.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
+          try {
+            await imagekit.deleteFile(artist.mediaFileId);
+            console.log(
+              "✅ Image supprimée sur ImageKit :",
+              artist.mediaFileId
+            );
+          } catch (err) {
+            console.error("❌ Erreur suppression ImageKit :", err.message);
+          }
+        } else {
+          console.log("⚠️ Aucun mediaFileId ou fichier encore utilisé");
         }
 
-        // Puis supprimer le document de la base
         await Artist.findByIdAndDelete(artistId);
       }
     }
