@@ -280,6 +280,7 @@ export const deleteEdition = async (req, res) => {
     const guestsIds = edition.guests || [];
 
     await Edition.findByIdAndDelete(req.params.id);
+
     // Nettoyer artistes
     for (const artistId of artistsIds) {
       const stillUsed = await Edition.findOne({ artists: artistId });
@@ -287,15 +288,12 @@ export const deleteEdition = async (req, res) => {
       if (!stillUsed) {
         const artist = await Artist.findById(artistId);
 
-        // Si l’artiste a bien une image hébergée (pas un lien)
-        if (artist && artist.mediaFileId) {
-          const inUse = await isFileInUse(artist.mediaFileId);
-          if (!inUse) {
-            await imagekit.deleteFile(artist.mediaFileId);
-          }
+        // Supprimer d’abord le fichier sur ImageKit
+        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
+          await imagekit.deleteFile(artist.mediaFileId);
         }
 
-        // Supprimer ensuite le document artiste
+        // Puis supprimer le document de la base
         await Artist.findByIdAndDelete(artistId);
       }
     }
