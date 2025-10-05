@@ -296,12 +296,9 @@ export const deleteEdition = async (req, res) => {
 
           if (!usedElsewhere) {
             await imagekit.deleteFile(artist.mediaFileId);
-            console.log(
-              "✅ Image supprimée sur ImageKit :",
-              artist.mediaFileId
-            );
+            console.log("Image supprimée sur ImageKit :", artist.mediaFileId);
           } else {
-            console.log("⚠️ Image utilisée ailleurs :", artist.mediaFileId);
+            console.log(" Image utilisée ailleurs :", artist.mediaFileId);
           }
         }
 
