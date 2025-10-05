@@ -12,16 +12,26 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
         fileIdSmall: null,
       };
     } catch {
-      // pas une URL valide → on continue
+      // Pas une URL valide → on continue
     }
   }
 
   // 2. Upload depuis req.file (Sharp)
   if (file) {
-    // Si Sharp a généré deux versions
-    if (file.bufferSmall && file.bufferLarge) {
-      const timestamp = Date.now();
+    const timestamp = Date.now();
 
+    // Dossiers nécessitant une double version (small + large)
+    const dualVersionFolders = [
+      "festn_breizh/accueil",
+      "festn_breizh/affiches",
+    ];
+
+    // Si Sharp a généré deux versions et que le dossier le demande
+    if (
+      file.bufferSmall &&
+      file.bufferLarge &&
+      dualVersionFolders.includes(folder)
+    ) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),
@@ -43,11 +53,11 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       };
     }
 
-    // Sinon, image unique (logos, annonces, etc.)
+    // Cas standard : une seule version (artistes, invités, partenaires, annonces)
     if (file.buffer) {
       const upload = await imagekit.upload({
         file: file.buffer.toString("base64"),
-        fileName: `${cleanName}-${Date.now()}.webp`,
+        fileName: `${cleanName}-${timestamp}.webp`,
         folder,
       });
 
