@@ -287,12 +287,15 @@ export const deleteEdition = async (req, res) => {
       if (!stillUsed) {
         const artist = await Artist.findById(artistId);
 
-        // Supprimer d'abord sur ImageKit si le fichier existe
-        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-          await imagekit.deleteFile(artist.mediaFileId);
+        // Si l’artiste a bien une image hébergée (pas un lien)
+        if (artist && artist.mediaFileId) {
+          const inUse = await isFileInUse(artist.mediaFileId);
+          if (!inUse) {
+            await imagekit.deleteFile(artist.mediaFileId);
+          }
         }
 
-        // Puis supprimer le document de la base
+        // Supprimer ensuite le document artiste
         await Artist.findByIdAndDelete(artistId);
       }
     }
