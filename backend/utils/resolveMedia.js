@@ -17,7 +17,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
   }
 
   // 2. Upload depuis req.file (Sharp)
-  if (file) {
+  if (file && (file.buffer || file.bufferSmall || file.bufferLarge)) {
     const timestamp = Date.now();
 
     // Dossiers nécessitant une double version (small + large)
