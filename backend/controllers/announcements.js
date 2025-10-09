@@ -66,6 +66,10 @@ export const getOneAnnouncement = async (req, res) => {
 //modifier une annonce//
 export const updateAnnouncement = async (req, res) => {
   try {
+    const body = req.body.announcement
+      ? JSON.parse(req.body.announcement)
+      : req.body;
+
     const existing = await Announcement.findById(req.params.id);
     if (!existing) return res.status(404).json("Annonce non trouvée");
 
@@ -73,15 +77,15 @@ export const updateAnnouncement = async (req, res) => {
     const allowed = ["title", "text", "url"];
     const filtered = {};
     for (const k of allowed) {
-      if (req.body[k] !== undefined) filtered[k] = req.body[k];
+      if (body[k] !== undefined) filtered[k] = body[k];
     }
 
     const hasNewMedia =
       !!req.file ||
-      (typeof req.body.media === "string" && req.body.media.trim() !== "");
+      (typeof body.media === "string" && body.media.trim() !== "");
 
     // Si on change mediaType, on exige un nouveau média (sinon risque d'incohérence de dossier)
-    if (req.body.mediaType && !hasNewMedia) {
+    if (body.mediaType && !hasNewMedia) {
       return res.status(400).json("Envoyez un média si vous changez mediaType");
     }
 
@@ -91,12 +95,12 @@ export const updateAnnouncement = async (req, res) => {
         .toLowerCase();
 
       // Dossier déterminé par le type cible (celui envoyé, sinon l’actuel)
-      const nextType = req.body.mediaType || existing.mediaType || null;
+      const nextType = body.mediaType || existing.mediaType || null;
       const folder =
         nextType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/accueil";
 
       const newMedia = await resolveMedia(
-        req.body.media,
+        body.media,
         req.file,
         folder,
         cleanName
