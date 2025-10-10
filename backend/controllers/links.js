@@ -60,27 +60,61 @@ export const getOneLink = async (req, res) => {
 };
 
 // Mettre à jour un lien //
+// Mettre à jour un lien //
 export const updateLink = async (req, res) => {
   try {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    const body = req.body.link ? JSON.parse(req.body.link) : req.body;
+    // Récupération sûre du body (form-data ou raw JSON)
+    const body = req.body?.link ? JSON.parse(req.body.link) : req.body;
 
+    // 1) Mises à jour textuelles
     const allowedFields = ["title", "description", "url"];
     const filteredData = {};
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) filteredData[field] = body[field];
+    for (const k of allowedFields) {
+      if (body[k] !== undefined) filteredData[k] = body[k];
     }
 
-    const cleanName = req.body.fileName?.trim()
-      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-      : (filteredData.title || existingLink.title || "link")
-          .replace(/\s+/g, "-")
-          .toLowerCase();
+    // 2) Renommage du logo SANS nouveau fichier (fileName seul)
+    if (
+      !req.file &&
+      !body.logo &&
+      req.body.fileName &&
+      existingLink.logoFileId
+    ) {
+      const base = req.body.fileName.trim().replace(/\s+/g, "-").toLowerCase();
+      // on conserve l’extension actuelle (souvent .webp)
+      const ext =
+        (existingLink.logo && existingLink.logo.split(".").pop()) || "webp";
+      const newName = `${base}.${ext}`;
 
-    // Gestion du logo
+      // rename côté ImageKit
+      await imagekit.updateFileDetails(existingLink.logoFileId, {
+        name: newName,
+      });
+
+      // récupérer l'URL à jour depuis ImageKit
+      let newUrl = existingLink.logo;
+      try {
+        const details = await imagekit.getFileDetails(existingLink.logoFileId);
+        if (details?.url) newUrl = details.url;
+      } catch {
+        // fallback: remplacer le nom en fin d'URL
+        newUrl = existingLink.logo.replace(/[^/]+$/, newName);
+      }
+
+      filteredData.logo = newUrl;
+      // logoFileId inchangé
+    }
+
+    // 3) Remplacement du logo (nouveau fichier ou URL)
     if (req.file || body.logo) {
+      const nameSource = req.body.fileName?.trim()
+        ? req.body.fileName
+        : filteredData.title || existingLink.title || "link";
+      const cleanName = nameSource.replace(/\s+/g, "-").toLowerCase();
+
       const newLogo = await resolveMedia(
         body.logo,
         req.file,
@@ -89,11 +123,10 @@ export const updateLink = async (req, res) => {
       );
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      if (
-        existingLink.logoFileId &&
-        !(await isFileInUse(existingLink.logoFileId))
-      ) {
-        await imagekit.deleteFile(existingLink.logoFileId);
+      // supprimer l’ancien fichier s’il n’est plus utilisé
+      if (existingLink.logoFileId && newLogo.fileId) {
+        const inUse = await isFileInUse(existingLink.logoFileId);
+        if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
       }
 
       filteredData.logo = newLogo.url;
@@ -103,16 +136,13 @@ export const updateLink = async (req, res) => {
     const updatedLink = await Link.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedLink);
   } catch (error) {
     console.error("Erreur updateLink :", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Erreur lors de la mise à jour du lien." });
   }
 };
 
