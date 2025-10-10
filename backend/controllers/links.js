@@ -80,10 +80,14 @@ export const updateLink = async (req, res) => {
     if (
       !req.file &&
       !body.logo &&
-      req.body.fileName &&
+      (req.body.fileName || body.fileName) &&
       existingLink.logoFileId
     ) {
-      const base = req.body.fileName.trim().replace(/\s+/g, "-").toLowerCase();
+      const base = (req.body.fileName || body.fileName)
+        .trim()
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
       const ext =
         (existingLink.logo && existingLink.logo.split(".").pop()) || "webp";
       const newName = `${base}.${ext}`;
