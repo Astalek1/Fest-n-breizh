@@ -20,14 +20,18 @@ export const newPoster = async (req, res) => {
     if (existing)
       return res.status(400).json("Une affiche avec ce titre existe déjà");
 
-    const cleanName = posterData.title.replace(/\s+/g, "-").toLowerCase();
+    const cleanName = req.body.fileName?.trim()
+      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+      : posterData.title
+      ? posterData.title.replace(/\s+/g, "-").toLowerCase()
+      : `${Date.now()}`;
+
     const newMedia = await resolveMedia(
       posterData.media,
       req.file,
       "festn_breizh/affiches",
       cleanName
     );
-
     if (!newMedia?.url) return res.status(400).json("Média invalide");
 
     const newPoster = new Gallery({
@@ -78,35 +82,40 @@ export const updatePoster = async (req, res) => {
     });
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
-    const posterData = req.body.poster ? JSON.parse(req.body.poster) : req.body;
+    const body = req.body.poster ? JSON.parse(req.body.poster) : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
     for (const field of allowedFields) {
-      if (posterData[field] !== undefined)
-        filteredData[field] = posterData[field];
+      if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    if (req.file || posterData.media) {
-      if (existingPoster.mediaFileId)
-        await imagekit.deleteFile(existingPoster.mediaFileId).catch(() => {});
-      if (existingPoster.mediaFileIdSmall)
-        await imagekit
-          .deleteFile(existingPoster.mediaFileIdSmall)
-          .catch(() => {});
-
-      const cleanName = (posterData.title || existingPoster.title)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+    if (req.file || body.media) {
+      const cleanName = req.body.fileName?.trim()
+        ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+        : body.title
+        ? body.title.replace(/\s+/g, "-").toLowerCase()
+        : existingPoster.title.replace(/\s+/g, "-").toLowerCase();
 
       const newMedia = await resolveMedia(
-        posterData.media,
+        body.media,
         req.file,
         "festn_breizh/affiches",
         cleanName
       );
-
       if (!newMedia?.url) return res.status(400).json("Média invalide");
+
+      if (
+        existingPoster.mediaFileId &&
+        !(await isFileInUse(existingPoster.mediaFileId))
+      )
+        await imagekit.deleteFile(existingPoster.mediaFileId);
+
+      if (
+        existingPoster.mediaFileIdSmall &&
+        !(await isFileInUse(existingPoster.mediaFileIdSmall))
+      )
+        await imagekit.deleteFile(existingPoster.mediaFileIdSmall);
 
       filteredData.url = newMedia.url;
       filteredData.urlSmall = newMedia.urlSmall || null;
@@ -117,7 +126,10 @@ export const updatePoster = async (req, res) => {
     const updatedPoster = await Gallery.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     res.status(200).json(updatedPoster);
@@ -134,15 +146,14 @@ export const deletePoster = async (req, res) => {
     });
     if (!poster) return res.status(404).json("Affiche non trouvée");
 
-    if (poster.mediaFileId) {
-      const stillUsed = await isFileInUse(poster.mediaFileId);
-      if (!stillUsed) await imagekit.deleteFile(poster.mediaFileId);
-    }
+    if (poster.mediaFileId && !(await isFileInUse(poster.mediaFileId)))
+      await imagekit.deleteFile(poster.mediaFileId);
 
-    if (poster.mediaFileIdSmall) {
-      const stillUsed = await isFileInUse(poster.mediaFileIdSmall);
-      if (!stillUsed) await imagekit.deleteFile(poster.mediaFileIdSmall);
-    }
+    if (
+      poster.mediaFileIdSmall &&
+      !(await isFileInUse(poster.mediaFileIdSmall))
+    )
+      await imagekit.deleteFile(poster.mediaFileIdSmall);
 
     res.status(200).json("Affiche supprimée avec succès");
   } catch (error) {
@@ -167,14 +178,18 @@ export const newPhoto = async (req, res) => {
     if (existing)
       return res.status(400).json("Une photo avec ce titre existe déjà");
 
-    const cleanName = photoData.title.replace(/\s+/g, "-").toLowerCase();
+    const cleanName = req.body.fileName?.trim()
+      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+      : photoData.title
+      ? photoData.title.replace(/\s+/g, "-").toLowerCase()
+      : `${Date.now()}`;
+
     const newMedia = await resolveMedia(
       photoData.media,
       req.file,
       "festn_breizh/photos",
       cleanName
     );
-
     if (!newMedia?.url) return res.status(400).json("Média invalide");
 
     const newPhoto = new Gallery({
@@ -222,37 +237,40 @@ export const updatePhoto = async (req, res) => {
     });
     if (!existingPhoto) return res.status(404).json("Photo non trouvée");
 
-    const photoData = req.body.photoData
-      ? JSON.parse(req.body.photoData)
-      : req.body;
+    const body = req.body.photoData ? JSON.parse(req.body.photoData) : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
     for (const field of allowedFields) {
-      if (photoData[field] !== undefined)
-        filteredData[field] = photoData[field];
+      if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    if (req.file || photoData.media) {
-      if (existingPhoto.mediaFileId)
-        await imagekit.deleteFile(existingPhoto.mediaFileId).catch(() => {});
-      if (existingPhoto.mediaFileIdSmall)
-        await imagekit
-          .deleteFile(existingPhoto.mediaFileIdSmall)
-          .catch(() => {});
-
-      const cleanName = (photoData.title || existingPhoto.title)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+    if (req.file || body.media) {
+      const cleanName = req.body.fileName?.trim()
+        ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+        : body.title
+        ? body.title.replace(/\s+/g, "-").toLowerCase()
+        : existingPhoto.title.replace(/\s+/g, "-").toLowerCase();
 
       const newMedia = await resolveMedia(
-        photoData.media,
+        body.media,
         req.file,
         "festn_breizh/photos",
         cleanName
       );
-
       if (!newMedia?.url) return res.status(400).json("Média invalide");
+
+      if (
+        existingPhoto.mediaFileId &&
+        !(await isFileInUse(existingPhoto.mediaFileId))
+      )
+        await imagekit.deleteFile(existingPhoto.mediaFileId);
+
+      if (
+        existingPhoto.mediaFileIdSmall &&
+        !(await isFileInUse(existingPhoto.mediaFileIdSmall))
+      )
+        await imagekit.deleteFile(existingPhoto.mediaFileIdSmall);
 
       filteredData.url = newMedia.url;
       filteredData.urlSmall = newMedia.urlSmall || null;
@@ -263,7 +281,10 @@ export const updatePhoto = async (req, res) => {
     const updatedPhoto = await Gallery.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     res.status(200).json(updatedPhoto);
@@ -280,15 +301,11 @@ export const deletePhoto = async (req, res) => {
     });
     if (!photo) return res.status(404).json("Photo non trouvée");
 
-    if (photo.mediaFileId) {
-      const stillUsed = await isFileInUse(photo.mediaFileId);
-      if (!stillUsed) await imagekit.deleteFile(photo.mediaFileId);
-    }
+    if (photo.mediaFileId && !(await isFileInUse(photo.mediaFileId)))
+      await imagekit.deleteFile(photo.mediaFileId);
 
-    if (photo.mediaFileIdSmall) {
-      const stillUsed = await isFileInUse(photo.mediaFileIdSmall);
-      if (!stillUsed) await imagekit.deleteFile(photo.mediaFileIdSmall);
-    }
+    if (photo.mediaFileIdSmall && !(await isFileInUse(photo.mediaFileIdSmall)))
+      await imagekit.deleteFile(photo.mediaFileIdSmall);
 
     res.status(200).json("Photo supprimée avec succès");
   } catch (error) {

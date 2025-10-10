@@ -8,9 +8,11 @@ export const newLink = async (req, res) => {
   try {
     const linkData = JSON.parse(req.body.link);
 
-    const cleanName = (linkData.title || "link")
-      .replace(/\s+/g, "-")
-      .toLowerCase();
+    const cleanName = req.body.fileName?.trim()
+      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+      : linkData.title
+      ? linkData.title.replace(/\s+/g, "-").toLowerCase()
+      : "link";
 
     const mediaResult = await resolveMedia(
       linkData.media,
@@ -18,6 +20,8 @@ export const newLink = async (req, res) => {
       "/festn_breizh/logos",
       cleanName
     );
+
+    if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
     const newLink = new Link({
       title: linkData.title,
@@ -34,23 +38,23 @@ export const newLink = async (req, res) => {
   }
 };
 
-// Récupérer tous les liens
+// Récupérer tous les liens //
 export const getAllLinks = async (req, res) => {
   try {
     const links = await Link.find();
     res.status(200).json(links);
-  } catch {
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// Récupérer un lien par ID
+// Récupérer un lien par ID //
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
     if (!link) return res.status(404).json("Lien non trouvé");
     res.status(200).json(link);
-  } catch {
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -61,8 +65,7 @@ export const updateLink = async (req, res) => {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    // Récupération sûre du body (form-data ou raw JSON)
-    const body = req.body?.link ? JSON.parse(req.body.link) : req.body;
+    const body = req.body.link ? JSON.parse(req.body.link) : req.body;
 
     const allowedFields = ["title", "description", "url"];
     const filteredData = {};
@@ -70,11 +73,14 @@ export const updateLink = async (req, res) => {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    // Gestion du logo si mis à jour
-    if (req.file || body.logo) {
-      const nameSource = filteredData.title || existingLink.title || "link";
-      const cleanName = nameSource.replace(/\s+/g, "-").toLowerCase();
+    const cleanName = req.body.fileName?.trim()
+      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+      : (filteredData.title || existingLink.title || "link")
+          .replace(/\s+/g, "-")
+          .toLowerCase();
 
+    // Gestion du logo
+    if (req.file || body.logo) {
       const newLogo = await resolveMedia(
         body.logo,
         req.file,
@@ -83,10 +89,11 @@ export const updateLink = async (req, res) => {
       );
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      // Suppression de l’ancien logo si plus utilisé
-      if (existingLink.logoFileId && newLogo.fileId) {
-        const inUse = await isFileInUse(existingLink.logoFileId);
-        if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
+      if (
+        existingLink.logoFileId &&
+        !(await isFileInUse(existingLink.logoFileId))
+      ) {
+        await imagekit.deleteFile(existingLink.logoFileId);
       }
 
       filteredData.logo = newLogo.url;
@@ -96,13 +103,16 @@ export const updateLink = async (req, res) => {
     const updatedLink = await Link.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     res.status(200).json(updatedLink);
   } catch (error) {
     console.error("Erreur updateLink :", error);
-    res.status(500).json({ error: "Erreur lors de la mise à jour du lien." });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -112,9 +122,8 @@ export const deleteLink = async (req, res) => {
     const link = await Link.findById(req.params.id);
     if (!link) return res.status(404).json("Lien non trouvé");
 
-    if (link.logoFileId) {
-      const inUse = await isFileInUse(link.logoFileId);
-      if (!inUse) await imagekit.deleteFile(link.logoFileId);
+    if (link.logoFileId && !(await isFileInUse(link.logoFileId))) {
+      await imagekit.deleteFile(link.logoFileId);
     }
 
     await Link.findByIdAndDelete(req.params.id);

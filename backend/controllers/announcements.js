@@ -7,7 +7,9 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 export const newAnnouncement = async (req, res) => {
   try {
     const announcementData = JSON.parse(req.body.announcement);
-    const cleanName = announcementData.title.replace(/\s+/g, "-").toLowerCase();
+    const cleanName = req.file?.originalname
+      ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
+      : `${Date.now()}`;
 
     // Déterminer le dossier selon le type de média
     let folderPath = "/festn_breizh/accueil";
@@ -90,9 +92,13 @@ export const updateAnnouncement = async (req, res) => {
     }
 
     if (hasNewMedia) {
-      const cleanName = (filtered.title || existing.title)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+      const cleanName = req.body.fileName?.trim()
+        ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
+        : req.file?.originalname
+        ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
+        : (filtered.title || existing.title || `media-${Date.now()}`)
+            .replace(/\s+/g, "-")
+            .toLowerCase();
 
       // Dossier déterminé par le type cible (celui envoyé, sinon l’actuel)
       const nextType = body.mediaType || existing.mediaType || null;
