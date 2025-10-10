@@ -29,6 +29,7 @@ export const newLink = async (req, res) => {
       url: linkData.url,
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
+      logoName: mediaResult.fileName || cleanName,
     });
 
     await newLink.save();
@@ -60,7 +61,6 @@ export const getOneLink = async (req, res) => {
 };
 
 // Mettre à jour un lien //
-// Mettre à jour un lien //
 export const updateLink = async (req, res) => {
   try {
     const existingLink = await Link.findById(req.params.id);
@@ -84,7 +84,6 @@ export const updateLink = async (req, res) => {
       existingLink.logoFileId
     ) {
       const base = req.body.fileName.trim().replace(/\s+/g, "-").toLowerCase();
-      // on conserve l’extension actuelle (souvent .webp)
       const ext =
         (existingLink.logo && existingLink.logo.split(".").pop()) || "webp";
       const newName = `${base}.${ext}`;
@@ -105,7 +104,7 @@ export const updateLink = async (req, res) => {
       }
 
       filteredData.logo = newUrl;
-      // logoFileId inchangé
+      filteredData.logoName = base; // ajout de la synchro du nom
     }
 
     // 3) Remplacement du logo (nouveau fichier ou URL)
@@ -131,6 +130,7 @@ export const updateLink = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
+      filteredData.logoName = newLogo.fileName || cleanName; // ajout de la synchro du nom
     }
 
     const updatedLink = await Link.findByIdAndUpdate(
