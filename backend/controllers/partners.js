@@ -55,57 +55,58 @@ export const getOnePartner = async (req, res) => {
   }
 };
 
-//modifier un partenaire//
+// modifier un partenaire //
 export const updatePartner = async (req, res) => {
   try {
-    const existingPartner = await Partner.findOne({
-      _id: req.params.id,
-    });
-    if (!existingPartner) {
-      return res.status(404).json("partenaire non trouvée");
-    }
+    // Récupération du JSON envoyé (comme pour les annonces)
+    const body = req.body.partner ? JSON.parse(req.body.partner) : req.body;
 
-    const allowedFields = ["name", "url", "description"];
+    const existingPartner = await Partner.findById(req.params.id);
+    if (!existingPartner) return res.status(404).json("Partenaire non trouvé");
 
+    const allowedFields = ["name", "description", "url"];
     const filteredData = {};
     for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        filteredData[field] = req.body[field];
-      }
+      if (body[field] !== undefined) filteredData[field] = body[field];
     }
-    // Gestion du logo si mis à jour
-    if (req.file || req.body.logo) {
+
+    // Si un nouveau logo est envoyé
+    if (req.file || body.logo) {
       const cleanName = (filteredData.name || existingPartner.name)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
       const newLogo = await resolveMedia(
-        req.body.logo,
+        body.logo,
         req.file,
-        "/festn_breizh/logos",
+        "festn_breizh/logos",
         cleanName
       );
+
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
-      // Supprimer l'ancien logo si remplacé
+
+      // Suppression de l’ancien logo si non utilisé ailleurs
       if (existingPartner.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingPartner.logoFileId);
-        if (!inUse) {
-          await imagekit.deleteFile(existingPartner.logoFileId);
-        }
+        if (!inUse) await imagekit.deleteFile(existingPartner.logoFileId);
       }
+
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
     }
 
-    const newDataPartner = await Partner.findByIdAndUpdate(
+    const updated = await Partner.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
-    res.status(200).json(newDataPartner);
+    res.status(200).json(updated);
   } catch (error) {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
+    res.status(500).json({ error: error.message });
   }
 };
 
