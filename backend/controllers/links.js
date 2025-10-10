@@ -61,26 +61,29 @@ export const updateLink = async (req, res) => {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
+    // Récupération sûre du body (form-data ou raw JSON)
+    const body = req.body?.link ? JSON.parse(req.body.link) : req.body;
+
     const allowedFields = ["title", "description", "url"];
     const filteredData = {};
     for (const field of allowedFields) {
-      if (req.body[field] !== undefined) filteredData[field] = req.body[field];
+      if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
     // Gestion du logo si mis à jour
-    if (req.file || req.body.logo) {
-      const nameSource = filteredData.title || existingLink?.title || "link";
+    if (req.file || body.logo) {
+      const nameSource = filteredData.title || existingLink.title || "link";
       const cleanName = nameSource.replace(/\s+/g, "-").toLowerCase();
 
       const newLogo = await resolveMedia(
-        req.body.logo,
+        body.logo,
         req.file,
         "/festn_breizh/logos",
         cleanName
       );
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      // Supprimer l'ancien logo si plus utilisé
+      // Suppression de l’ancien logo si plus utilisé
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
         if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
@@ -97,8 +100,9 @@ export const updateLink = async (req, res) => {
     );
 
     res.status(200).json(updatedLink);
-  } catch {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
+  } catch (error) {
+    console.error("Erreur updateLink :", error);
+    res.status(500).json({ error: "Erreur lors de la mise à jour du lien." });
   }
 };
 
