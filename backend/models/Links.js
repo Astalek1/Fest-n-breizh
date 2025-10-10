@@ -6,7 +6,7 @@ const linkSchema = mongoose.Schema({
   url: { type: String, required: true },
   logo: { type: String, required: true },
   logoFileId: { type: String, required: true },
-  logoName: { type: String, required: false },
+  logoName: { type: String },
 });
 
 const Link = mongoose.model("Link", linkSchema);
