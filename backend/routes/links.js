@@ -9,12 +9,12 @@ const router = express.Router();
 router.get("/", linksCtrl.getAllLinks);
 router.get("/:id", linksCtrl.getOneLink);
 
-router.post("/", auth, multer.single("media"), resizeImage, linksCtrl.newLink);
+router.post("/", auth, multer.single("file"), resizeImage, linksCtrl.newLink);
 
 router.put(
   "/:id",
   auth,
-  multer.single("media"),
+  multer.single("file"),
   resizeImage,
   linksCtrl.updateLink
 );
