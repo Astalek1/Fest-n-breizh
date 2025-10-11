@@ -66,17 +66,42 @@ export const updateLink = async (req, res) => {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    // Récupération sûre du body (form-data ou raw JSON)
+    // Récupération du body (form-data ou JSON brut)
     const body = req.body?.link ? JSON.parse(req.body.link) : req.body;
 
     // 1) Mises à jour textuelles
     const allowedFields = ["title", "description", "url"];
     const filteredData = {};
-    for (const k of allowedFields) {
-      if (body[k] !== undefined) filteredData[k] = body[k];
+    for (const key of allowedFields) {
+      if (body[key] !== undefined) filteredData[key] = body[key];
     }
 
-    // 2) Renommage du logo SANS nouveau fichier (fileName seul)
+    // 2) Utiliser un logo déjà présent (URL + fileId fournis, sans upload)
+    if (body.logo && body.logoFileId && !req.file) {
+      if (
+        existingLink.logoFileId &&
+        existingLink.logoFileId !== body.logoFileId
+      ) {
+        const inUse = await isFileInUse(existingLink.logoFileId);
+        if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
+      }
+
+      filteredData.logo = body.logo;
+      filteredData.logoFileId = body.logoFileId;
+
+      const updated = await Link.findByIdAndUpdate(
+        req.params.id,
+        filteredData,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      return res.status(200).json(updated);
+    }
+
+    // 3) Renommage du logo sans nouveau fichier (fileName seul)
     if (
       !req.file &&
       !body.logo &&
@@ -92,30 +117,28 @@ export const updateLink = async (req, res) => {
         (existingLink.logo && existingLink.logo.split(".").pop()) || "webp";
       const newName = `${base}.${ext}`;
 
-      // rename côté ImageKit
       await imagekit.updateFileDetails(existingLink.logoFileId, {
         name: newName,
       });
 
-      // récupérer l'URL à jour depuis ImageKit
       let newUrl = existingLink.logo;
       try {
         const details = await imagekit.getFileDetails(existingLink.logoFileId);
         if (details?.url) newUrl = details.url;
       } catch {
-        // fallback: remplacer le nom en fin d'URL
         newUrl = existingLink.logo.replace(/[^/]+$/, newName);
       }
 
       filteredData.logo = newUrl;
-      filteredData.logoName = base; // ajout de la synchro du nom
+      filteredData.logoName = base;
     }
 
-    // 3) Remplacement du logo (nouveau fichier ou URL)
+    // 4) Remplacement du logo (nouveau fichier ou URL)
     if (req.file || body.logo) {
       const nameSource = req.body.fileName?.trim()
         ? req.body.fileName
         : filteredData.title || existingLink.title || "link";
+
       const cleanName = nameSource.replace(/\s+/g, "-").toLowerCase();
 
       const newLogo = await resolveMedia(
@@ -124,9 +147,9 @@ export const updateLink = async (req, res) => {
         "/festn_breizh/logos",
         cleanName
       );
+
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      // supprimer l’ancien fichier s’il n’est plus utilisé
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
         if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
@@ -134,13 +157,17 @@ export const updateLink = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
-      filteredData.logoName = newLogo.fileName || cleanName; // ajout de la synchro du nom
+      filteredData.logoName = newLogo.fileName || cleanName;
     }
 
+    // 5) Sauvegarde finale
     const updatedLink = await Link.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     res.status(200).json(updatedLink);
