@@ -3,16 +3,15 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// Créer un nouveau lien //
+// 🔹 Créer un nouveau lien
 export const newLink = async (req, res) => {
   try {
-    const linkData = JSON.parse(req.body.link);
+    const linkData = JSON.parse(req.body.link || "{}");
 
-    const cleanName = req.body.fileName?.trim()
-      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-      : linkData.title
-      ? linkData.title.replace(/\s+/g, "-").toLowerCase()
-      : "link";
+    const cleanName = (req.body.fileName || linkData.title || "link")
+      .trim()
+      .replace(/\s+/g, "-")
+      .toLowerCase();
 
     const mediaResult = await resolveMedia(
       linkData.media,
@@ -39,41 +38,46 @@ export const newLink = async (req, res) => {
   }
 };
 
-// Récupérer tous les liens //
+// 🔹 Récupérer tous les liens
 export const getAllLinks = async (req, res) => {
   try {
     const links = await Link.find();
     res.status(200).json(links);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// Récupérer un lien par ID //
+// 🔹 Récupérer un lien par ID
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
     if (!link) return res.status(404).json("Lien non trouvé");
     res.status(200).json(link);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
+// 🔹 Mettre à jour un lien
 export const updateLink = async (req, res) => {
   try {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    const body = req.body?.link ? JSON.parse(req.body.link) : req.body;
-    const filteredData = {};
+    // ✅ Parsing sécurisé du body
+    let body = {};
+    try {
+      body = req.body.link ? JSON.parse(req.body.link) : req.body;
+    } catch {
+      body = req.body || {};
+    }
 
-    // 1️⃣ Mise à jour des champs textuels
+    const filteredData = {};
     for (const field of ["title", "description", "url"]) {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    // 2️⃣ Détection du nom souhaité pour le logo
     const baseName = (
       req.body.fileName ||
       body.fileName ||
@@ -85,29 +89,20 @@ export const updateLink = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    // 3️⃣ Cas A : Renommage du logo existant uniquement
-    if (!req.file && !body.logo && baseName && existingLink.logoFileId) {
-      const ext =
-        (existingLink.logo && existingLink.logo.split(".").pop()) || "webp";
+    // 🅰️ Renommage du logo existant
+    if (!req.file && !body.logo && existingLink.logoFileId) {
+      const ext = (existingLink.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
 
       await imagekit.updateFileDetails(existingLink.logoFileId, {
         name: newName,
       });
 
-      let newUrl = existingLink.logo;
-      try {
-        const details = await imagekit.getFileDetails(existingLink.logoFileId);
-        if (details?.url) newUrl = details.url;
-      } catch {
-        newUrl = existingLink.logo.replace(/[^/]+$/, newName);
-      }
-
-      filteredData.logo = newUrl;
+      filteredData.logo = existingLink.logo.replace(/[^/]+$/, newName);
       filteredData.logoName = baseName;
     }
 
-    // 4️⃣ Cas B : Remplacement du logo par un logo déjà existant (fileId)
+    // 🅱️ Remplacement par un logo déjà existant (fileId)
     else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
 
@@ -115,17 +110,13 @@ export const updateLink = async (req, res) => {
       filteredData.logoFileId = logoDetails.fileId;
       filteredData.logoName = baseName;
 
-      // suppression de l’ancien logo si plus utilisé
-      if (
-        existingLink.logoFileId &&
-        existingLink.logoFileId !== logoDetails.fileId
-      ) {
+      if (existingLink.logoFileId !== logoDetails.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
         if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
       }
     }
 
-    // 5️⃣ Cas C : Remplacement du logo par un nouveau média (upload ou URL)
+    // 🅲 Remplacement par une URL ou un nouveau fichier
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
@@ -162,7 +153,7 @@ export const updateLink = async (req, res) => {
   }
 };
 
-// Supprimer un lien //
+// 🔹 Supprimer un lien
 export const deleteLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
