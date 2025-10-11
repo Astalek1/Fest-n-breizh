@@ -155,16 +155,18 @@ export const updatePartner = async (req, res) => {
   }
 };
 
-// 🔴 Supprimer un partenaire
+// Supprimer un partenaire
 export const deletePartner = async (req, res) => {
   try {
-    console.log(inUse);
     const partner = await Partner.findById(req.params.id);
     if (!partner) return res.status(404).json("Partenaire non trouvé");
 
+    // Vérifie si le logo est encore utilisé ailleurs avant suppression
     if (partner.logoFileId) {
       const inUse = await isFileInUse(partner.logoFileId);
-      if (!inUse) await imagekit.deleteFile(partner.logoFileId);
+      if (inUse === false) {
+        await imagekit.deleteFile(partner.logoFileId);
+      }
     }
 
     await Partner.findByIdAndDelete(req.params.id);
