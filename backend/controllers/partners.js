@@ -158,6 +158,7 @@ export const updatePartner = async (req, res) => {
 // 🔴 Supprimer un partenaire
 export const deletePartner = async (req, res) => {
   try {
+    console.log(inUse);
     const partner = await Partner.findById(req.params.id);
     if (!partner) return res.status(404).json("Partenaire non trouvé");
 
