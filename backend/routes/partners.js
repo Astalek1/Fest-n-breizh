@@ -12,7 +12,7 @@ router.get("/:id", partnersCtrl.getOnePartner);
 router.post(
   "/",
   auth,
-  multer.single("media"),
+  multer.single("file"),
   resizeImage,
   partnersCtrl.newPartner
 );
@@ -20,7 +20,7 @@ router.post(
 router.put(
   "/:id",
   auth,
-  multer.single("media"),
+  multer.single("file"),
   resizeImage,
   partnersCtrl.updatePartner
 );
