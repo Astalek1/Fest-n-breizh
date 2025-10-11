@@ -65,10 +65,10 @@ export const updatePartner = async (req, res) => {
     const existingPartner = await Partner.findById(req.params.id);
     if (!existingPartner) return res.status(404).json("Partenaire non trouvé");
 
-    // Parsing sécurisé du body
+    // ✅ Correction : parsing sûr et constant
     let body = {};
     try {
-      body = req.body.partner ? JSON.parse(req.body.partner) : req.body;
+      body = JSON.parse(req.body.partner || "{}");
     } catch {
       body = req.body || {};
     }
