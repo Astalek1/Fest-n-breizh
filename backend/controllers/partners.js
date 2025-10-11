@@ -3,23 +3,22 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// 🔹 Créer un nouveau partenaire
+// 🟢 Créer un nouveau partenaire
 export const newPartner = async (req, res) => {
   try {
     const partnerData = JSON.parse(req.body.partner || "{}");
 
-    // Nom du fichier (soit personnalisé, soit auto-généré)
-    const customName =
-      req.body.fileName?.trim() ||
-      partnerData.fileName?.trim() ||
-      partnerData.name?.replace(/\s+/g, "-").toLowerCase() ||
-      `partner-${Date.now()}`;
+    // 🔸 Le nom du logo peut être donné par l'utilisateur
+    const cleanName = (req.body.fileName || "logo-partner")
+      .trim()
+      .replace(/\s+/g, "-")
+      .toLowerCase();
 
     const mediaResult = await resolveMedia(
       partnerData.media,
       req.file,
       "/festn_breizh/logos",
-      customName
+      cleanName
     );
 
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
@@ -30,7 +29,7 @@ export const newPartner = async (req, res) => {
       url: partnerData.url || null,
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
-      logoName: mediaResult.fileName || customName,
+      logoName: mediaResult.fileName || cleanName,
     });
 
     await newPartner.save();
@@ -41,7 +40,7 @@ export const newPartner = async (req, res) => {
   }
 };
 
-// 🔹 Récupérer tous les partenaires
+// 🟢 Récupérer tous les partenaires
 export const getAllPartners = async (req, res) => {
   try {
     const partners = await Partner.find();
@@ -51,7 +50,7 @@ export const getAllPartners = async (req, res) => {
   }
 };
 
-// 🔹 Récupérer un seul partenaire
+// 🟢 Récupérer un seul partenaire
 export const getOnePartner = async (req, res) => {
   try {
     const partner = await Partner.findById(req.params.id);
@@ -62,12 +61,13 @@ export const getOnePartner = async (req, res) => {
   }
 };
 
-// 🔹 Mettre à jour un partenaire
+// 🟢 Modifier un partenaire
 export const updatePartner = async (req, res) => {
   try {
     const existingPartner = await Partner.findById(req.params.id);
     if (!existingPartner) return res.status(404).json("Partenaire non trouvé");
 
+    // Parsing sécurisé du body
     let body = {};
     try {
       body = req.body.partner ? JSON.parse(req.body.partner) : req.body;
@@ -75,49 +75,59 @@ export const updatePartner = async (req, res) => {
       body = req.body || {};
     }
 
+    // Champs modifiables
     const filteredData = {};
     for (const field of ["name", "description", "url"]) {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    const customName =
-      req.body.fileName?.trim() ||
-      body.fileName?.trim() ||
-      `partner-${Date.now()}`;
+    // 🔸 Le nom du fichier peut être défini par l'utilisateur
+    const baseName = (
+      req.body.fileName ||
+      body.fileName ||
+      existingPartner.logoName ||
+      "logo-partner"
+    )
+      .trim()
+      .replace(/\s+/g, "-")
+      .toLowerCase();
 
-    // Aucun changement de logo → mise à jour simple
-    if (!req.file && !body.logo) {
-      const updatedPartner = await Partner.findByIdAndUpdate(
-        req.params.id,
-        filteredData,
-        { new: true, runValidators: true }
-      );
-      return res.status(200).json(updatedPartner);
+    // a) Renommage du logo existant (pas d'upload, pas de remplacement)
+    if (!req.file && !body.logo && existingPartner.logoFileId) {
+      const ext = (
+        existingPartner.logo.split(".").pop() || "webp"
+      ).toLowerCase();
+      const newName = `${baseName}.${ext}`;
+
+      await imagekit.updateFileDetails(existingPartner.logoFileId, {
+        name: newName,
+      });
+
+      filteredData.logo = existingPartner.logo.replace(/[^/]+$/, newName);
+      filteredData.logoName = baseName;
     }
 
-    // Réutilisation d’un logo existant (fileId)
-    if (body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
+    // b) Réutilisation d’un logo déjà présent (via fileId)
+    else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
+
       filteredData.logo = logoDetails.url;
       filteredData.logoFileId = logoDetails.fileId;
-      filteredData.logoName = logoDetails.name;
+      filteredData.logoName = baseName;
 
-      if (
-        existingPartner.logoFileId &&
-        existingPartner.logoFileId !== logoDetails.fileId
-      ) {
+      if (existingPartner.logoFileId !== logoDetails.fileId) {
         const inUse = await isFileInUse(existingPartner.logoFileId);
         if (!inUse) await imagekit.deleteFile(existingPartner.logoFileId);
       }
     }
 
-    // Nouveau logo (upload ou URL)
+    // c) Nouveau logo (upload ou URL)
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
         req.file,
         "/festn_breizh/logos",
-        customName
+        baseName
       );
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
@@ -129,7 +139,7 @@ export const updatePartner = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
-      filteredData.logoName = newLogo.fileName || customName;
+      filteredData.logoName = newLogo.fileName || baseName;
     }
 
     const updatedPartner = await Partner.findByIdAndUpdate(
@@ -141,16 +151,17 @@ export const updatePartner = async (req, res) => {
     res.status(200).json(updatedPartner);
   } catch (error) {
     console.error("Erreur updatePartner :", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Erreur serveur (updatePartner)" });
   }
 };
 
-// 🔹 Supprimer un partenaire
+// 🟢 Supprimer un partenaire
 export const deletePartner = async (req, res) => {
   try {
     const partner = await Partner.findById(req.params.id);
     if (!partner) return res.status(404).json("Partenaire non trouvé");
 
+    // Suppression du logo si plus utilisé ailleurs
     if (partner.logoFileId) {
       const inUse = await isFileInUse(partner.logoFileId);
       if (!inUse) await imagekit.deleteFile(partner.logoFileId);
@@ -159,6 +170,7 @@ export const deletePartner = async (req, res) => {
     await Partner.findByIdAndDelete(req.params.id);
     res.status(200).json("Partenaire supprimé avec succès");
   } catch (error) {
+    console.error("Erreur deletePartner :", error);
     res.status(500).json({ error: error.message });
   }
 };
