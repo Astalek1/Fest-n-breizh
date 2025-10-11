@@ -8,20 +8,21 @@ export const newPartner = async (req, res) => {
   try {
     const partnerData = JSON.parse(req.body.partner || "{}");
 
-    // Nom unique du logo (indépendant du nom du partenaire)
-    const uniqueName = `partner-${Date.now()}`;
+    // Nom du fichier (soit personnalisé, soit auto-généré)
+    const customName =
+      req.body.fileName?.trim() ||
+      partnerData.fileName?.trim() ||
+      partnerData.name?.replace(/\s+/g, "-").toLowerCase() ||
+      `partner-${Date.now()}`;
 
-    // Upload du logo
     const mediaResult = await resolveMedia(
       partnerData.media,
       req.file,
       "/festn_breizh/logos",
-      uniqueName
+      customName
     );
 
-    if (!mediaResult?.url) {
-      return res.status(400).json("Logo invalide");
-    }
+    if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
     const newPartner = new Partner({
       name: partnerData.name,
@@ -29,7 +30,7 @@ export const newPartner = async (req, res) => {
       url: partnerData.url || null,
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
-      logoName: mediaResult.fileName || uniqueName,
+      logoName: mediaResult.fileName || customName,
     });
 
     await newPartner.save();
@@ -61,7 +62,7 @@ export const getOnePartner = async (req, res) => {
   }
 };
 
-// 🔹 Modifier un partenaire
+// 🔹 Mettre à jour un partenaire
 export const updatePartner = async (req, res) => {
   try {
     const existingPartner = await Partner.findById(req.params.id);
@@ -79,7 +80,12 @@ export const updatePartner = async (req, res) => {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    // Aucun nouveau fichier => pas d’action sur le logo
+    const customName =
+      req.body.fileName?.trim() ||
+      body.fileName?.trim() ||
+      `partner-${Date.now()}`;
+
+    // Aucun changement de logo → mise à jour simple
     if (!req.file && !body.logo) {
       const updatedPartner = await Partner.findByIdAndUpdate(
         req.params.id,
@@ -89,7 +95,7 @@ export const updatePartner = async (req, res) => {
       return res.status(200).json(updatedPartner);
     }
 
-    // Réutilisation d’un logo existant (fileId transmis)
+    // Réutilisation d’un logo existant (fileId)
     if (body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
       filteredData.logo = logoDetails.url;
@@ -105,13 +111,13 @@ export const updatePartner = async (req, res) => {
       }
     }
 
-    // Nouveau fichier uploadé (remplacement)
+    // Nouveau logo (upload ou URL)
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
         req.file,
         "/festn_breizh/logos",
-        `partner-${Date.now()}`
+        customName
       );
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
@@ -123,7 +129,7 @@ export const updatePartner = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
-      filteredData.logoName = newLogo.fileName;
+      filteredData.logoName = newLogo.fileName || customName;
     }
 
     const updatedPartner = await Partner.findByIdAndUpdate(
@@ -153,7 +159,6 @@ export const deletePartner = async (req, res) => {
     await Partner.findByIdAndDelete(req.params.id);
     res.status(200).json("Partenaire supprimé avec succès");
   } catch (error) {
-    console.error("Erreur deletePartner :", error);
     res.status(500).json({ error: error.message });
   }
 };
