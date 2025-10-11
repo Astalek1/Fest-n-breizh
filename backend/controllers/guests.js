@@ -8,13 +8,14 @@ export const newGuest = async (req, res) => {
   try {
     const guestData = JSON.parse(req.body.guest);
 
-    const cleanName = req.body.fileName?.trim()
-      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-      : req.file?.originalname
-      ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
-      : guestData.name
-      ? guestData.name.replace(/\s+/g, "-").toLowerCase()
-      : `${Date.now()}`;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      req.file?.originalname
+        ?.split(".")[0]
+        .replace(/\s+/g, "-")
+        .toLowerCase() ||
+      guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
+      `${Date.now()}`;
 
     const mediaResult = await resolveMedia(
       guestData.media,
@@ -39,8 +40,8 @@ export const newGuest = async (req, res) => {
       description: guestData.description,
       media: mediaResult?.url || null,
       mediaFileId: mediaResult?.fileId || null,
-      logo: logoResult ? logoResult.url : null,
-      logoFileId: logoResult ? logoResult.fileId : null,
+      logo: logoResult?.url || null,
+      logoFileId: logoResult?.fileId || null,
     });
 
     await newGuest.save();
@@ -55,7 +56,7 @@ export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
     res.status(200).json(guests);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -66,7 +67,7 @@ export const getOneGuest = async (req, res) => {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json("Invité non trouvé");
     res.status(200).json(guest);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -85,11 +86,11 @@ export const updateGuest = async (req, res) => {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    const cleanName = req.body.fileName?.trim()
-      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-      : (filteredData.name || guest.name || `${Date.now()}`)
-          .replace(/\s+/g, "-")
-          .toLowerCase();
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      (filteredData.name || guest.name || `${Date.now()}`)
+        .replace(/\s+/g, "-")
+        .toLowerCase();
 
     // --- Média principal ---
     if (req.file || body.media) {
@@ -102,8 +103,9 @@ export const updateGuest = async (req, res) => {
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      if (guest.mediaFileId && !(await isFileInUse(guest.mediaFileId))) {
-        await imagekit.deleteFile(guest.mediaFileId);
+      if (guest.mediaFileId && newMedia.fileId) {
+        const inUse = await isFileInUse(guest.mediaFileId);
+        if (inUse === false) await imagekit.deleteFile(guest.mediaFileId);
       }
 
       filteredData.media = newMedia.url;
@@ -121,8 +123,9 @@ export const updateGuest = async (req, res) => {
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      if (guest.logoFileId && !(await isFileInUse(guest.logoFileId))) {
-        await imagekit.deleteFile(guest.logoFileId);
+      if (guest.logoFileId && newLogo.fileId) {
+        const inUse = await isFileInUse(guest.logoFileId);
+        if (inUse === false) await imagekit.deleteFile(guest.logoFileId);
       }
 
       filteredData.logo = newLogo.url;
@@ -150,17 +153,19 @@ export const deleteGuest = async (req, res) => {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json("Invité non trouvé");
 
-    if (guest.mediaFileId && !(await isFileInUse(guest.mediaFileId))) {
-      await imagekit.deleteFile(guest.mediaFileId);
+    if (guest.mediaFileId) {
+      const inUse = await isFileInUse(guest.mediaFileId);
+      if (inUse === false) await imagekit.deleteFile(guest.mediaFileId);
     }
 
-    if (guest.logoFileId && !(await isFileInUse(guest.logoFileId))) {
-      await imagekit.deleteFile(guest.logoFileId);
+    if (guest.logoFileId) {
+      const inUse = await isFileInUse(guest.logoFileId);
+      if (inUse === false) await imagekit.deleteFile(guest.logoFileId);
     }
 
     await Guest.findByIdAndDelete(req.params.id);
     res.status(200).json("Invité supprimé avec succès");
   } catch (error) {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
+    res.status(500).json({ error: "Erreur serveur (deleteGuest)" });
   }
 };

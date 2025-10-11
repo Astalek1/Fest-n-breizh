@@ -8,15 +8,15 @@ export const newArtist = async (req, res) => {
   try {
     const artistData = JSON.parse(req.body.artist);
 
-    const cleanName = req.body.fileName?.trim()
-      ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-      : req.file?.originalname
-      ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
-      : artistData.name
-      ? artistData.name.replace(/\s+/g, "-").toLowerCase()
-      : `${Date.now()}`;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      req.file?.originalname
+        ?.split(".")[0]
+        .replace(/\s+/g, "-")
+        .toLowerCase() ||
+      artistData.name?.replace(/\s+/g, "-").toLowerCase() ||
+      `${Date.now()}`;
 
-    // Upload de la photo principale
     const mediaResult = await resolveMedia(
       artistData.media,
       req.file,
@@ -24,7 +24,6 @@ export const newArtist = async (req, res) => {
       cleanName
     );
 
-    // Upload du logo optionnel
     let logoResult = null;
     if (artistData.logo) {
       const logoName = `${cleanName}-logo`;
@@ -41,8 +40,8 @@ export const newArtist = async (req, res) => {
       description: artistData.description,
       media: mediaResult?.url || null,
       mediaFileId: mediaResult?.fileId || null,
-      logo: logoResult ? logoResult.url : null,
-      logoFileId: logoResult ? logoResult.fileId : null,
+      logo: logoResult?.url || null,
+      logoFileId: logoResult?.fileId || null,
     });
 
     await newArtist.save();
@@ -57,7 +56,7 @@ export const getAllArtists = async (req, res) => {
   try {
     const artists = await Artist.find();
     res.status(200).json(artists);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -68,7 +67,7 @@ export const getOneArtist = async (req, res) => {
     const artist = await Artist.findById(req.params.id);
     if (!artist) return res.status(404).json("Artiste non trouvé");
     res.status(200).json(artist);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -89,13 +88,15 @@ export const updateArtist = async (req, res) => {
 
     // Mise à jour du média principal
     if (req.file || body.media) {
-      const cleanName = req.body.fileName?.trim()
-        ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
-        : req.file?.originalname
-        ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
-        : (filteredData.name || artist.name || `${Date.now()}`)
-            .replace(/\s+/g, "-")
-            .toLowerCase();
+      const cleanName =
+        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        req.file?.originalname
+          ?.split(".")[0]
+          .replace(/\s+/g, "-")
+          .toLowerCase() ||
+        (filteredData.name || artist.name || `${Date.now()}`)
+          .replace(/\s+/g, "-")
+          .toLowerCase();
 
       const newMedia = await resolveMedia(
         body.media,
@@ -103,10 +104,15 @@ export const updateArtist = async (req, res) => {
         "/festn_breizh/artistes",
         cleanName
       );
+
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      if (artist.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-        await imagekit.deleteFile(artist.mediaFileId);
+      // Vérifie si l'ancien fichier peut être supprimé
+      if (artist.mediaFileId && newMedia.fileId) {
+        const inUse = await isFileInUse(artist.mediaFileId);
+        if (inUse === false) {
+          await imagekit.deleteFile(artist.mediaFileId);
+        }
       }
 
       filteredData.media = newMedia.url;
@@ -128,8 +134,12 @@ export const updateArtist = async (req, res) => {
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      if (artist.logoFileId && !(await isFileInUse(artist.logoFileId))) {
-        await imagekit.deleteFile(artist.logoFileId);
+      // Vérifie si l'ancien logo peut être supprimé
+      if (artist.logoFileId && newLogo.fileId) {
+        const inUse = await isFileInUse(artist.logoFileId);
+        if (inUse === false) {
+          await imagekit.deleteFile(artist.logoFileId);
+        }
       }
 
       filteredData.logo = newLogo.url;
@@ -157,17 +167,23 @@ export const deleteArtist = async (req, res) => {
     const artist = await Artist.findById(req.params.id);
     if (!artist) return res.status(404).json("Artiste non trouvé");
 
-    if (artist.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-      await imagekit.deleteFile(artist.mediaFileId);
+    if (artist.mediaFileId) {
+      const inUse = await isFileInUse(artist.mediaFileId);
+      if (inUse === false) {
+        await imagekit.deleteFile(artist.mediaFileId);
+      }
     }
 
-    if (artist.logoFileId && !(await isFileInUse(artist.logoFileId))) {
-      await imagekit.deleteFile(artist.logoFileId);
+    if (artist.logoFileId) {
+      const inUse = await isFileInUse(artist.logoFileId);
+      if (inUse === false) {
+        await imagekit.deleteFile(artist.logoFileId);
+      }
     }
 
     await Artist.findByIdAndDelete(req.params.id);
     res.status(200).json("Artiste supprimé avec succès");
   } catch (error) {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
+    res.status(500).json({ error: "Erreur serveur (deleteArtist)" });
   }
 };

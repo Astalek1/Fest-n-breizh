@@ -24,7 +24,6 @@ export const createEdition = async (req, res) => {
     const artistIds = [];
     let artistFileIdx = 0;
 
-    // --- Création des artistes ---
     for (let i = 0; i < editionData.artists.length; i++) {
       const artist = editionData.artists[i];
       let mediaFileId = null;
@@ -65,7 +64,6 @@ export const createEdition = async (req, res) => {
       artistIds.push(newArtist._id);
     }
 
-    // --- Création des invités ---
     const guestIds = [];
     let guestFileIdx = 0;
 
@@ -129,7 +127,7 @@ export const getAllEditions = async (req, res) => {
       .populate("artists")
       .populate("guests");
     res.status(200).json(editions);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -142,7 +140,7 @@ export const getOneEdition = async (req, res) => {
       .populate("guests");
     if (!edition) return res.status(404).json("Édition non trouvée");
     res.status(200).json(edition);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -275,7 +273,7 @@ export const updateEdition = async (req, res) => {
 
     await existingEdition.save();
     res.status(200).json(existingEdition);
-  } catch (error) {
+  } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -286,36 +284,45 @@ export const deleteEdition = async (req, res) => {
     const edition = await Edition.findById(req.params.id);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    const artistsIds = edition.artists || [];
-    const guestsIds = edition.guests || [];
+    const artistIds = edition.artists || [];
+    const guestIds = edition.guests || [];
 
     await Edition.findByIdAndDelete(req.params.id);
 
-    // Nettoyer artistes
-    for (const artistId of artistsIds) {
+    for (const artistId of artistIds) {
       const stillUsed = await Edition.findOne({ artists: artistId });
       if (!stillUsed) {
         const artist = await Artist.findById(artistId);
-        if (artist?.mediaFileId && !(await isFileInUse(artist.mediaFileId))) {
-          await imagekit.deleteFile(artist.mediaFileId);
+        if (artist) {
+          if (artist.mediaFileId) {
+            const inUse = await isFileInUse(artist.mediaFileId);
+            if (inUse === false) await imagekit.deleteFile(artist.mediaFileId);
+          }
+          if (artist.logoFileId) {
+            const inUse = await isFileInUse(artist.logoFileId);
+            if (inUse === false) await imagekit.deleteFile(artist.logoFileId);
+          }
+          await Artist.findByIdAndDelete(artistId);
         }
-        await Artist.findByIdAndDelete(artistId);
       }
     }
 
-    // Nettoyer invités
-    for (const guestId of guestsIds) {
+    for (const guestId of guestIds) {
       const stillUsed = await Edition.findOne({ guests: guestId });
       if (!stillUsed) {
-        const guest = await Guest.findByIdAndDelete(guestId);
-        if (guest?.mediaFileId && !(await isFileInUse(guest.mediaFileId))) {
-          await imagekit.deleteFile(guest.mediaFileId);
+        const guest = await Guest.findById(guestId);
+        if (guest) {
+          if (guest.mediaFileId) {
+            const inUse = await isFileInUse(guest.mediaFileId);
+            if (inUse === false) await imagekit.deleteFile(guest.mediaFileId);
+          }
+          await Guest.findByIdAndDelete(guestId);
         }
       }
     }
 
     res.status(200).json("Édition supprimée avec nettoyage");
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Erreur serveur (deleteEdition)" });
   }
 };

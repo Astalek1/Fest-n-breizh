@@ -3,7 +3,7 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// 🔹 Créer un nouveau lien
+// Créer un nouveau lien
 export const newLink = async (req, res) => {
   try {
     const linkData = JSON.parse(req.body.link || "{}");
@@ -38,7 +38,7 @@ export const newLink = async (req, res) => {
   }
 };
 
-// 🔹 Récupérer tous les liens
+// Récupérer tous les liens
 export const getAllLinks = async (req, res) => {
   try {
     const links = await Link.find();
@@ -48,7 +48,7 @@ export const getAllLinks = async (req, res) => {
   }
 };
 
-// 🔹 Récupérer un lien par ID
+// Récupérer un lien par ID
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -59,13 +59,13 @@ export const getOneLink = async (req, res) => {
   }
 };
 
-// 🔹 Mettre à jour un lien
+// Mettre à jour un lien
 export const updateLink = async (req, res) => {
   try {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    // ✅ Parsing sécurisé du body
+    // Parsing sécurisé du body
     let body = {};
     try {
       body = req.body.link ? JSON.parse(req.body.link) : req.body;
@@ -89,7 +89,7 @@ export const updateLink = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    // 🅰️ Renommage du logo existant
+    // a) Renommage du logo existant
     if (!req.file && !body.logo && existingLink.logoFileId) {
       const ext = (existingLink.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
@@ -102,7 +102,7 @@ export const updateLink = async (req, res) => {
       filteredData.logoName = baseName;
     }
 
-    // 🅱️ Remplacement par un logo déjà existant (fileId)
+    // b) Remplacement par un logo déjà existant (fileId)
     else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
 
@@ -116,7 +116,7 @@ export const updateLink = async (req, res) => {
       }
     }
 
-    // 🅲 Remplacement par une URL ou un nouveau fichier
+    // c) Remplacement par une URL ou un nouveau fichier
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
@@ -129,7 +129,9 @@ export const updateLink = async (req, res) => {
 
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
-        if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
+        if (inUse === false) {
+          await imagekit.deleteFile(existingLink.logoFileId);
+        }
       }
 
       filteredData.logo = newLogo.url;
@@ -153,14 +155,15 @@ export const updateLink = async (req, res) => {
   }
 };
 
-// 🔹 Supprimer un lien
+// Supprimer un lien
 export const deleteLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
     if (!link) return res.status(404).json("Lien non trouvé");
 
-    if (link.logoFileId && !(await isFileInUse(link.logoFileId))) {
-      await imagekit.deleteFile(link.logoFileId);
+    if (link.logoFileId) {
+      const inUse = await isFileInUse(link.logoFileId);
+      if (!inUse) await imagekit.deleteFile(link.logoFileId);
     }
 
     await Link.findByIdAndDelete(req.params.id);
