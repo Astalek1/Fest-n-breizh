@@ -11,6 +11,7 @@ const announcementSchema = mongoose.Schema({
     enum: ["photo", "video", "logo"],
     required: true,
   },
+  mediaName: { type: String },
 });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
