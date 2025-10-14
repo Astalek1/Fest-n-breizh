@@ -144,13 +144,14 @@ export const updateAnnouncement = async (req, res) => {
         !!req.file || (body.media && /^https?:\/\//i.test(body.media));
 
       if (hasNewFile) {
-        // Remplacement par une NOUVELLE photo
+        // Nouvelle photo ou remplacement
         const uploaded = await resolveMedia(
           body.media,
           req.file,
           "/festn_breizh/accueil",
           baseName
         );
+
         if (!uploaded?.url) return res.status(400).json("Photo invalide");
 
         filtered.media = uploaded.url;
@@ -159,41 +160,23 @@ export const updateAnnouncement = async (req, res) => {
 
         newFileId = uploaded.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
-      }
 
-      // Renommage d’une photo existante (sans nouvel upload)
-      else if (
-        existing.mediaFileId &&
-        baseName &&
-        baseName !== (existing.mediaName || "")
-      ) {
-        const ext = (existing.media?.split(".").pop() || "webp").toLowerCase();
-        const safeName = `${baseName}.${ext}`.replace(/^\//, "");
-
-        try {
-          console.log(
-            "Renommage sur ImageKit :",
-            existing.mediaFileId,
-            "→",
-            safeName
-          );
-          await Promise.resolve(
-            imagekit.updateFileDetails(existing.mediaFileId, {
-              name: safeName,
-              useUniqueFileName: false,
-              tags: ["renamed"],
-            })
-          );
-        } catch (e) {
-          console.error("Erreur renommage ImageKit :", e?.message || e);
+        // Suppression directe de l’ancienne photo remplacée
+        if (didChangeFile && oldFileId) {
+          try {
+            await imagekit.deleteFile(oldFileId);
+          } catch (e) {
+            console.error(
+              "Suppression ancienne photo échouée :",
+              e?.message || e
+            );
+          }
         }
-
-        filtered.media = existing.media.replace(/[^/]+$/, safeName);
-        filtered.mediaName = baseName;
-
-        // Pas de changement de fileId → pas de suppression à faire
-        newFileId = oldFileId;
-        didChangeFile = false;
+      } else {
+        // Aucun nouveau média → conserver les données existantes
+        filtered.media = existing.media;
+        filtered.mediaFileId = existing.mediaFileId;
+        filtered.mediaName = existing.mediaName;
       }
     }
 
@@ -207,27 +190,14 @@ export const updateAnnouncement = async (req, res) => {
       }
     );
 
-    // Suppression de l’ancien fichier si nécessaire
-    if (didChangeFile && oldFileId) {
-      if (nextType === "photo") {
-        // Photo → suppression directe
+    // Suppression de l’ancien fichier si nécessaire (logos uniquement)
+    if (didChangeFile && oldFileId && nextType === "logo") {
+      const inUse = await isFileInUse(oldFileId);
+      if (!inUse) {
         try {
           await imagekit.deleteFile(oldFileId);
         } catch (e) {
-          console.error(
-            "Suppression ancienne photo échouée :",
-            e?.message || e
-          );
-        }
-      } else if (nextType === "logo") {
-        // Logo → suppression conditionnelle
-        const inUse = await isFileInUse(oldFileId);
-        if (!inUse) {
-          try {
-            await imagekit.deleteFile(oldFileId);
-          } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
+          console.error("Suppression ancien logo échouée :", e?.message || e);
         }
       }
     }
