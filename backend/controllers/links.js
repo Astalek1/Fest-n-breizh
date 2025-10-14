@@ -65,7 +65,6 @@ export const updateLink = async (req, res) => {
     const existingLink = await Link.findById(req.params.id);
     if (!existingLink) return res.status(404).json("Lien non trouvé");
 
-    // Parsing sécurisé du body
     let body = {};
     try {
       body = req.body.link ? JSON.parse(req.body.link) : req.body;
@@ -102,7 +101,7 @@ export const updateLink = async (req, res) => {
       filteredData.logoName = baseName;
     }
 
-    // b) Remplacement par un logo déjà existant (fileId)
+    // b) Réutilisation d’un logo déjà existant
     else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
 
@@ -116,7 +115,7 @@ export const updateLink = async (req, res) => {
       }
     }
 
-    // c) Remplacement par une URL ou un nouveau fichier
+    // c) Nouveau logo uploadé ou par URL
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
@@ -129,9 +128,7 @@ export const updateLink = async (req, res) => {
 
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(existingLink.logoFileId);
-        }
+        if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
       }
 
       filteredData.logo = newLogo.url;
@@ -142,10 +139,7 @@ export const updateLink = async (req, res) => {
     const updatedLink = await Link.findByIdAndUpdate(
       req.params.id,
       filteredData,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedLink);
@@ -169,6 +163,7 @@ export const deleteLink = async (req, res) => {
     await Link.findByIdAndDelete(req.params.id);
     res.status(200).json("Lien supprimé avec succès");
   } catch (error) {
+    console.error("Erreur deleteLink :", error);
     res.status(500).json({ error: error.message });
   }
 };
