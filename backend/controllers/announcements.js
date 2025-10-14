@@ -168,6 +168,22 @@ export const updateAnnouncement = async (req, res) => {
         const ext = (existing.media?.split(".").pop() || "webp").toLowerCase();
         const newName = `${baseName}.${ext}`;
 
+        if (existing.mediaFileId) {
+          try {
+            console.log(
+              "Renommage sur ImageKit :",
+              existing.mediaFileId,
+              "→",
+              newName
+            );
+            await imagekit.updateFileDetails(existing.mediaFileId, {
+              name: newName,
+            });
+          } catch (e) {
+            console.error("Erreur renommage ImageKit :", e?.message || e);
+          }
+        }
+
         await imagekit.updateFileDetails(existing.mediaFileId, {
           name: newName,
         });
