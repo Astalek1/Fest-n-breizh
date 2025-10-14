@@ -3,53 +3,62 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// créer une nouvelle annonce //
+// Créer une nouvelle annonce
 export const newAnnouncement = async (req, res) => {
   try {
-    const announcementData = JSON.parse(req.body.announcement);
-    const cleanName = req.file?.originalname
-      ? req.file.originalname.split(".")[0].replace(/\s+/g, "-").toLowerCase()
-      : `${Date.now()}`;
+    const data = JSON.parse(req.body.announcement || "{}");
 
-    let folderPath =
-      announcementData.mediaType === "logo"
-        ? "/festn_breizh/logos"
-        : "/festn_breizh/accueil";
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      req.file?.originalname
+        ?.split(".")[0]
+        .replace(/\s+/g, "-")
+        .toLowerCase() ||
+      (data.title
+        ? data.title.replace(/\s+/g, "-").toLowerCase()
+        : `media-${Date.now()}`);
 
-    const mediaResult = await resolveMedia(
-      announcementData.media,
-      req.file,
-      folderPath,
-      cleanName
-    );
+    let mediaResult = { url: null, fileId: null };
+
+    if (data.mediaType === "video") {
+      mediaResult.url = data.media || null;
+    } else if (req.file || data.media) {
+      const folder =
+        data.mediaType === "logo"
+          ? "/festn_breizh/logos"
+          : "/festn_breizh/accueil";
+      mediaResult = await resolveMedia(data.media, req.file, folder, cleanName);
+    }
 
     const newAnnouncement = new Announcement({
-      title: announcementData.title,
-      text: announcementData.text,
-      url: announcementData.url || null,
-      media: mediaResult?.url || null,
-      mediaFileId: mediaResult?.fileId || null,
-      mediaType: announcementData.mediaType || null,
+      title: data.title,
+      text: data.text,
+      url: data.url || null,
+      media: mediaResult.url,
+      mediaFileId: mediaResult.fileId,
+      mediaType: data.mediaType,
+      mediaName: mediaResult.fileName || cleanName,
     });
 
     await newAnnouncement.save();
     res.status(201).json({ message: "Annonce créée avec succès !" });
   } catch (error) {
+    console.error("Erreur newAnnouncement :", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// trouver toutes les annonces //
+// Obtenir toutes les annonces
 export const getAllAnnouncements = async (req, res) => {
   try {
-    const announcements = await Announcement.find().sort({ createdAt: -1 });
-    res.status(200).json(announcements);
+    const list = await Announcement.find().sort({ createdAt: -1 });
+    res.status(200).json(list);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
 
-// trouver une seule annonce //
+// Obtenir une seule annonce
 export const getOneAnnouncement = async (req, res) => {
   try {
     const announcement = await Announcement.findById(req.params.id);
@@ -60,94 +69,160 @@ export const getOneAnnouncement = async (req, res) => {
   }
 };
 
-// modifier une annonce //
+// Modifier une annonce
 export const updateAnnouncement = async (req, res) => {
   try {
-    const body = req.body.announcement
-      ? JSON.parse(req.body.announcement)
-      : req.body;
-
     const existing = await Announcement.findById(req.params.id);
     if (!existing) return res.status(404).json("Annonce non trouvée");
 
-    const allowed = ["title", "text", "url"];
+    let body = {};
+    try {
+      body = req.body.announcement
+        ? JSON.parse(req.body.announcement)
+        : req.body;
+    } catch {
+      body = req.body || {};
+    }
+
     const filtered = {};
-    for (const key of allowed) {
-      if (body[key] !== undefined) filtered[key] = body[key];
+    for (const field of ["title", "text", "url"]) {
+      if (body[field] !== undefined) filtered[field] = body[field];
     }
 
-    const hasNewMedia =
-      !!req.file ||
-      (typeof body.media === "string" && body.media.trim() !== "");
+    const baseName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      existing.mediaName ||
+      (body.title || existing.title || "media")
+        .replace(/\s+/g, "-")
+        .toLowerCase();
 
-    if (body.mediaType && !hasNewMedia)
-      return res.status(400).json("Envoyez un média si vous changez mediaType");
+    const nextType = body.mediaType || existing.mediaType;
+    const oldFileId = existing.mediaFileId;
+    let newFileId = oldFileId;
+    let didChangeFile = false;
 
-    if (hasNewMedia) {
-      const cleanName =
-        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-        req.file?.originalname
-          ?.split(".")[0]
-          .replace(/\s+/g, "-")
-          .toLowerCase() ||
-        (filtered.title || existing.title || `media-${Date.now()}`)
-          .replace(/\s+/g, "-")
-          .toLowerCase();
+    // === Cas 1 : Vidéo (URL uniquement) ===
+    if (nextType === "video") {
+      filtered.media = body.media || existing.media;
+      filtered.mediaFileId = null;
+      filtered.mediaName = baseName;
+      didChangeFile = !!oldFileId; // suppression du fichier précédent si existait
+    }
 
-      const nextType = body.mediaType || existing.mediaType || "photo";
-      const folder =
-        nextType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/accueil";
+    // === Cas 2 : Logo ===
+    else if (nextType === "logo") {
+      if (!req.file && body.media && /^[a-zA-Z0-9]{8,}$/.test(body.media)) {
+        // Réutilisation d’un logo existant
+        const details = await imagekit.getFileDetails(body.media);
+        filtered.media = details.url;
+        filtered.mediaFileId = details.fileId;
+        filtered.mediaName = baseName;
+        newFileId = details.fileId;
+        didChangeFile = oldFileId && oldFileId !== newFileId;
+      } else if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
+        // Nouveau logo
+        const uploaded = await resolveMedia(
+          body.media,
+          req.file,
+          "/festn_breizh/logos",
+          baseName
+        );
+        if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
-      const newMedia = await resolveMedia(
-        body.media,
-        req.file,
-        folder,
-        cleanName
-      );
-      if (!newMedia?.url) return res.status(400).json("Média invalide");
-
-      // Vérification avant suppression
-      if (existing.mediaFileId && newMedia.fileId) {
-        const inUse = await isFileInUse(existing.mediaFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(existing.mediaFileId);
-        }
+        filtered.media = uploaded.url;
+        filtered.mediaFileId = uploaded.fileId;
+        filtered.mediaName = uploaded.fileName || baseName;
+        newFileId = uploaded.fileId;
+        didChangeFile = oldFileId && oldFileId !== newFileId;
       }
-
-      filtered.media = newMedia.url;
-      filtered.mediaFileId = newMedia.fileId;
-      filtered.mediaType = nextType;
     }
 
+    // === Cas 3 : Photo ===
+    else if (nextType === "photo") {
+      if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
+        const uploaded = await resolveMedia(
+          body.media,
+          req.file,
+          "/festn_breizh/accueil",
+          baseName
+        );
+        if (!uploaded?.url) return res.status(400).json("Photo invalide");
+
+        filtered.media = uploaded.url;
+        filtered.mediaFileId = uploaded.fileId;
+        filtered.mediaName = uploaded.fileName || baseName;
+        newFileId = uploaded.fileId;
+        didChangeFile = oldFileId && oldFileId !== newFileId;
+      }
+    }
+
+    // Mise à jour en base
     const updated = await Announcement.findByIdAndUpdate(
       req.params.id,
       filtered,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
+
+    // Suppression de l’ancien fichier si nécessaire
+    if (didChangeFile && oldFileId) {
+      if (nextType === "photo") {
+        // Photo → suppression directe
+        try {
+          await imagekit.deleteFile(oldFileId);
+        } catch (e) {
+          console.error(
+            "Suppression ancienne photo échouée :",
+            e?.message || e
+          );
+        }
+      } else if (nextType === "logo") {
+        // Logo → suppression conditionnelle
+        const inUse = await isFileInUse(oldFileId);
+        if (!inUse) {
+          try {
+            await imagekit.deleteFile(oldFileId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
+        }
+      }
+    }
 
     res.status(200).json(updated);
   } catch (error) {
+    console.error("Erreur updateAnnouncement :", error);
     res.status(500).json({ error: "Erreur serveur (updateAnnouncement)" });
   }
 };
 
-// supprimer une annonce //
+// Supprimer une annonce
 export const deleteAnnouncement = async (req, res) => {
   try {
     const announcement = await Announcement.findById(req.params.id);
     if (!announcement) return res.status(404).json("Annonce non trouvée");
 
-    if (announcement.mediaFileId) {
-      // Vérification avant suppression (même logique qu’à l’update)
-      const inUse = await isFileInUse(announcement.mediaFileId);
-      if (inUse === false) {
-        await imagekit.deleteFile(announcement.mediaFileId);
+    const { mediaType, mediaFileId } = announcement;
+
+    await Announcement.findByIdAndDelete(req.params.id);
+
+    if (mediaFileId) {
+      if (mediaType === "photo") {
+        // Suppression directe
+        await imagekit.deleteFile(mediaFileId);
+      } else if (mediaType === "logo") {
+        // Suppression conditionnelle
+        const inUse = await isFileInUse(mediaFileId);
+        if (!inUse) await imagekit.deleteFile(mediaFileId);
       }
     }
 
-    await Announcement.findByIdAndDelete(req.params.id);
     res.status(200).json("Annonce supprimée avec succès");
   } catch (error) {
+    console.error("Erreur deleteAnnouncement :", error);
     res.status(500).json({ error: "Erreur serveur (deleteAnnouncement)" });
   }
 };
