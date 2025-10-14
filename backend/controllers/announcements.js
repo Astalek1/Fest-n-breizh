@@ -140,7 +140,11 @@ export const updateAnnouncement = async (req, res) => {
 
     // === Cas 3 : Photo ===
     else if (nextType === "photo") {
-      if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
+      const hasNewFile =
+        !!req.file || (body.media && /^https?:\/\//i.test(body.media));
+
+      if (hasNewFile) {
+        // Remplacement par NOUVELLE photo
         const uploaded = await resolveMedia(
           body.media,
           req.file,
@@ -152,8 +156,28 @@ export const updateAnnouncement = async (req, res) => {
         filtered.media = uploaded.url;
         filtered.mediaFileId = uploaded.fileId;
         filtered.mediaName = uploaded.fileName || baseName;
+
         newFileId = uploaded.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
+      } else if (
+        existing.mediaFileId &&
+        baseName &&
+        baseName !== (existing.mediaName || "")
+      ) {
+        // Renommage de la photo EXISTANTE (pas de réupload)
+        const ext = (existing.media?.split(".").pop() || "webp").toLowerCase();
+        const newName = `${baseName}.${ext}`;
+
+        await imagekit.updateFileDetails(existing.mediaFileId, {
+          name: newName,
+        });
+
+        filtered.media = existing.media.replace(/[^/]+$/, newName);
+        filtered.mediaName = baseName;
+
+        // Pas de changement de fileId → pas de suppression à faire
+        newFileId = oldFileId;
+        didChangeFile = false;
       }
     }
 
