@@ -177,10 +177,13 @@ export const updateAnnouncement = async (req, res) => {
             "→",
             safeName
           );
-          await imagekit.updateFileDetails(existing.mediaFileId, {
-            name: safeName,
-            useUniqueFileName: false, // autorise le renommage direct
-          });
+          await Promise.resolve(
+            imagekit.updateFileDetails(existing.mediaFileId, {
+              name: safeName,
+              useUniqueFileName: false,
+              tags: ["renamed"],
+            })
+          );
         } catch (e) {
           console.error("Erreur renommage ImageKit :", e?.message || e);
         }
