@@ -8,7 +8,7 @@ export const newLink = async (req, res) => {
   try {
     const linkData = JSON.parse(req.body.link || "{}");
 
-    const cleanName = (req.body.fileName || linkData.title || "link")
+    const cleanName = (req.body.fileName || linkData.fileName || "logo-link")
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase();
@@ -34,6 +34,7 @@ export const newLink = async (req, res) => {
     await newLink.save();
     res.status(201).json({ message: "Lien ajouté avec succès !" });
   } catch (error) {
+    console.error("Erreur newLink :", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -48,7 +49,7 @@ export const getAllLinks = async (req, res) => {
   }
 };
 
-// Récupérer un seul lien
+// Récupérer un lien par ID
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -62,8 +63,8 @@ export const getOneLink = async (req, res) => {
 // Mettre à jour un lien
 export const updateLink = async (req, res) => {
   try {
-    const existingLink = await Link.findById(req.params.id);
-    if (!existingLink) return res.status(404).json("Lien non trouvé");
+    const existing = await Link.findById(req.params.id);
+    if (!existing) return res.status(404).json("Lien non trouvé");
 
     let body = {};
     try {
@@ -72,117 +73,78 @@ export const updateLink = async (req, res) => {
       body = req.body || {};
     }
 
-    const filteredData = {};
-    for (const field of ["title", "description", "url"]) {
-      if (body[field] !== undefined) filteredData[field] = body[field];
+    const filtered = {};
+    for (const k of ["title", "description", "url"]) {
+      if (body[k] !== undefined) filtered[k] = body[k];
     }
 
     const baseName = (
       req.body.fileName ||
       body.fileName ||
-      filteredData.title ||
-      existingLink.title ||
-      "link"
+      existing.logoName ||
+      "logo-link"
     )
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    // a) Renommage du logo existant (aucun changement de fichier)
-    if (!req.file && !body.logo && existingLink.logoFileId) {
-      console.log("=== Étape a) Renommage du logo existant ===");
-      const ext = (existingLink.logo.split(".").pop() || "webp").toLowerCase();
+    const oldFileId = existing.logoFileId;
+    let newFileId = oldFileId;
+    let didChangeFile = false;
+
+    // a) Renommage du logo existant
+    if (!req.file && !body.logo && existing.logoFileId) {
+      const ext = (existing.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
-      console.log("Ancien logo ID :", existingLink.logoFileId);
-      console.log("Nouveau nom :", newName);
-
-      await imagekit.updateFileDetails(existingLink.logoFileId, {
-        name: newName,
-      });
-
-      filteredData.logo = existingLink.logo.replace(/[^/]+$/, newName);
-      filteredData.logoName = baseName;
+      await imagekit.updateFileDetails(existing.logoFileId, { name: newName });
+      filtered.logo = existing.logo.replace(/[^/]+$/, newName);
+      filtered.logoName = baseName;
     }
 
     // b) Réutilisation d’un logo existant (fileId)
     else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
-      console.log("=== Étape b) Réutilisation d’un logo existant ===");
-      console.log("Nouveau logo fileId fourni :", body.logo);
-      console.log("Ancien logo fileId :", existingLink.logoFileId);
-
-      const logoDetails = await imagekit.getFileDetails(body.logo);
-
-      filteredData.logo = logoDetails.url;
-      filteredData.logoFileId = logoDetails.fileId;
-      filteredData.logoName = logoDetails.name.replace(/\.[^/.]+$/, "");
-
-      if (existingLink.logoFileId !== logoDetails.fileId) {
-        console.log("Logo remplacé, vérification de l'ancien...");
-        const inUse = await isFileInUse(existingLink.logoFileId);
-        console.log("Encore utilisé ?", inUse);
-        if (!inUse) {
-          console.log(
-            "Suppression de l'ancien logo :",
-            existingLink.logoFileId
-          );
-          await imagekit.deleteFile(existingLink.logoFileId);
-        } else {
-          console.log("Ancien logo conservé, encore utilisé ailleurs.");
-        }
-      } else {
-        console.log("Même logo, aucune suppression nécessaire.");
-      }
+      const details = await imagekit.getFileDetails(body.logo);
+      filtered.logo = details.url;
+      filtered.logoFileId = details.fileId;
+      filtered.logoName = details.name.replace(/\.[^/.]+$/, "");
+      newFileId = details.fileId;
+      didChangeFile = oldFileId && oldFileId !== newFileId;
     }
 
     // c) Nouveau logo (upload ou URL)
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
-      console.log("=== Étape c) Nouveau logo uploadé ou via URL ===");
-      const newLogo = await resolveMedia(
+      const uploaded = await resolveMedia(
         body.logo,
         req.file,
         "/festn_breizh/logos",
         baseName
       );
+      if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
-      if (!newLogo?.url) return res.status(400).json("Logo invalide");
-
-      console.log("Ancien logo ID :", existingLink.logoFileId);
-      console.log("Nouveau logo ID :", newLogo.fileId);
-
-      if (existingLink.logoFileId && newLogo.fileId) {
-        const inUse = await isFileInUse(existingLink.logoFileId);
-        console.log(
-          "Verification suppression :",
-          existingLink.logoFileId,
-          "Encore utilisé ?",
-          inUse
-        );
-        if (!inUse) {
-          console.log(
-            "Suppression de l'ancien logo :",
-            existingLink.logoFileId
-          );
-          await imagekit.deleteFile(existingLink.logoFileId);
-        } else {
-          console.log("Ancien logo conservé, encore utilisé ailleurs.");
-        }
-      }
-
-      filteredData.logo = newLogo.url;
-      filteredData.logoFileId = newLogo.fileId;
-      filteredData.logoName = newLogo.fileName || baseName;
-    } else {
-      console.log("=== Aucun changement de logo détecté ===");
+      filtered.logo = uploaded.url;
+      filtered.logoFileId = uploaded.fileId;
+      filtered.logoName = uploaded.fileName || baseName;
+      newFileId = uploaded.fileId;
+      didChangeFile = oldFileId && oldFileId !== newFileId;
     }
 
-    const updatedLink = await Link.findByIdAndUpdate(
-      req.params.id,
-      filteredData,
-      { new: true, runValidators: true }
-    );
+    const updated = await Link.findByIdAndUpdate(req.params.id, filtered, {
+      new: true,
+      runValidators: true,
+    });
 
-    console.log("=== Mise à jour terminée ===");
-    res.status(200).json(updatedLink);
+    if (didChangeFile && oldFileId) {
+      const inUse = await isFileInUse(oldFileId);
+      if (!inUse) {
+        try {
+          await imagekit.deleteFile(oldFileId);
+        } catch (e) {
+          console.error("Suppression ImageKit échouée :", e?.message || e);
+        }
+      }
+    }
+
+    res.status(200).json(updated);
   } catch (error) {
     console.error("Erreur updateLink :", error);
     res.status(500).json({ error: "Erreur serveur (updateLink)" });
@@ -195,12 +157,21 @@ export const deleteLink = async (req, res) => {
     const link = await Link.findById(req.params.id);
     if (!link) return res.status(404).json("Lien non trouvé");
 
-    if (link.logoFileId) {
-      const inUse = await isFileInUse(link.logoFileId);
-      if (!inUse) await imagekit.deleteFile(link.logoFileId);
-    }
+    const fileId = link.logoFileId || null;
 
     await Link.findByIdAndDelete(req.params.id);
+
+    if (fileId) {
+      const inUse = await isFileInUse(fileId);
+      if (!inUse) {
+        try {
+          await imagekit.deleteFile(fileId);
+        } catch (e) {
+          console.error("Suppression ImageKit échouée :", e?.message || e);
+        }
+      }
+    }
+
     res.status(200).json("Lien supprimé avec succès");
   } catch (error) {
     console.error("Erreur deleteLink :", error);
