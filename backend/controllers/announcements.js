@@ -144,7 +144,7 @@ export const updateAnnouncement = async (req, res) => {
         !!req.file || (body.media && /^https?:\/\//i.test(body.media));
 
       if (hasNewFile) {
-        // Remplacement par NOUVELLE photo
+        // Remplacement par une NOUVELLE photo
         const uploaded = await resolveMedia(
           body.media,
           req.file,
@@ -159,36 +159,32 @@ export const updateAnnouncement = async (req, res) => {
 
         newFileId = uploaded.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
-      } else if (
+      }
+      // Renommage d’une photo existante (sans nouvel upload)
+      else if (
         existing.mediaFileId &&
         baseName &&
         baseName !== (existing.mediaName || "")
       ) {
-        // Renommage de la photo EXISTANTE (pas de réupload)
         const ext = (existing.media?.split(".").pop() || "webp").toLowerCase();
-        const newName = `${baseName}.${ext}`;
+        const safeName = `${baseName}.${ext}`.replace(/^\//, "");
 
-        if (existing.mediaFileId) {
-          try {
-            console.log(
-              "Renommage sur ImageKit :",
-              existing.mediaFileId,
-              "→",
-              newName
-            );
-            await imagekit.updateFileDetails(existing.mediaFileId, {
-              name: newName,
-            });
-          } catch (e) {
-            console.error("Erreur renommage ImageKit :", e?.message || e);
-          }
+        try {
+          console.log(
+            "Renommage sur ImageKit :",
+            existing.mediaFileId,
+            "→",
+            safeName
+          );
+          await imagekit.updateFileDetails(existing.mediaFileId, {
+            name: safeName,
+            useUniqueFileName: false,
+          });
+        } catch (e) {
+          console.error("Erreur renommage ImageKit :", e?.message || e);
         }
 
-        await imagekit.updateFileDetails(existing.mediaFileId, {
-          name: newName,
-        });
-
-        filtered.media = existing.media.replace(/[^/]+$/, newName);
+        filtered.media = existing.media.replace(/[^/]+$/, safeName);
         filtered.mediaName = baseName;
 
         // Pas de changement de fileId → pas de suppression à faire
