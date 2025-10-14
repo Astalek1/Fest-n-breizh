@@ -6,6 +6,7 @@ const partnerSchema = mongoose.Schema({
   url: { type: String },
   logo: { type: String, required: true },
   logoFileId: { type: String, required: true },
+  logoName: { type: String },
 });
 
 const Partner = mongoose.model("Partner", partnerSchema);
