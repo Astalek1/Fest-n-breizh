@@ -77,7 +77,6 @@ export const updatePartner = async (req, res) => {
       body = req.body || {};
     }
 
-    // Champs textuels
     const filtered = {};
     for (const k of ["name", "description", "url"]) {
       if (body[k] !== undefined) filtered[k] = body[k];
@@ -93,9 +92,8 @@ export const updatePartner = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    // On mémorise l’ancien fileId pour suppression éventuelle APRÈS mise à jour
     const oldFileId = existing.logoFileId;
-    let newFileId = oldFileId; // par défaut, pas de changement
+    let newFileId = oldFileId;
     let didChangeFile = false;
 
     // a) Renommage du logo existant (pas d’upload)
@@ -106,7 +104,6 @@ export const updatePartner = async (req, res) => {
       await imagekit.updateFileDetails(existing.logoFileId, { name: newName });
       filtered.logo = existing.logo.replace(/[^/]+$/, newName);
       filtered.logoName = baseName;
-      // newFileId inchangé
     }
 
     // b) Réutilisation d’un logo existant (fileId)
@@ -114,7 +111,7 @@ export const updatePartner = async (req, res) => {
       const details = await imagekit.getFileDetails(body.logo);
       filtered.logo = details.url;
       filtered.logoFileId = details.fileId;
-      filtered.logoName = baseName;
+      filtered.logoName = details.name.replace(/\.[^/.]+$/, "");
       newFileId = details.fileId;
       didChangeFile = oldFileId && oldFileId !== newFileId;
     }
@@ -136,13 +133,12 @@ export const updatePartner = async (req, res) => {
       didChangeFile = oldFileId && oldFileId !== newFileId;
     }
 
-    // Écriture DB d’abord
     const updated = await Partner.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
       runValidators: true,
     });
 
-    // Puis nettoyage conditionnel de l’ancien fichier s’il a réellement changé
+    // Suppression conditionnelle du logo inutilisé
     if (didChangeFile && oldFileId) {
       const inUse = await isFileInUse(oldFileId);
       if (!inUse) {
@@ -167,13 +163,9 @@ export const deletePartner = async (req, res) => {
     const partner = await Partner.findById(req.params.id);
     if (!partner) return res.status(404).json("Partenaire non trouvé");
 
-    // On mémorise le fileId AVANT suppression du document
     const fileId = partner.logoFileId || null;
-
-    // 1) Supprimer le document d’abord
     await Partner.findByIdAndDelete(req.params.id);
 
-    // 2) Puis vérifier l’usage et supprimer le fichier si inutilisé
     if (fileId) {
       const inUse = await isFileInUse(fileId);
       if (!inUse) {
