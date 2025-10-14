@@ -128,6 +128,13 @@ export const updateLink = async (req, res) => {
 
       if (existingLink.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
+        console.log(
+          "Verification suppression :",
+          existingLink.logoFileId,
+          "Encore utilisé ?",
+          inUse
+        );
+
         if (!inUse) await imagekit.deleteFile(existingLink.logoFileId);
       }
 
