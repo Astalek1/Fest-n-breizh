@@ -25,7 +25,7 @@ export const newLink = async (req, res) => {
     const newLink = new Link({
       title: linkData.title,
       description: linkData.description,
-      url: linkData.url,
+      url: linkData.url || null,
       logo: mediaResult.url,
       logoFileId: mediaResult.fileId,
       logoName: mediaResult.fileName || cleanName,
@@ -48,7 +48,7 @@ export const getAllLinks = async (req, res) => {
   }
 };
 
-// Récupérer un lien par ID
+// Récupérer un seul lien
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -88,7 +88,7 @@ export const updateLink = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    // a) Renommage du logo existant
+    // a) Renommage du logo existant (aucun changement de fichier)
     if (!req.file && !body.logo && existingLink.logoFileId) {
       const ext = (existingLink.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
@@ -101,13 +101,13 @@ export const updateLink = async (req, res) => {
       filteredData.logoName = baseName;
     }
 
-    // b) Réutilisation d’un logo déjà existant
+    // b) Réutilisation d’un logo existant (fileId)
     else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
       const logoDetails = await imagekit.getFileDetails(body.logo);
 
       filteredData.logo = logoDetails.url;
       filteredData.logoFileId = logoDetails.fileId;
-      filteredData.logoName = baseName;
+      filteredData.logoName = logoDetails.name.replace(/\.[^/.]+$/, "");
 
       if (existingLink.logoFileId !== logoDetails.fileId) {
         const inUse = await isFileInUse(existingLink.logoFileId);
@@ -115,7 +115,7 @@ export const updateLink = async (req, res) => {
       }
     }
 
-    // c) Nouveau logo uploadé ou par URL
+    // c) Nouveau logo (upload ou URL)
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
       const newLogo = await resolveMedia(
         body.logo,
@@ -164,6 +164,6 @@ export const deleteLink = async (req, res) => {
     res.status(200).json("Lien supprimé avec succès");
   } catch (error) {
     console.error("Erreur deleteLink :", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Erreur serveur (deleteLink)" });
   }
 };
