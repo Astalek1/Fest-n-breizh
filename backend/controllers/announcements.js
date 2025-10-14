@@ -160,6 +160,7 @@ export const updateAnnouncement = async (req, res) => {
         newFileId = uploaded.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
       }
+
       // Renommage d’une photo existante (sans nouvel upload)
       else if (
         existing.mediaFileId &&
@@ -178,7 +179,7 @@ export const updateAnnouncement = async (req, res) => {
           );
           await imagekit.updateFileDetails(existing.mediaFileId, {
             name: safeName,
-            useUniqueFileName: false,
+            useUniqueFileName: false, // autorise le renommage direct
           });
         } catch (e) {
           console.error("Erreur renommage ImageKit :", e?.message || e);
