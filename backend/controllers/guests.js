@@ -19,7 +19,7 @@ export const newGuest = async (req, res) => {
 
     const mediaType = guestData.mediaType?.toLowerCase(); // "image", "logo" ou "video"
 
-    // --- Cas vidéo (YouTube) ---
+    // --- Cas vidéo (URL uniquement) ---
     if (mediaType === "video") {
       const newGuest = new Guest({
         name: guestData.name,
@@ -38,13 +38,35 @@ export const newGuest = async (req, res) => {
     const folder =
       mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-    // --- Upload, URL ou logo déjà existant ---
-    const mediaResult = await resolveMedia(
-      guestData.media,
-      req.file,
-      folder,
-      cleanName
-    );
+    let mediaResult;
+
+    // ✅ Si le logo ou l'image est déjà présent (fileId fourni)
+    if (
+      guestData.media &&
+      typeof guestData.media === "object" &&
+      guestData.media.fileId
+    ) {
+      const fileDetails = await imagekit
+        .getFileDetails(guestData.media.fileId)
+        .catch(() => null);
+      if (!fileDetails)
+        return res
+          .status(400)
+          .json("Fichier introuvable sur ImageKit (fileId invalide)");
+      mediaResult = {
+        url: fileDetails.url,
+        fileId: fileDetails.fileId,
+        fileName: fileDetails.name,
+      };
+    } else {
+      // Upload ou URL classique
+      mediaResult = await resolveMedia(
+        guestData.media,
+        req.file,
+        folder,
+        cleanName
+      );
+    }
 
     if (!mediaResult?.url)
       return res.status(400).json("Média invalide ou introuvable");
@@ -127,12 +149,31 @@ export const updateGuest = async (req, res) => {
             ? "/festn_breizh/logos"
             : "/festn_breizh/invités";
 
-        const newMedia = await resolveMedia(
-          body.media,
-          req.file,
-          folder,
-          `${cleanName}-${Date.now()}`
-        );
+        let newMedia;
+
+        // ✅ Cas d’un logo déjà existant (fileId)
+        if (body.media && typeof body.media === "object" && body.media.fileId) {
+          const fileDetails = await imagekit
+            .getFileDetails(body.media.fileId)
+            .catch(() => null);
+          if (!fileDetails)
+            return res
+              .status(400)
+              .json("Fichier introuvable sur ImageKit (fileId invalide)");
+          newMedia = {
+            url: fileDetails.url,
+            fileId: fileDetails.fileId,
+            fileName: fileDetails.name,
+          };
+        } else {
+          // Upload / URL standard
+          newMedia = await resolveMedia(
+            body.media,
+            req.file,
+            folder,
+            `${cleanName}-${Date.now()}`
+          );
+        }
 
         if (!newMedia?.url)
           return res.status(400).json("Média invalide ou introuvable");
