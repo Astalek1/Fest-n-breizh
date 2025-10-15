@@ -17,13 +17,29 @@ export const newGuest = async (req, res) => {
       guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
       `${Date.now()}`;
 
-    // Dossier selon le type de média
-    const folder = guestData.logo
-      ? "/festn_breizh/logos"
-      : "/festn_breizh/invités";
+    // Type de média : image, logo ou vidéo
+    const mediaType = guestData.mediaType?.toLowerCase();
+
+    if (mediaType === "video") {
+      const newGuest = new Guest({
+        name: guestData.name,
+        description: guestData.description,
+        media: guestData.media,
+        mediaFileId: null,
+        mediaName: cleanName,
+      });
+
+      await newGuest.save();
+      return res
+        .status(201)
+        .json({ message: "Invité vidéo ajouté avec succès !" });
+    }
+
+    const folder =
+      mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
     const mediaResult = await resolveMedia(
-      guestData.media || guestData.logo,
+      guestData.media,
       req.file,
       folder,
       cleanName
@@ -94,19 +110,22 @@ export const updateGuest = async (req, res) => {
 
     const mediaType = body.mediaType?.toLowerCase(); // "image", "logo" ou "video"
 
-    // === Cas 1️⃣ : on ajoute ou remplace un média ===
-    if (req.file || body.media || mediaType === "video") {
-      let folder = "/festn_breizh/invités";
-      if (mediaType === "logo") folder = "/festn_breizh/logos";
+    let oldLogoId = guest.logoFileId;
+    let oldImageId = guest.mediaFileId;
 
-      // --- Gestion des vidéos ---
+    // === 1️⃣ Gestion des médias ===
+    if (req.file || body.media || mediaType === "video") {
       if (mediaType === "video") {
-        filteredData.media = body.media; // URL YouTube
+        filteredData.media = body.media;
         filteredData.mediaFileId = null;
         filteredData.logo = null;
         filteredData.logoFileId = null;
       } else {
-        // Upload d’une image ou d’un logo
+        const folder =
+          mediaType === "logo"
+            ? "/festn_breizh/logos"
+            : "/festn_breizh/invités";
+
         const newMedia = await resolveMedia(
           body.media,
           req.file,
@@ -117,59 +136,12 @@ export const updateGuest = async (req, res) => {
         if (!newMedia?.url)
           return res.status(400).json("Média invalide ou introuvable");
 
-        // 🧹 Suppression ancienne ressource AVANT mise à jour
         if (mediaType === "logo") {
-          // suppression directe de l’ancienne image
-          if (guest.mediaFileId) {
-            try {
-              await imagekit.deleteFile(guest.mediaFileId);
-              console.log("Ancienne image supprimée :", guest.mediaFileId);
-            } catch (e) {
-              console.error("Erreur suppression image :", e.message);
-            }
-          }
-
-          // suppression conditionnelle de l’ancien logo
-          if (guest.logoFileId && guest.logoFileId !== newMedia.fileId) {
-            const inUse = await isFileInUse(guest.logoFileId);
-            if (inUse === false) {
-              try {
-                await imagekit.deleteFile(guest.logoFileId);
-                console.log("Ancien logo supprimé :", guest.logoFileId);
-              } catch (e) {
-                console.error("Erreur suppression logo :", e.message);
-              }
-            }
-          }
-
           filteredData.logo = newMedia.url;
           filteredData.logoFileId = newMedia.fileId;
           filteredData.media = null;
           filteredData.mediaFileId = null;
         } else {
-          // suppression conditionnelle de l’ancien logo
-          if (guest.logoFileId) {
-            const inUse = await isFileInUse(guest.logoFileId);
-            if (inUse === false) {
-              try {
-                await imagekit.deleteFile(guest.logoFileId);
-                console.log("Ancien logo supprimé :", guest.logoFileId);
-              } catch (e) {
-                console.error("Erreur suppression logo :", e.message);
-              }
-            }
-          }
-
-          // suppression directe de l’ancienne image
-          if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
-            try {
-              await imagekit.deleteFile(guest.mediaFileId);
-              console.log("Ancienne image supprimée :", guest.mediaFileId);
-            } catch (e) {
-              console.error("Erreur suppression image :", e.message);
-            }
-          }
-
           filteredData.media = newMedia.url;
           filteredData.mediaFileId = newMedia.fileId;
           filteredData.logo = null;
@@ -180,20 +152,47 @@ export const updateGuest = async (req, res) => {
       }
     }
 
-    // === Cas 2️⃣ : mise à jour du nom du média uniquement ===
-    if (!req.file && !body.media && req.body.fileName) {
-      filteredData.mediaName = req.body.fileName
-        .trim()
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-    }
-
-    // === Cas 3️⃣ : mise à jour finale ===
+    // === 2️⃣ Mise à jour de la base ===
     const updatedGuest = await Guest.findByIdAndUpdate(
       req.params.id,
       filteredData,
       { new: true, runValidators: true }
     );
+
+    // === 3️⃣ Nettoyage des anciens fichiers ===
+    if (mediaType === "logo" && oldImageId) {
+      try {
+        await imagekit.deleteFile(oldImageId);
+      } catch (e) {
+        console.error("Erreur suppression ancienne image :", e.message);
+      }
+    }
+
+    if (mediaType === "image" && oldLogoId) {
+      const inUse = await isFileInUse(oldLogoId);
+      if (inUse === false) {
+        try {
+          await imagekit.deleteFile(oldLogoId);
+        } catch (e) {
+          console.error("Erreur suppression ancien logo :", e.message);
+        }
+      }
+    }
+
+    if (
+      mediaType === "logo" &&
+      oldLogoId &&
+      oldLogoId !== updatedGuest.logoFileId
+    ) {
+      const inUse = await isFileInUse(oldLogoId);
+      if (inUse === false) {
+        try {
+          await imagekit.deleteFile(oldLogoId);
+        } catch (e) {
+          console.error("Erreur suppression ancien logo :", e.message);
+        }
+      }
+    }
 
     res.status(200).json(updatedGuest);
   } catch (error) {
@@ -208,13 +207,21 @@ export const deleteGuest = async (req, res) => {
     if (!guest) return res.status(404).json("Invité non trouvé");
 
     if (guest.mediaFileId) {
-      await imagekit.deleteFile(guest.mediaFileId);
+      try {
+        await imagekit.deleteFile(guest.mediaFileId);
+      } catch (e) {
+        console.error("Erreur suppression image :", e.message);
+      }
     }
 
     if (guest.logoFileId) {
       const inUse = await isFileInUse(guest.logoFileId);
       if (inUse === false) {
-        await imagekit.deleteFile(guest.logoFileId);
+        try {
+          await imagekit.deleteFile(guest.logoFileId);
+        } catch (e) {
+          console.error("Erreur suppression logo :", e.message);
+        }
       }
     }
 
