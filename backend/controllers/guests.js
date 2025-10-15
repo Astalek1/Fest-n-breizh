@@ -106,9 +106,19 @@ export const updateGuest = async (req, res) => {
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      if (guest.mediaFileId && newMedia.fileId) {
+      if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
         const inUse = await isFileInUse(guest.mediaFileId);
-        if (inUse === false) await imagekit.deleteFile(guest.mediaFileId);
+        if (!inUse) {
+          try {
+            await imagekit.deleteFile(guest.mediaFileId);
+            console.log("Ancien média supprimé :", guest.mediaFileId);
+          } catch (e) {
+            console.error(
+              "Erreur suppression ancienne image :",
+              e?.message || e
+            );
+          }
+        }
       }
 
       filteredData.media = newMedia.url;
