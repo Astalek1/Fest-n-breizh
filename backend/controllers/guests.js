@@ -120,10 +120,10 @@ export const updateGuest = async (req, res) => {
     }
 
     // --- Logo optionnel ---
-    if (body.logo) {
+    if (req.file || body.logo) {
       const newLogo = await resolveMedia(
         body.logo,
-        null,
+        req.file,
         "/festn_breizh/logos",
         `${cleanName}-logo`
       );
