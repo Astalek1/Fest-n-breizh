@@ -72,6 +72,7 @@ export const getOneGuest = async (req, res) => {
 };
 
 // === Modifier un invité ===
+// === Modifier un invité ===
 export const updateGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -115,23 +116,25 @@ export const updateGuest = async (req, res) => {
       if (!newMedia?.url)
         return res.status(400).json("Erreur : média invalide ou introuvable");
 
-      // --- Suppression ancienne ressource selon le cas ---
+      // === Cas : on passe à un LOGO ===
       if (mediaType === "logo") {
-        // suppression de l'ancienne image (car on passe à un logo)
+        // Supprimer ancienne image (elle ne doit plus rester)
         if (guest.mediaFileId) {
           try {
             await imagekit.deleteFile(guest.mediaFileId);
+            console.log("Ancienne image supprimée :", guest.mediaFileId);
           } catch (e) {
             console.error("Erreur suppression ancienne image :", e.message);
           }
         }
 
-        // suppression conditionnelle de l'ancien logo
+        // Supprimer ancien logo si non utilisé
         if (guest.logoFileId && guest.logoFileId !== newMedia.fileId) {
           const inUse = await isFileInUse(guest.logoFileId);
           if (inUse === false) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
+              console.log("Ancien logo supprimé :", guest.logoFileId);
             } catch (e) {
               console.error("Erreur suppression ancien logo :", e.message);
             }
@@ -142,23 +145,28 @@ export const updateGuest = async (req, res) => {
         filteredData.logoFileId = newMedia.fileId;
         filteredData.media = null;
         filteredData.mediaFileId = null;
-      } else {
-        // suppression de l'ancien logo (si on revient à une image)
+      }
+
+      // === Cas : on passe à une IMAGE ===
+      if (mediaType === "image") {
+        // Supprimer l'ancien logo si non utilisé ailleurs
         if (guest.logoFileId) {
           const inUse = await isFileInUse(guest.logoFileId);
           if (inUse === false) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
+              console.log("Ancien logo supprimé :", guest.logoFileId);
             } catch (e) {
               console.error("Erreur suppression ancien logo :", e.message);
             }
           }
         }
 
-        // suppression directe de l'ancienne image
+        // Supprimer ancienne image (sécurité)
         if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
           try {
             await imagekit.deleteFile(guest.mediaFileId);
+            console.log("Ancienne image supprimée :", guest.mediaFileId);
           } catch (e) {
             console.error("Erreur suppression ancienne image :", e.message);
           }
