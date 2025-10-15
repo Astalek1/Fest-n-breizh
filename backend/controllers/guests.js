@@ -187,7 +187,7 @@ export const updateGuest = async (req, res) => {
     // --- 3) Mise à jour en base ---
     const updated = await Guest.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
-      runValidators: true,
+      runValidators: false,
     });
 
     // --- 4) Nettoyage post-update ---
