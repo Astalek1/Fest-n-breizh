@@ -77,118 +77,154 @@ export const updateGuest = async (req, res) => {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json("Invité non trouvé");
 
-    const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
-    const allowedFields = ["name", "description"];
-    const filteredData = {};
-
-    // --- 1️⃣ Mises à jour partielles ---
-    for (const field of allowedFields) {
-      if (body[field] !== undefined && body[field] !== "")
-        filteredData[field] = body[field];
+    // Body tolérant: JSON string ou objet
+    let body = {};
+    try {
+      body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
+    } catch {
+      body = req.body || {};
     }
 
-    // --- 2️⃣ Nom du média ---
-    const cleanName =
+    // 1) Mises à jour partielles de base
+    const filteredData = {};
+    for (const k of ["name", "description"]) {
+      if (body[k] !== undefined && body[k] !== "") filteredData[k] = body[k];
+    }
+
+    // 2) Nom "base" pour fichier si upload
+    const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      (filteredData.name || guest.name || `${Date.now()}`)
+      (filteredData.name || guest.name || `media-${Date.now()}`)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-    // --- 3️⃣ Gestion du nouveau média ---
-    if (req.file || body.media) {
-      const mediaType = body.mediaType?.toLowerCase(); // "image" ou "logo"
-      if (!mediaType)
+    // 3) Changement de média ?
+    const hasNewMedia = !!req.file || body.media !== undefined;
+
+    if (hasNewMedia) {
+      const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo"
+      if (!mediaType || !["image", "logo"].includes(mediaType)) {
         return res
           .status(400)
           .json("Le champ 'mediaType' est requis (image ou logo)");
+      }
 
-      const folder =
-        mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
-
-      const newMedia = await resolveMedia(
-        body.media,
-        req.file,
-        folder,
-        `${cleanName}-${Date.now()}`
-      );
-
-      if (!newMedia?.url)
-        return res.status(400).json("Erreur : média invalide ou introuvable");
-
-      // === LOGO ===
       if (mediaType === "logo") {
-        // Supprimer l’ancienne image (affiche)
+        // --- LOGO ---
+        let newLogoUrl = null;
+        let newLogoFileId = null;
+        let derivedName =
+          req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+          `${baseName}-logo`;
+
+        // Autoriser réutilisation par fileId
+        const isFileId =
+          typeof body.media === "string" &&
+          /^[A-Za-z0-9]{8,}$/.test(body.media);
+
+        if (isFileId) {
+          const details = await imagekit.getFileDetails(body.media);
+          newLogoUrl = details.url;
+          newLogoFileId = details.fileId;
+        } else {
+          const uploaded = await resolveMedia(
+            body.media,
+            req.file,
+            "/festn_breizh/logos",
+            derivedName
+          );
+          if (!uploaded?.url) return res.status(400).json("Logo invalide");
+          newLogoUrl = uploaded.url;
+          newLogoFileId = uploaded.fileId;
+          derivedName = uploaded.fileName || derivedName;
+        }
+
+        // On bascule sur un logo → supprimer l'ANCIENNE IMAGE si elle existait
         if (guest.mediaFileId) {
           try {
             await imagekit.deleteFile(guest.mediaFileId);
-            console.log("Ancienne image supprimée :", guest.mediaFileId);
           } catch (e) {
-            console.error("Erreur suppression ancienne image :", e.message);
+            console.error(
+              "Suppression ancienne image échouée :",
+              e?.message || e
+            );
           }
         }
 
-        // Supprimer l’ancien logo s’il n’est plus utilisé
-        if (guest.logoFileId && guest.logoFileId !== newMedia.fileId) {
+        // Ancien logo: suppression conditionnelle si différent et inutilisé ailleurs
+        if (guest.logoFileId && guest.logoFileId !== newLogoFileId) {
           const inUse = await isFileInUse(guest.logoFileId);
           if (!inUse) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
-              console.log("Ancien logo supprimé :", guest.logoFileId);
             } catch (e) {
-              console.error("Erreur suppression ancien logo :", e.message);
+              console.error(
+                "Suppression ancien logo échouée :",
+                e?.message || e
+              );
             }
           }
         }
 
-        filteredData.logo = newMedia.url;
-        filteredData.logoFileId = newMedia.fileId;
+        // Écritures
+        filteredData.logo = newLogoUrl;
+        filteredData.logoFileId = newLogoFileId;
         filteredData.media = null;
         filteredData.mediaFileId = null;
-      }
+        filteredData.mediaName = derivedName;
+      } else {
+        // --- IMAGE ---
+        const uploaded = await resolveMedia(
+          body.media,
+          req.file,
+          "/festn_breizh/invités",
+          `${baseName}-${Date.now()}`
+        );
+        if (!uploaded?.url) return res.status(400).json("Image invalide");
 
-      // === IMAGE ===
-      if (mediaType === "image") {
-        // Supprimer ancien logo s’il n’est plus utilisé ailleurs
+        // Remplacement image->image : suppression stricte de l'ancienne image
+        if (guest.mediaFileId && guest.mediaFileId !== uploaded.fileId) {
+          try {
+            await imagekit.deleteFile(guest.mediaFileId);
+          } catch (e) {
+            console.error(
+              "Suppression ancienne image échouée :",
+              e?.message || e
+            );
+          }
+        }
+
+        // Si on revient d'un logo vers une image : suppression conditionnelle de l'ancien logo
         if (guest.logoFileId) {
           const inUse = await isFileInUse(guest.logoFileId);
           if (!inUse) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
-              console.log("Ancien logo supprimé :", guest.logoFileId);
             } catch (e) {
-              console.error("Erreur suppression ancien logo :", e.message);
+              console.error(
+                "Suppression ancien logo échouée :",
+                e?.message || e
+              );
             }
           }
         }
 
-        // Supprimer ancienne image même si on reste sur une image
-        if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
-          try {
-            await imagekit.deleteFile(guest.mediaFileId);
-            console.log("Ancienne image supprimée :", guest.mediaFileId);
-          } catch (e) {
-            console.error("Erreur suppression ancienne image :", e.message);
-          }
-        }
-
-        filteredData.media = newMedia.url;
-        filteredData.mediaFileId = newMedia.fileId;
+        // Écritures
+        filteredData.media = uploaded.url;
+        filteredData.mediaFileId = uploaded.fileId;
+        filteredData.mediaName = uploaded.fileName || baseName;
         filteredData.logo = null;
         filteredData.logoFileId = null;
       }
-
-      filteredData.mediaName = newMedia.fileName || cleanName;
-    }
-
-    // --- 4️⃣ Mise à jour du nom de fichier seul ---
-    if (!req.file && !body.media && req.body.fileName) {
+    } else if (req.body.fileName) {
+      // 4) MAJ du nom seulement (aucun upload)
       filteredData.mediaName = req.body.fileName
         .trim()
         .replace(/\s+/g, "-")
         .toLowerCase();
     }
 
-    // --- 5️⃣ Enregistrement final ---
+    // 5) Sauvegarde
     const updatedGuest = await Guest.findByIdAndUpdate(
       req.params.id,
       filteredData,
@@ -197,7 +233,8 @@ export const updateGuest = async (req, res) => {
 
     res.status(200).json(updatedGuest);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Erreur updateGuest :", error);
+    res.status(500).json({ error: "Erreur serveur (updateGuest)" });
   }
 };
 
