@@ -40,7 +40,11 @@ export const newGuest = async (req, res) => {
       description: guestData.description,
       media: mediaResult?.url || logoResult?.url || null,
       mediaFileId: mediaResult?.fileId || logoResult?.fileId || null,
-      mediaName: mediaResult?.mediaName || guestData.fileName || null,
+      mediaName:
+        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        guestData.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        mediaResult?.fileName ||
+        cleanName,
     });
 
     await newGuest.save();
@@ -129,6 +133,14 @@ export const updateGuest = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
+    }
+
+    // --- Mise à jour du nom du média sans changement de fichier ---
+    if (!req.file && !body.media && req.body.fileName) {
+      filteredData.mediaName = req.body.fileName
+        .trim()
+        .replace(/\s+/g, "-")
+        .toLowerCase();
     }
 
     const updatedGuest = await Guest.findByIdAndUpdate(
