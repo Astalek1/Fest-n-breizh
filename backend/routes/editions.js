@@ -6,41 +6,6 @@ import * as editionsCtrl from "../controllers/editions.js";
 
 const router = express.Router();
 
-// Récupérer toutes les éditions
-router.get("/", editionsCtrl.getAllEditions);
-
-// Récupérer une édition spécifique
-router.get("/:id", editionsCtrl.getOneEdition);
-
-// Créer une édition (avec affiche, artistes, invités)
-router.post(
-  "/",
-  auth,
-  upload.fields([
-    { name: "media", maxCount: 1 }, // affiche
-    { name: "artistFiles", maxCount: 10 }, // images artistes
-    { name: "guestFiles", maxCount: 10 }, // logos invités
-  ]),
-  resizeImage,
-  editionsCtrl.createEdition
-);
-
-// Modifier une édition
-router.put(
-  "/:id",
-  auth,
-  upload.fields([
-    { name: "media", maxCount: 1 },
-    { name: "artistFiles", maxCount: 10 },
-    { name: "guestFiles", maxCount: 10 },
-  ]),
-  resizeImage,
-  editionsCtrl.updateEdition
-);
-
-// Supprimer une édition
-router.delete("/:id", auth, editionsCtrl.deleteEdition);
-
 // === Gestion des invités d'une édition ===
 router.post(
   "/:editionId/guests",
@@ -86,5 +51,35 @@ router.delete(
   auth,
   editionsCtrl.deleteArtistFromEdition
 );
+
+// === Routes générales ===
+router.get("/", editionsCtrl.getAllEditions);
+router.get("/:id", editionsCtrl.getOneEdition);
+
+router.post(
+  "/",
+  auth,
+  upload.fields([
+    { name: "media", maxCount: 1 },
+    { name: "artistFiles", maxCount: 10 },
+    { name: "guestFiles", maxCount: 10 },
+  ]),
+  resizeImage,
+  editionsCtrl.createEdition
+);
+
+router.put(
+  "/:id",
+  auth,
+  upload.fields([
+    { name: "media", maxCount: 1 },
+    { name: "artistFiles", maxCount: 10 },
+    { name: "guestFiles", maxCount: 10 },
+  ]),
+  resizeImage,
+  editionsCtrl.updateEdition
+);
+
+router.delete("/:id", auth, editionsCtrl.deleteEdition);
 
 export default router;
