@@ -106,7 +106,7 @@ export const updateGuest = async (req, res) => {
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
 
-    // Champs textuels
+    // --- 1) Champs textuels ---
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
@@ -117,18 +117,19 @@ export const updateGuest = async (req, res) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    const mediaType = (body.mediaType || "").toLowerCase();
+    const mediaType = (body.mediaType || "").toLowerCase(); // image | logo | video
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
 
-    let newImageId = null; // pour détecter un nouvel upload image
-    let newLogoId = null; // pour détecter un nouvel upload logo
+    let newImageId = null;
+    let newLogoId = null;
 
-    // --- 1) Préparer la mise à jour ---
+    // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
+        // Passage vers vidéo : suppression image + logo
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -143,11 +144,13 @@ export const updateGuest = async (req, res) => {
         let fileName = null;
 
         if (isFileId(body.media)) {
+          // Utilisation d’un fichier existant
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
+          // Upload ou URL
           const up = await resolveMedia(
             body.media,
             req.file,
@@ -181,15 +184,15 @@ export const updateGuest = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-    // --- 2) Mise à jour en base ---
+    // --- 3) Mise à jour en base ---
     const updated = await Guest.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
       runValidators: true,
     });
 
-    // --- 3) Nettoyage ---
+    // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
-      // Passage vers vidéo → suppression image + logo
+      // Passage vers vidéo → supprimer ancienne image et logo
       if (mediaType === "video") {
         if (oldImageId) {
           try {
@@ -257,20 +260,18 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE
-      if (
-        mediaType === "image" &&
-        oldImageId &&
-        newImageId &&
-        oldImageId !== newImageId
-      ) {
-        try {
-          await imagekit.deleteFile(oldImageId);
-        } catch (e) {
-          console.error(
-            "Suppression ancienne image échouée :",
-            e?.message || e
-          );
+      // Remplacement IMAGE → IMAGE (corrigé)
+      if (mediaType === "image" && oldImageId) {
+        if ((newImageId && oldImageId !== newImageId) || req.file) {
+          try {
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée :", oldImageId);
+          } catch (e) {
+            console.error(
+              "Suppression ancienne image échouée :",
+              e?.message || e
+            );
+          }
         }
       }
     }
