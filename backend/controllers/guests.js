@@ -127,6 +127,30 @@ export const updateGuest = async (req, res) => {
     // 1) Préparer la mise à jour média (on n’efface rien avant la réussite DB)
     if (sentNewMedia) {
       if (mediaType === "video") {
+        // Si passage vers vidéo, suppression de l'ancien média (image/logo)
+        if (oldImageId) {
+          try {
+            await imagekit.deleteFile(oldImageId);
+          } catch (e) {
+            console.error(
+              "Suppression ancienne image échouée :",
+              e?.message || e
+            );
+          }
+        }
+        if (oldLogoId) {
+          const inUse = await isFileInUse(oldLogoId);
+          if (inUse === false) {
+            try {
+              await imagekit.deleteFile(oldLogoId);
+            } catch (e) {
+              console.error(
+                "Suppression ancien logo échouée :",
+                e?.message || e
+              );
+            }
+          }
+        }
         // Vidéo = URL uniquement
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
