@@ -115,9 +115,9 @@ export const updateGuest = async (req, res) => {
       if (!newMedia?.url)
         return res.status(400).json("Erreur : média invalide ou introuvable");
 
-      // === Cas : on passe à un LOGO ===
+      // === LOGO ===
       if (mediaType === "logo") {
-        // Supprimer ancienne image (elle ne doit plus rester)
+        // Supprimer l’ancienne image (affiche)
         if (guest.mediaFileId) {
           try {
             await imagekit.deleteFile(guest.mediaFileId);
@@ -127,10 +127,10 @@ export const updateGuest = async (req, res) => {
           }
         }
 
-        // Supprimer ancien logo si non utilisé
+        // Supprimer l’ancien logo s’il n’est plus utilisé
         if (guest.logoFileId && guest.logoFileId !== newMedia.fileId) {
           const inUse = await isFileInUse(guest.logoFileId);
-          if (inUse === false) {
+          if (!inUse) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
               console.log("Ancien logo supprimé :", guest.logoFileId);
@@ -146,12 +146,12 @@ export const updateGuest = async (req, res) => {
         filteredData.mediaFileId = null;
       }
 
-      // === Cas : on passe à une IMAGE ===
+      // === IMAGE ===
       if (mediaType === "image") {
-        // Supprimer l'ancien logo si non utilisé ailleurs
+        // Supprimer ancien logo s’il n’est plus utilisé ailleurs
         if (guest.logoFileId) {
           const inUse = await isFileInUse(guest.logoFileId);
-          if (inUse === false) {
+          if (!inUse) {
             try {
               await imagekit.deleteFile(guest.logoFileId);
               console.log("Ancien logo supprimé :", guest.logoFileId);
@@ -161,7 +161,7 @@ export const updateGuest = async (req, res) => {
           }
         }
 
-        // Supprimer ancienne image (sécurité)
+        // Supprimer ancienne image même si on reste sur une image
         if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
           try {
             await imagekit.deleteFile(guest.mediaFileId);
