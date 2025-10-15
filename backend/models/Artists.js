@@ -7,6 +7,7 @@ const artistSchema = mongoose.Schema({
   mediaFileId: { type: String },
   logo: { type: String },
   logoFileId: { type: String },
+  MediaName: { type: String },
 });
 
 const Artist = mongoose.model("Artist", artistSchema);

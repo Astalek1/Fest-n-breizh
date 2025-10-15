@@ -7,6 +7,7 @@ const guestsSchema = mongoose.Schema({
   mediaFileId: { type: String },
   logo: { type: String },
   logoFileId: { type: String },
+  mediaName: { type: String },
 });
 
 const Guest = mongoose.model("Guest", guestsSchema);
