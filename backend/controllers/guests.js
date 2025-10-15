@@ -38,10 +38,9 @@ export const newGuest = async (req, res) => {
     const newGuest = new Guest({
       name: guestData.name,
       description: guestData.description,
-      media: mediaResult?.url || null,
-      mediaFileId: mediaResult?.fileId || null,
-      logo: logoResult?.url || null,
-      logoFileId: logoResult?.fileId || null,
+      media: mediaResult?.url || logoResult?.url || null,
+      mediaFileId: mediaResult?.fileId || logoResult?.fileId || null,
+      mediaName: mediaResult?.mediaName || guestData.fileName || null,
     });
 
     await newGuest.save();

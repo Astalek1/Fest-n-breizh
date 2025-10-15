@@ -35,13 +35,12 @@ export const newArtist = async (req, res) => {
       );
     }
 
-    const newArtist = new Artist({
-      name: artistData.name,
-      description: artistData.description,
-      media: mediaResult?.url || null,
-      mediaFileId: mediaResult?.fileId || null,
-      logo: logoResult?.url || null,
-      logoFileId: logoResult?.fileId || null,
+    const newGuest = new Guest({
+      name: guestData.name,
+      description: guestData.description,
+      media: mediaResult?.url || logoResult?.url || null,
+      mediaFileId: mediaResult?.fileId || logoResult?.fileId || null,
+      mediaName: mediaResult?.mediaName || guestData.fileName || null,
     });
 
     await newArtist.save();
