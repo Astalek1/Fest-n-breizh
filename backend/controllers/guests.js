@@ -4,14 +4,11 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// Util
-const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9]{8,}$/.test(v);
+const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) =>
   (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// =========================
 // Créer un nouvel invité
-// =========================
 export const newGuest = async (req, res) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
@@ -22,12 +19,12 @@ export const newGuest = async (req, res) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(body.name);
 
-    // Cas vidéo: URL uniquement, aucun fichier ImageKit
+    // Cas vidéo (URL uniquement)
     if (mediaType === "video") {
       const doc = new Guest({
         name: body.name,
         description: body.description,
-        media: body.media || null, // URL
+        media: body.media || null, // URL vidéo
         mediaFileId: null,
         logo: null,
         logoFileId: null,
@@ -39,22 +36,22 @@ export const newGuest = async (req, res) => {
         .json({ message: "Invité (vidéo) ajouté avec succès !" });
     }
 
-    // Image ou logo
+    // Dossier cible en fonction du type
     const isLogo = mediaType === "logo";
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
+    // Source du média : fileId existant, URL http(s) ou upload (req.file)
     let url = null;
     let fileId = null;
     let fileName = null;
 
     if (isFileId(body.media)) {
-      // Réutilisation d'un fichier existant (surtout pour les logos)
+      // Réutilisation d’un fichier existant (surtout pour logos)
       const details = await imagekit.getFileDetails(body.media);
       url = details.url;
       fileId = details.fileId;
       fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
     } else {
-      // Upload ou URL http(s)
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) return res.status(400).json("Média invalide");
       url = up.url;
@@ -71,6 +68,7 @@ export const newGuest = async (req, res) => {
       logoFileId: isLogo ? fileId : null,
       mediaName: fileName,
     });
+
     await doc.save();
     res.status(201).json({ message: "Invité ajouté avec succès !" });
   } catch (error) {
@@ -79,9 +77,7 @@ export const newGuest = async (req, res) => {
   }
 };
 
-// =========================
 // Récupérer tous les invités
-// =========================
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -91,9 +87,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// =========================
 // Récupérer un invité
-// =========================
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -104,9 +98,7 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// =========================
 // Modifier un invité
-// =========================
 export const updateGuest = async (req, res) => {
   try {
     const existing = await Guest.findById(req.params.id);
@@ -128,14 +120,15 @@ export const updateGuest = async (req, res) => {
     const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video" | ""
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
-    // Conserver les anciens IDs pour le nettoyage post-update
+    // Mémoriser les anciens IDs pour nettoyage post-update
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
 
-    // 1) Préparer la MAJ média (sans rien supprimer avant)
+    // 1) Préparer la mise à jour média (on n’efface rien avant la réussite DB)
     if (sentNewMedia) {
       if (mediaType === "video") {
-        filtered.media = body.media || existing.media; // URL
+        // Vidéo = URL uniquement
+        filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
         filtered.logoFileId = null;
@@ -149,11 +142,13 @@ export const updateGuest = async (req, res) => {
         let fileName = null;
 
         if (isFileId(body.media)) {
+          // Réutilisation d’un fichier existant
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
+          // Upload / URL http(s)
           const up = await resolveMedia(
             body.media,
             req.file,
@@ -181,19 +176,19 @@ export const updateGuest = async (req, res) => {
         filtered.mediaName = fileName;
       }
     } else if (req.body.fileName) {
-      // Renommage logique côté DB (pas de renommage chez ImageKit ici)
+      // Mise à jour uniquement du nom logique stocké (pas de rename chez ImageKit ici)
       filtered.mediaName = baseName;
     }
 
-    // 2) Écrire en base d'abord
+    // 2) Écriture en base d’abord
     const updated = await Guest.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
       runValidators: true,
     });
 
-    // 3) Nettoyage après succès de la mise à jour
+    // 3) Nettoyage après succès DB (ne rien supprimer si la MAJ n’a pas abouti)
     if (sentNewMedia) {
-      // a) Si on est passé à un LOGO → l’ancienne image doit être supprimée (images non réutilisées)
+      // a) Passage à LOGO → supprimer ancienne IMAGE (images non réutilisées)
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -205,7 +200,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // b) Si on est passé à une IMAGE → l’ancien logo peut être supprimé seulement s’il est inutilisé
+      // b) Passage à IMAGE → supprimer ancien LOGO seulement s’il est inutilisé ailleurs
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -217,7 +212,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // c) Si on a remplacé un LOGO par un autre LOGO (fileId différent) → suppression conditionnelle de l’ancien
+      // c) Remplacement LOGO → LOGO (fileId différent) → suppression conditionnelle de l’ancien
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -234,7 +229,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // d) Si on a remplacé une IMAGE par une autre IMAGE → supprimer l’ancienne image
+      // d) Remplacement IMAGE → IMAGE → supprimer l’ancienne image
       if (
         mediaType === "image" &&
         oldImageId &&
@@ -259,9 +254,7 @@ export const updateGuest = async (req, res) => {
   }
 };
 
-// =========================
-// Supprimer un invité
-// =========================
+// suprimer un invité
 export const deleteGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -270,9 +263,10 @@ export const deleteGuest = async (req, res) => {
     const imgId = guest.mediaFileId || null;
     const logoId = guest.logoFileId || null;
 
+    // Supprime d’abord le document pour éviter les ré-lectures
     await Guest.findByIdAndDelete(req.params.id);
 
-    // Images: suppression directe (non réutilisées)
+    // Images : suppression directe (jamais réutilisées)
     if (imgId) {
       try {
         await imagekit.deleteFile(imgId);
@@ -281,7 +275,7 @@ export const deleteGuest = async (req, res) => {
       }
     }
 
-    // Logos: suppression conditionnelle (peuvent être réutilisés)
+    // Logos : suppression conditionnelle (peuvent être réutilisés)
     if (logoId) {
       const inUse = await isFileInUse(logoId);
       if (inUse === false) {
