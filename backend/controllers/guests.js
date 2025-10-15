@@ -1,4 +1,3 @@
-// controllers/guests.js
 import Guest from "../models/Guests.js";
 import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
@@ -8,7 +7,7 @@ const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) =>
   (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// Créer un nouvel invité
+// Créer un nouvel invité //
 export const newGuest = async (req, res) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
@@ -77,7 +76,7 @@ export const newGuest = async (req, res) => {
   }
 };
 
-// Récupérer tous les invités
+// Récupérer tous les invités //
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -87,7 +86,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// Récupérer un invité
+// Récupérer un invité //
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -98,7 +97,7 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// Modifier un invité
+// Modifier un invité //
 export const updateGuest = async (req, res) => {
   try {
     const existing = await Guest.findById(req.params.id);
@@ -283,7 +282,7 @@ export const updateGuest = async (req, res) => {
   }
 };
 
-// suprimer un invité
+// suprimer un invité //
 export const deleteGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
