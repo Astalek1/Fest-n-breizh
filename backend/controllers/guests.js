@@ -130,6 +130,22 @@ export const updateGuest = async (req, res) => {
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
+      // 🧹 Supprime l’ancien média (photo) s’il existe
+      if (guest.mediaFileId) {
+        const inUse = await isFileInUse(guest.mediaFileId);
+        if (inUse === false) {
+          try {
+            await imagekit.deleteFile(guest.mediaFileId);
+          } catch (e) {
+            console.error(
+              "Erreur suppression ancienne image :",
+              e?.message || e
+            );
+          }
+        }
+      }
+
+      // 🧹 Supprime l’ancien logo uniquement s’il n’est plus utilisé ailleurs
       if (guest.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(guest.logoFileId);
         if (inUse === false) await imagekit.deleteFile(guest.logoFileId);
@@ -137,6 +153,8 @@ export const updateGuest = async (req, res) => {
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
+      filteredData.media = null; // important : on vide l’ancien champ image
+      filteredData.mediaFileId = null;
     }
 
     // --- Mise à jour du nom du média sans changement de fichier ---
