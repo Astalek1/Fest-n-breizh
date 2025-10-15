@@ -41,4 +41,50 @@ router.put(
 // Supprimer une édition
 router.delete("/:id", auth, editionsCtrl.deleteEdition);
 
+// === Gestion des invités d'une édition ===
+router.post(
+  "/:editionId/guests",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  editionsCtrl.addGuestToEdition
+);
+
+router.put(
+  "/:editionId/guests/:guestId",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  editionsCtrl.updateGuestInEdition
+);
+
+router.delete(
+  "/:editionId/guests/:guestId",
+  auth,
+  editionsCtrl.deleteGuestFromEdition
+);
+
+// === Gestion des artistes d'une édition ===
+router.post(
+  "/:editionId/artists",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  editionsCtrl.addArtistToEdition
+);
+
+router.put(
+  "/:editionId/artists/:artistId",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  editionsCtrl.updateArtistInEdition
+);
+
+router.delete(
+  "/:editionId/artists/:artistId",
+  auth,
+  editionsCtrl.deleteArtistFromEdition
+);
+
 export default router;

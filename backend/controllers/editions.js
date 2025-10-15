@@ -326,3 +326,246 @@ export const deleteEdition = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur (deleteEdition)" });
   }
 };
+
+// === Gestion des invités d'une édition ===
+export const addGuestToEdition = async (req, res) => {
+  try {
+    const { editionId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const guestData = req.body.guest ? JSON.parse(req.body.guest) : req.body;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
+      `${Date.now()}`;
+
+    // Gestion du média (image ou logo)
+    let mediaResult = null;
+    if (req.file || guestData.media) {
+      const folder =
+        guestData.mediaType === "logo"
+          ? "festn_breizh/logos"
+          : "festn_breizh/invités";
+
+      mediaResult = await resolveMedia(
+        guestData.media,
+        req.file,
+        folder,
+        cleanName
+      );
+    }
+
+    const newGuest = new Guest({
+      name: guestData.name,
+      description: guestData.description,
+      media: mediaResult?.url || null,
+      mediaFileId: mediaResult?.fileId || null,
+      mediaName:
+        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        guestData.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        cleanName,
+    });
+
+    await newGuest.save();
+
+    edition.guests.push(newGuest._id);
+    await edition.save();
+
+    res.status(201).json({ message: "Invité ajouté à l'édition avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateGuestInEdition = async (req, res) => {
+  try {
+    const { editionId, guestId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const guest = await Guest.findById(guestId);
+    if (!guest) return res.status(404).json("Invité non trouvé");
+
+    const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      body.name?.replace(/\s+/g, "-").toLowerCase() ||
+      guest.name;
+
+    if (req.file || body.media) {
+      const folder =
+        body.mediaType === "logo"
+          ? "festn_breizh/logos"
+          : "festn_breizh/invités";
+
+      const newMedia = await resolveMedia(
+        body.media,
+        req.file,
+        folder,
+        cleanName
+      );
+
+      if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
+        const inUse = await isFileInUse(guest.mediaFileId);
+        if (!inUse) await imagekit.deleteFile(guest.mediaFileId);
+      }
+
+      guest.media = newMedia.url;
+      guest.mediaFileId = newMedia.fileId;
+    }
+
+    guest.name = body.name || guest.name;
+    guest.description = body.description || guest.description;
+    guest.mediaName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      guest.mediaName;
+
+    await guest.save();
+
+    res.status(200).json({ message: "Invité mis à jour avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteGuestFromEdition = async (req, res) => {
+  try {
+    const { editionId, guestId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const guest = await Guest.findById(guestId);
+    if (!guest) return res.status(404).json("Invité non trouvé");
+
+    edition.guests = edition.guests.filter(
+      (id) => id.toString() !== guestId.toString()
+    );
+    await edition.save();
+
+    if (guest.mediaFileId) {
+      const inUse = await isFileInUse(guest.mediaFileId);
+      if (!inUse) await imagekit.deleteFile(guest.mediaFileId);
+    }
+
+    await Guest.findByIdAndDelete(guestId);
+    res.status(200).json({ message: "Invité supprimé de l'édition" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// === Gestion des artistes d'une édition ===
+export const addArtistToEdition = async (req, res) => {
+  try {
+    const { editionId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const artistData = req.body.artist ? JSON.parse(req.body.artist) : req.body;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      artistData.name?.replace(/\s+/g, "-").toLowerCase() ||
+      `${Date.now()}`;
+
+    let mediaResult = null;
+    if (req.file || artistData.media) {
+      mediaResult = await resolveMedia(
+        artistData.media,
+        req.file,
+        "festn_breizh/artistes",
+        cleanName
+      );
+    }
+
+    const newArtist = new Artist({
+      name: artistData.name,
+      role: artistData.role,
+      description: artistData.description,
+      media: mediaResult?.url || null,
+      mediaFileId: mediaResult?.fileId || null,
+      link: artistData.link || null,
+    });
+
+    await newArtist.save();
+
+    edition.artists.push(newArtist._id);
+    await edition.save();
+
+    res.status(201).json({ message: "Artiste ajouté à l'édition avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const updateArtistInEdition = async (req, res) => {
+  try {
+    const { editionId, artistId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const artist = await Artist.findById(artistId);
+    if (!artist) return res.status(404).json("Artiste non trouvé");
+
+    const body = req.body.artist ? JSON.parse(req.body.artist) : req.body;
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      body.name?.replace(/\s+/g, "-").toLowerCase() ||
+      artist.name;
+
+    if (req.file || body.media) {
+      const newMedia = await resolveMedia(
+        body.media,
+        req.file,
+        "festn_breizh/artistes",
+        cleanName
+      );
+
+      if (artist.mediaFileId && artist.mediaFileId !== newMedia.fileId) {
+        const inUse = await isFileInUse(artist.mediaFileId);
+        if (!inUse) await imagekit.deleteFile(artist.mediaFileId);
+      }
+
+      artist.media = newMedia.url;
+      artist.mediaFileId = newMedia.fileId;
+    }
+
+    artist.name = body.name || artist.name;
+    artist.role = body.role || artist.role;
+    artist.description = body.description || artist.description;
+    artist.link = body.link || artist.link;
+
+    await artist.save();
+
+    res.status(200).json({ message: "Artiste mis à jour avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteArtistFromEdition = async (req, res) => {
+  try {
+    const { editionId, artistId } = req.params;
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    const artist = await Artist.findById(artistId);
+    if (!artist) return res.status(404).json("Artiste non trouvé");
+
+    edition.artists = edition.artists.filter(
+      (id) => id.toString() !== artistId.toString()
+    );
+    await edition.save();
+
+    if (artist.mediaFileId) {
+      const inUse = await isFileInUse(artist.mediaFileId);
+      if (!inUse) await imagekit.deleteFile(artist.mediaFileId);
+    }
+
+    await Artist.findByIdAndDelete(artistId);
+    res.status(200).json({ message: "Artiste supprimé de l'édition" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
