@@ -3,7 +3,7 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// créer un nouvel artiste //
+// === Créer un nouvel artiste ===
 export const newArtist = async (req, res) => {
   try {
     const artistData = JSON.parse(req.body.artist);
@@ -12,35 +12,33 @@ export const newArtist = async (req, res) => {
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       req.file?.originalname
         ?.split(".")[0]
-        .replace(/\s+/g, "-")
+        ?.replace(/\s+/g, "-")
         .toLowerCase() ||
       artistData.name?.replace(/\s+/g, "-").toLowerCase() ||
       `${Date.now()}`;
 
+    // Déterminer le bon dossier
+    const folder = artistData.logo
+      ? "/festn_breizh/logos"
+      : "/festn_breizh/artistes";
+
     const mediaResult = await resolveMedia(
       artistData.media,
       req.file,
-      "/festn_breizh/artistes",
+      folder,
       cleanName
     );
 
-    let logoResult = null;
-    if (artistData.logo) {
-      const logoName = `${cleanName}-logo`;
-      logoResult = await resolveMedia(
-        artistData.logo,
-        null,
-        "/festn_breizh/logos",
-        logoName
-      );
-    }
-
-    const newGuest = new Guest({
-      name: guestData.name,
-      description: guestData.description,
-      media: mediaResult?.url || logoResult?.url || null,
-      mediaFileId: mediaResult?.fileId || logoResult?.fileId || null,
-      mediaName: mediaResult?.mediaName || guestData.fileName || null,
+    const newArtist = new Artist({
+      name: artistData.name,
+      description: artistData.description,
+      media: mediaResult?.url || null,
+      mediaFileId: mediaResult?.fileId || null,
+      mediaName:
+        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        artistData.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+        mediaResult?.fileName ||
+        cleanName,
     });
 
     await newArtist.save();
@@ -50,7 +48,7 @@ export const newArtist = async (req, res) => {
   }
 };
 
-// trouver tous les artistes //
+// === Trouver tous les artistes ===
 export const getAllArtists = async (req, res) => {
   try {
     const artists = await Artist.find();
@@ -60,7 +58,7 @@ export const getAllArtists = async (req, res) => {
   }
 };
 
-// trouver un seul artiste //
+// === Trouver un artiste ===
 export const getOneArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
@@ -71,59 +69,58 @@ export const getOneArtist = async (req, res) => {
   }
 };
 
-// modifier un artiste //
+// === Modifier un artiste ===
 export const updateArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
     if (!artist) return res.status(404).json("Artiste non trouvé");
 
     const body = req.body.artist ? JSON.parse(req.body.artist) : req.body;
-
     const allowedFields = ["name", "description"];
     const filteredData = {};
+
     for (const field of allowedFields) {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    // Mise à jour du média principal
+    const cleanName =
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      (filteredData.name || artist.name || `${Date.now()}`)
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
+    // --- Média principal ---
     if (req.file || body.media) {
-      const cleanName =
-        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-        req.file?.originalname
-          ?.split(".")[0]
-          .replace(/\s+/g, "-")
-          .toLowerCase() ||
-        (filteredData.name || artist.name || `${Date.now()}`)
-          .replace(/\s+/g, "-")
-          .toLowerCase();
+      const folder = body.logo
+        ? "/festn_breizh/logos"
+        : "/festn_breizh/artistes";
 
       const newMedia = await resolveMedia(
         body.media,
         req.file,
-        "/festn_breizh/artistes",
-        cleanName
+        folder,
+        `${cleanName}-${Date.now()}`
       );
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      // Vérifie si l'ancien fichier peut être supprimé
-      if (artist.mediaFileId && newMedia.fileId) {
-        const inUse = await isFileInUse(artist.mediaFileId);
-        if (inUse === false) {
+      // Supprime l’ancien média (strictement, sauf si logo)
+      if (artist.mediaFileId && folder !== "/festn_breizh/logos") {
+        try {
           await imagekit.deleteFile(artist.mediaFileId);
+          console.log("Ancien média supprimé :", artist.mediaFileId);
+        } catch (e) {
+          console.error("Erreur suppression ancienne image :", e?.message || e);
         }
       }
 
       filteredData.media = newMedia.url;
       filteredData.mediaFileId = newMedia.fileId;
+      filteredData.mediaName = newMedia.fileName || cleanName;
     }
 
-    // Mise à jour du logo
+    // --- Logo optionnel ---
     if (body.logo) {
-      const cleanName = (filteredData.name || artist.name)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-
       const newLogo = await resolveMedia(
         body.logo,
         null,
@@ -133,16 +130,21 @@ export const updateArtist = async (req, res) => {
 
       if (!newLogo?.url) return res.status(400).json("Logo invalide");
 
-      // Vérifie si l'ancien logo peut être supprimé
       if (artist.logoFileId && newLogo.fileId) {
         const inUse = await isFileInUse(artist.logoFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(artist.logoFileId);
-        }
+        if (inUse === false) await imagekit.deleteFile(artist.logoFileId);
       }
 
       filteredData.logo = newLogo.url;
       filteredData.logoFileId = newLogo.fileId;
+    }
+
+    // --- Mise à jour du nom du média sans changement de fichier ---
+    if (!req.file && !body.media && req.body.fileName) {
+      filteredData.mediaName = req.body.fileName
+        .trim()
+        .replace(/\s+/g, "-")
+        .toLowerCase();
     }
 
     const updatedArtist = await Artist.findByIdAndUpdate(
@@ -160,23 +162,29 @@ export const updateArtist = async (req, res) => {
   }
 };
 
-// supprimer un artiste //
+// === Supprimer un artiste ===
 export const deleteArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
     if (!artist) return res.status(404).json("Artiste non trouvé");
 
     if (artist.mediaFileId) {
-      const inUse = await isFileInUse(artist.mediaFileId);
-      if (inUse === false) {
+      try {
         await imagekit.deleteFile(artist.mediaFileId);
+        console.log("Média supprimé :", artist.mediaFileId);
+      } catch (e) {
+        console.error("Erreur suppression média :", e?.message || e);
       }
     }
 
     if (artist.logoFileId) {
       const inUse = await isFileInUse(artist.logoFileId);
       if (inUse === false) {
-        await imagekit.deleteFile(artist.logoFileId);
+        try {
+          await imagekit.deleteFile(artist.logoFileId);
+        } catch (e) {
+          console.error("Erreur suppression logo :", e?.message || e);
+        }
       }
     }
 

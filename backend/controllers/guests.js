@@ -3,7 +3,7 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// créer un nouvel invité //
+// === Créer un nouvel invité ===
 export const newGuest = async (req, res) => {
   try {
     const guestData = JSON.parse(req.body.guest);
@@ -12,34 +12,28 @@ export const newGuest = async (req, res) => {
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       req.file?.originalname
         ?.split(".")[0]
-        .replace(/\s+/g, "-")
+        ?.replace(/\s+/g, "-")
         .toLowerCase() ||
       guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
       `${Date.now()}`;
 
+    // Détermination du dossier en fonction du type de média
+    const folder = guestData.logo
+      ? "/festn_breizh/logos"
+      : "/festn_breizh/invités";
+
     const mediaResult = await resolveMedia(
       guestData.media,
       req.file,
-      "/festn_breizh/invités",
+      folder,
       cleanName
     );
-
-    let logoResult = null;
-    if (guestData.logo) {
-      const logoName = `${cleanName}-logo`;
-      logoResult = await resolveMedia(
-        guestData.logo,
-        null,
-        "/festn_breizh/logos",
-        logoName
-      );
-    }
 
     const newGuest = new Guest({
       name: guestData.name,
       description: guestData.description,
-      media: mediaResult?.url || logoResult?.url || null,
-      mediaFileId: mediaResult?.fileId || logoResult?.fileId || null,
+      media: mediaResult?.url || null,
+      mediaFileId: mediaResult?.fileId || null,
       mediaName:
         req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
         guestData.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
@@ -54,7 +48,7 @@ export const newGuest = async (req, res) => {
   }
 };
 
-// trouver tous les invités //
+// === Trouver tous les invités ===
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -64,7 +58,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// trouver un seul invité //
+// === Trouver un invité ===
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -75,7 +69,7 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// modifier un invité //
+// === Modifier un invité ===
 export const updateGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -97,17 +91,21 @@ export const updateGuest = async (req, res) => {
 
     // --- Média principal ---
     if (req.file || body.media) {
+      const folder = body.logo
+        ? "/festn_breizh/logos"
+        : "/festn_breizh/invités";
+
       const newMedia = await resolveMedia(
         body.media,
         req.file,
-        "/festn_breizh/invités",
+        folder,
         `${cleanName}-${Date.now()}`
       );
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      // Suppression stricte de l’ancien média (car ce n’est pas un logo)
-      if (guest.mediaFileId) {
+      // Supprime l’ancien média (strictement, sauf si logo)
+      if (guest.mediaFileId && folder !== "/festn_breizh/logos") {
         try {
           await imagekit.deleteFile(guest.mediaFileId);
           console.log("Ancien média supprimé :", guest.mediaFileId);
@@ -164,7 +162,7 @@ export const updateGuest = async (req, res) => {
   }
 };
 
-// supprimer un invité //
+// === Supprimer un invité ===
 export const deleteGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
