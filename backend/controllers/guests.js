@@ -106,23 +106,19 @@ export const updateGuest = async (req, res) => {
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
 
-      if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
-        const inUse = await isFileInUse(guest.mediaFileId);
-        if (!inUse) {
-          try {
-            await imagekit.deleteFile(guest.mediaFileId);
-            console.log("Ancien média supprimé :", guest.mediaFileId);
-          } catch (e) {
-            console.error(
-              "Erreur suppression ancienne image :",
-              e?.message || e
-            );
-          }
+      // Suppression stricte de l’ancien média (car ce n’est pas un logo)
+      if (guest.mediaFileId) {
+        try {
+          await imagekit.deleteFile(guest.mediaFileId);
+          console.log("Ancien média supprimé :", guest.mediaFileId);
+        } catch (e) {
+          console.error("Erreur suppression ancienne image :", e?.message || e);
         }
       }
 
       filteredData.media = newMedia.url;
       filteredData.mediaFileId = newMedia.fileId;
+      filteredData.mediaName = newMedia.fileName || cleanName;
     }
 
     // --- Logo optionnel ---
@@ -175,13 +171,23 @@ export const deleteGuest = async (req, res) => {
     if (!guest) return res.status(404).json("Invité non trouvé");
 
     if (guest.mediaFileId) {
-      const inUse = await isFileInUse(guest.mediaFileId);
-      if (inUse === false) await imagekit.deleteFile(guest.mediaFileId);
+      try {
+        await imagekit.deleteFile(guest.mediaFileId);
+        console.log("Média supprimé :", guest.mediaFileId);
+      } catch (e) {
+        console.error("Erreur suppression média :", e?.message || e);
+      }
     }
 
     if (guest.logoFileId) {
       const inUse = await isFileInUse(guest.logoFileId);
-      if (inUse === false) await imagekit.deleteFile(guest.logoFileId);
+      if (inUse === false) {
+        try {
+          await imagekit.deleteFile(guest.logoFileId);
+        } catch (e) {
+          console.error("Erreur suppression logo :", e?.message || e);
+        }
+      }
     }
 
     await Guest.findByIdAndDelete(req.params.id);
