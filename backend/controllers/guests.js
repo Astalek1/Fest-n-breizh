@@ -1,96 +1,87 @@
+// controllers/guests.js
 import Guest from "../models/Guests.js";
 import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// === Créer un nouvel invité ===
+// Util
+const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9]{8,}$/.test(v);
+const toSlug = (s) =>
+  (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
+
+// =========================
+// Créer un nouvel invité
+// =========================
 export const newGuest = async (req, res) => {
   try {
-    const guestData = JSON.parse(req.body.guest);
+    const body = JSON.parse(req.body.guest || "{}");
 
-    const cleanName =
+    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
+    const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      req.file?.originalname
-        ?.split(".")[0]
-        ?.replace(/\s+/g, "-")
-        .toLowerCase() ||
-      guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
-      `${Date.now()}`;
+      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      toSlug(body.name);
 
-    const mediaType = guestData.mediaType?.toLowerCase(); // "image", "logo" ou "video"
-
-    // --- Cas vidéo (URL uniquement) ---
+    // Cas vidéo: URL uniquement, aucun fichier ImageKit
     if (mediaType === "video") {
-      const newGuest = new Guest({
-        name: guestData.name,
-        description: guestData.description,
-        media: guestData.media,
+      const doc = new Guest({
+        name: body.name,
+        description: body.description,
+        media: body.media || null, // URL
         mediaFileId: null,
-        mediaName: cleanName,
+        logo: null,
+        logoFileId: null,
+        mediaName: baseName,
       });
-      await newGuest.save();
+      await doc.save();
       return res
         .status(201)
-        .json({ message: "Invité vidéo ajouté avec succès !" });
+        .json({ message: "Invité (vidéo) ajouté avec succès !" });
     }
 
-    // --- Dossier selon le type ---
-    const folder =
-      mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
+    // Image ou logo
+    const isLogo = mediaType === "logo";
+    const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-    let mediaResult;
+    let url = null;
+    let fileId = null;
+    let fileName = null;
 
-    // ✅ Si le logo ou l'image est déjà présent (fileId fourni)
-    if (
-      guestData.media &&
-      typeof guestData.media === "object" &&
-      guestData.media.fileId
-    ) {
-      const fileDetails = await imagekit
-        .getFileDetails(guestData.media.fileId)
-        .catch(() => null);
-      if (!fileDetails)
-        return res
-          .status(400)
-          .json("Fichier introuvable sur ImageKit (fileId invalide)");
-      mediaResult = {
-        url: fileDetails.url,
-        fileId: fileDetails.fileId,
-        fileName: fileDetails.name,
-      };
+    if (isFileId(body.media)) {
+      // Réutilisation d'un fichier existant (surtout pour les logos)
+      const details = await imagekit.getFileDetails(body.media);
+      url = details.url;
+      fileId = details.fileId;
+      fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
     } else {
-      // Upload ou URL classique
-      mediaResult = await resolveMedia(
-        guestData.media,
-        req.file,
-        folder,
-        cleanName
-      );
+      // Upload ou URL http(s)
+      const up = await resolveMedia(body.media, req.file, folder, baseName);
+      if (!up?.url) return res.status(400).json("Média invalide");
+      url = up.url;
+      fileId = up.fileId || null;
+      fileName = up.fileName || baseName;
     }
 
-    if (!mediaResult?.url)
-      return res.status(400).json("Média invalide ou introuvable");
-
-    const newGuest = new Guest({
-      name: guestData.name,
-      description: guestData.description,
-      media: mediaResult.url,
-      mediaFileId: mediaResult.fileId,
-      mediaName:
-        req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-        guestData.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-        mediaResult.fileName ||
-        cleanName,
+    const doc = new Guest({
+      name: body.name,
+      description: body.description,
+      media: isLogo ? null : url,
+      mediaFileId: isLogo ? null : fileId,
+      logo: isLogo ? url : null,
+      logoFileId: isLogo ? fileId : null,
+      mediaName: fileName,
     });
-
-    await newGuest.save();
+    await doc.save();
     res.status(201).json({ message: "Invité ajouté avec succès !" });
   } catch (error) {
+    console.error("newGuest error:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// === Récupérer tous les invités ===
+// =========================
+// Récupérer tous les invités
+// =========================
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -100,7 +91,9 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// === Récupérer un invité ===
+// =========================
+// Récupérer un invité
+// =========================
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -111,165 +104,198 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// === Modifier un invité ===
+// =========================
+// Modifier un invité
+// =========================
 export const updateGuest = async (req, res) => {
   try {
-    const guest = await Guest.findById(req.params.id);
-    if (!guest) return res.status(404).json("Invité non trouvé");
+    const existing = await Guest.findById(req.params.id);
+    if (!existing) return res.status(404).json("Invité non trouvé");
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
-    const allowedFields = ["name", "description"];
-    const filteredData = {};
 
-    for (const field of allowedFields) {
-      if (body[field] !== undefined && body[field] !== "")
-        filteredData[field] = body[field];
+    // Mises à jour partielles textuelles
+    const filtered = {};
+    for (const k of ["name", "description"]) {
+      if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
     }
 
-    const cleanName =
+    const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      (filteredData.name || guest.name || `${Date.now()}`)
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      toSlug(filtered.name || existing.name);
 
-    const mediaType = body.mediaType?.toLowerCase();
-    let oldLogoId = guest.logoFileId;
-    let oldImageId = guest.mediaFileId;
+    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video" | ""
+    const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
-    // === Gestion du nouveau média ===
-    if (req.file || body.media || mediaType === "video") {
+    // Conserver les anciens IDs pour le nettoyage post-update
+    const oldImageId = existing.mediaFileId || null;
+    const oldLogoId = existing.logoFileId || null;
+
+    // 1) Préparer la MAJ média (sans rien supprimer avant)
+    if (sentNewMedia) {
       if (mediaType === "video") {
-        filteredData.media = body.media;
-        filteredData.mediaFileId = null;
-        filteredData.logo = null;
-        filteredData.logoFileId = null;
+        filtered.media = body.media || existing.media; // URL
+        filtered.mediaFileId = null;
+        filtered.logo = null;
+        filtered.logoFileId = null;
+        filtered.mediaName = baseName;
       } else {
-        const folder =
-          mediaType === "logo"
-            ? "/festn_breizh/logos"
-            : "/festn_breizh/invités";
+        const isLogo = mediaType === "logo";
+        const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-        let newMedia;
+        let url = null;
+        let fileId = null;
+        let fileName = null;
 
-        // ✅ Cas d’un logo déjà existant (fileId)
-        if (body.media && typeof body.media === "object" && body.media.fileId) {
-          const fileDetails = await imagekit
-            .getFileDetails(body.media.fileId)
-            .catch(() => null);
-          if (!fileDetails)
-            return res
-              .status(400)
-              .json("Fichier introuvable sur ImageKit (fileId invalide)");
-          newMedia = {
-            url: fileDetails.url,
-            fileId: fileDetails.fileId,
-            fileName: fileDetails.name,
-          };
+        if (isFileId(body.media)) {
+          const details = await imagekit.getFileDetails(body.media);
+          url = details.url;
+          fileId = details.fileId;
+          fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
-          // Upload / URL standard
-          newMedia = await resolveMedia(
+          const up = await resolveMedia(
             body.media,
             req.file,
             folder,
-            `${cleanName}-${Date.now()}`
+            `${baseName}-${Date.now()}`
+          );
+          if (!up?.url)
+            return res.status(400).json("Média invalide ou introuvable");
+          url = up.url;
+          fileId = up.fileId || null;
+          fileName = up.fileName || baseName;
+        }
+
+        if (isLogo) {
+          filtered.logo = url;
+          filtered.logoFileId = fileId;
+          filtered.media = null;
+          filtered.mediaFileId = null;
+        } else {
+          filtered.media = url;
+          filtered.mediaFileId = fileId;
+          filtered.logo = null;
+          filtered.logoFileId = null;
+        }
+        filtered.mediaName = fileName;
+      }
+    } else if (req.body.fileName) {
+      // Renommage logique côté DB (pas de renommage chez ImageKit ici)
+      filtered.mediaName = baseName;
+    }
+
+    // 2) Écrire en base d'abord
+    const updated = await Guest.findByIdAndUpdate(req.params.id, filtered, {
+      new: true,
+      runValidators: true,
+    });
+
+    // 3) Nettoyage après succès de la mise à jour
+    if (sentNewMedia) {
+      // a) Si on est passé à un LOGO → l’ancienne image doit être supprimée (images non réutilisées)
+      if (mediaType === "logo" && oldImageId) {
+        try {
+          await imagekit.deleteFile(oldImageId);
+        } catch (e) {
+          console.error(
+            "Suppression ancienne image échouée :",
+            e?.message || e
           );
         }
+      }
 
-        if (!newMedia?.url)
-          return res.status(400).json("Média invalide ou introuvable");
-
-        if (mediaType === "logo") {
-          filteredData.logo = newMedia.url;
-          filteredData.logoFileId = newMedia.fileId;
-          filteredData.media = null;
-          filteredData.mediaFileId = null;
-        } else {
-          filteredData.media = newMedia.url;
-          filteredData.mediaFileId = newMedia.fileId;
-          filteredData.logo = null;
-          filteredData.logoFileId = null;
+      // b) Si on est passé à une IMAGE → l’ancien logo peut être supprimé seulement s’il est inutilisé
+      if (mediaType === "image" && oldLogoId) {
+        const inUse = await isFileInUse(oldLogoId);
+        if (inUse === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
         }
-
-        filteredData.mediaName = newMedia.fileName || cleanName;
       }
-    }
 
-    // === Mise à jour de la base ===
-    const updatedGuest = await Guest.findByIdAndUpdate(
-      req.params.id,
-      filteredData,
-      { new: true, runValidators: true }
-    );
-
-    // === Nettoyage intelligent ===
-    if (mediaType === "logo" && oldImageId) {
-      try {
-        await imagekit.deleteFile(oldImageId);
-      } catch (e) {
-        console.error("Erreur suppression ancienne image :", e.message);
+      // c) Si on a remplacé un LOGO par un autre LOGO (fileId différent) → suppression conditionnelle de l’ancien
+      if (
+        mediaType === "logo" &&
+        oldLogoId &&
+        updated.logoFileId &&
+        oldLogoId !== updated.logoFileId
+      ) {
+        const inUse = await isFileInUse(oldLogoId);
+        if (inUse === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
+        }
       }
-    }
 
-    if (mediaType === "image" && oldLogoId) {
-      const inUse = await isFileInUse(oldLogoId);
-      if (inUse === false) {
+      // d) Si on a remplacé une IMAGE par une autre IMAGE → supprimer l’ancienne image
+      if (
+        mediaType === "image" &&
+        oldImageId &&
+        updated.mediaFileId &&
+        oldImageId !== updated.mediaFileId
+      ) {
         try {
-          await imagekit.deleteFile(oldLogoId);
+          await imagekit.deleteFile(oldImageId);
         } catch (e) {
-          console.error("Erreur suppression ancien logo :", e.message);
+          console.error(
+            "Suppression ancienne image échouée :",
+            e?.message || e
+          );
         }
       }
     }
 
-    if (
-      mediaType === "logo" &&
-      oldLogoId &&
-      oldLogoId !== updatedGuest.logoFileId
-    ) {
-      const inUse = await isFileInUse(oldLogoId);
-      if (inUse === false) {
-        try {
-          await imagekit.deleteFile(oldLogoId);
-        } catch (e) {
-          console.error("Erreur suppression ancien logo :", e.message);
-        }
-      }
-    }
-
-    res.status(200).json(updatedGuest);
+    res.status(200).json(updated);
   } catch (error) {
+    console.error("updateGuest error:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// === Supprimer un invité ===
+// =========================
+// Supprimer un invité
+// =========================
 export const deleteGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json("Invité non trouvé");
 
-    if (guest.mediaFileId) {
+    const imgId = guest.mediaFileId || null;
+    const logoId = guest.logoFileId || null;
+
+    await Guest.findByIdAndDelete(req.params.id);
+
+    // Images: suppression directe (non réutilisées)
+    if (imgId) {
       try {
-        await imagekit.deleteFile(guest.mediaFileId);
+        await imagekit.deleteFile(imgId);
       } catch (e) {
-        console.error("Erreur suppression image :", e.message);
+        console.error("Suppression image échouée :", e?.message || e);
       }
     }
 
-    if (guest.logoFileId) {
-      const inUse = await isFileInUse(guest.logoFileId);
+    // Logos: suppression conditionnelle (peuvent être réutilisés)
+    if (logoId) {
+      const inUse = await isFileInUse(logoId);
       if (inUse === false) {
         try {
-          await imagekit.deleteFile(guest.logoFileId);
+          await imagekit.deleteFile(logoId);
         } catch (e) {
-          console.error("Erreur suppression logo :", e.message);
+          console.error("Suppression logo échouée :", e?.message || e);
         }
       }
     }
 
-    await Guest.findByIdAndDelete(req.params.id);
     res.status(200).json("Invité supprimé avec succès");
   } catch (error) {
+    console.error("deleteGuest error:", error);
     res.status(500).json({ error: "Erreur serveur (deleteGuest)" });
   }
 };
