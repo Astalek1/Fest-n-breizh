@@ -101,7 +101,7 @@ export const updateGuest = async (req, res) => {
         body.media,
         req.file,
         "/festn_breizh/invités",
-        cleanName
+        `${cleanName}-${Date.now()}`
       );
 
       if (!newMedia?.url) return res.status(400).json("Média invalide");
