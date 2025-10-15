@@ -106,7 +106,7 @@ export const updateGuest = async (req, res) => {
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
 
-    // Mises à jour partielles textuelles
+    // Champs textuels
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
@@ -117,17 +117,15 @@ export const updateGuest = async (req, res) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video" | ""
+    const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
-    // Sauvegarde des anciens IDs pour suppression après mise à jour
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
 
-    // Préparation de la mise à jour média
+    // --- 1) Préparer la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
-        // Vidéo = URL uniquement
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -178,17 +176,16 @@ export const updateGuest = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-    // Écriture en base
+    // --- 2) Mise à jour en base ---
     const updated = await Guest.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
       runValidators: true,
     });
 
-    // Nettoyage après mise à jour réussie
+    // --- 3) Nettoyage ---
     if (sentNewMedia) {
-      // Suppression d’anciens médias selon le nouveau type
+      // Passage vers vidéo → supprimer image + logo
       if (mediaType === "video") {
-        // On passe vers une vidéo → suppression image et logo
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
@@ -214,7 +211,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // Passage à LOGO → supprimer ancienne IMAGE (jamais réutilisée)
+      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -226,9 +223,10 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // Passage à IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
+      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
+        // suppression directe si plus utilisé par d’autres documents
         if (inUse === false) {
           try {
             await imagekit.deleteFile(oldLogoId);
@@ -238,7 +236,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // Remplacement LOGO → LOGO
+      // Remplacement LOGO → LOGO différent
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -255,7 +253,7 @@ export const updateGuest = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE
+      // Remplacement IMAGE → IMAGE différent
       if (
         mediaType === "image" &&
         oldImageId &&
