@@ -17,9 +17,9 @@ export const newGuest = async (req, res) => {
       guestData.name?.replace(/\s+/g, "-").toLowerCase() ||
       `${Date.now()}`;
 
-    // Type de média : image, logo ou vidéo
-    const mediaType = guestData.mediaType?.toLowerCase();
+    const mediaType = guestData.mediaType?.toLowerCase(); // "image", "logo" ou "video"
 
+    // --- Cas vidéo (YouTube) ---
     if (mediaType === "video") {
       const newGuest = new Guest({
         name: guestData.name,
@@ -28,16 +28,17 @@ export const newGuest = async (req, res) => {
         mediaFileId: null,
         mediaName: cleanName,
       });
-
       await newGuest.save();
       return res
         .status(201)
         .json({ message: "Invité vidéo ajouté avec succès !" });
     }
 
+    // --- Dossier selon le type ---
     const folder =
       mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
+    // --- Upload, URL ou logo déjà existant ---
     const mediaResult = await resolveMedia(
       guestData.media,
       req.file,
@@ -45,7 +46,8 @@ export const newGuest = async (req, res) => {
       cleanName
     );
 
-    if (!mediaResult?.url) return res.status(400).json("Média invalide");
+    if (!mediaResult?.url)
+      return res.status(400).json("Média invalide ou introuvable");
 
     const newGuest = new Guest({
       name: guestData.name,
@@ -108,12 +110,11 @@ export const updateGuest = async (req, res) => {
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-    const mediaType = body.mediaType?.toLowerCase(); // "image", "logo" ou "video"
-
+    const mediaType = body.mediaType?.toLowerCase();
     let oldLogoId = guest.logoFileId;
     let oldImageId = guest.mediaFileId;
 
-    // === 1️⃣ Gestion des médias ===
+    // === Gestion du nouveau média ===
     if (req.file || body.media || mediaType === "video") {
       if (mediaType === "video") {
         filteredData.media = body.media;
@@ -152,14 +153,14 @@ export const updateGuest = async (req, res) => {
       }
     }
 
-    // === 2️⃣ Mise à jour de la base ===
+    // === Mise à jour de la base ===
     const updatedGuest = await Guest.findByIdAndUpdate(
       req.params.id,
       filteredData,
       { new: true, runValidators: true }
     );
 
-    // === 3️⃣ Nettoyage des anciens fichiers ===
+    // === Nettoyage intelligent ===
     if (mediaType === "logo" && oldImageId) {
       try {
         await imagekit.deleteFile(oldImageId);
