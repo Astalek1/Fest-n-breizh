@@ -81,82 +81,88 @@ export const updateGuest = async (req, res) => {
     const allowedFields = ["name", "description"];
     const filteredData = {};
 
+    // --- 1️⃣ Mises à jour partielles des champs texte ---
     for (const field of allowedFields) {
-      if (body[field] !== undefined) filteredData[field] = body[field];
+      if (body[field] !== undefined && body[field] !== "")
+        filteredData[field] = body[field];
     }
 
+    // --- 2️⃣ Préparation du nom de fichier ---
     const cleanName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       (filteredData.name || guest.name || `${Date.now()}`)
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-    // === Cas 1 : on remplace par une image ===
-    if ((req.file || body.media) && !body.logo) {
+    // --- 3️⃣ Si un fichier ou une URL est envoyée ---
+    if (req.file || body.media) {
+      const mediaType = body.mediaType?.toLowerCase(); // "image" ou "logo"
+      if (!mediaType)
+        return res
+          .status(400)
+          .json("Le champ 'mediaType' est requis (image ou logo)");
+
+      const folder =
+        mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités";
+
       const newMedia = await resolveMedia(
         body.media,
         req.file,
-        "/festn_breizh/invités",
+        folder,
         `${cleanName}-${Date.now()}`
       );
 
-      if (!newMedia?.url) return res.status(400).json("Média invalide");
+      if (!newMedia?.url)
+        return res.status(400).json("Erreur : média invalide ou introuvable");
 
-      // Supprimer l’ancien logo s’il existe
-      if (guest.logoFileId) {
-        const inUse = await isFileInUse(guest.logoFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(guest.logoFileId);
+      // --- Suppression de l’ancien média ---
+      if (mediaType === "logo") {
+        // Supprime ancien logo si non utilisé ailleurs
+        if (guest.logoFileId && guest.logoFileId !== newMedia.fileId) {
+          const inUse = await isFileInUse(guest.logoFileId);
+          if (inUse === false) {
+            try {
+              await imagekit.deleteFile(guest.logoFileId);
+            } catch (e) {
+              console.error("Erreur suppression ancien logo :", e.message);
+            }
+          }
         }
+
+        // Supprime ancienne image s’il y en avait une
+        if (guest.mediaFileId) {
+          try {
+            await imagekit.deleteFile(guest.mediaFileId);
+          } catch (e) {
+            console.error("Erreur suppression ancienne image :", e.message);
+          }
+        }
+
+        filteredData.logo = newMedia.url;
+        filteredData.logoFileId = newMedia.fileId;
+        filteredData.media = null;
+        filteredData.mediaFileId = null;
+      } else {
+        // mediaType === "image"
+        // Supprime ancienne image
+        if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
+          try {
+            await imagekit.deleteFile(guest.mediaFileId);
+          } catch (e) {
+            console.error("Erreur suppression ancienne image :", e.message);
+          }
+        }
+
+        filteredData.media = newMedia.url;
+        filteredData.mediaFileId = newMedia.fileId;
+        filteredData.logo = null;
+        filteredData.logoFileId = null;
       }
 
-      // Supprimer l’ancien média
-      if (guest.mediaFileId) {
-        await imagekit.deleteFile(guest.mediaFileId);
-      }
-
-      filteredData.media = newMedia.url;
-      filteredData.mediaFileId = newMedia.fileId;
-      filteredData.logo = null;
-      filteredData.logoFileId = null;
       filteredData.mediaName = newMedia.fileName || cleanName;
     }
 
-    // === Cas 2 : on remplace par un logo ===
-    if (body.logo) {
-      const newLogo = await resolveMedia(
-        body.logo,
-        req.file,
-        "/festn_breizh/logos",
-        `${cleanName}-logo`
-      );
-
-      if (!newLogo?.url) return res.status(400).json("Logo invalide");
-
-      // Supprimer l’ancien média (image)
-      if (guest.mediaFileId) {
-        const inUse = await isFileInUse(guest.mediaFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(guest.mediaFileId);
-        }
-      }
-
-      // Supprimer l’ancien logo s’il n’est plus utilisé
-      if (guest.logoFileId) {
-        const inUse = await isFileInUse(guest.logoFileId);
-        if (inUse === false) {
-          await imagekit.deleteFile(guest.logoFileId);
-        }
-      }
-
-      filteredData.logo = newLogo.url;
-      filteredData.logoFileId = newLogo.fileId;
-      filteredData.media = null;
-      filteredData.mediaFileId = null;
-      filteredData.mediaName = newLogo.fileName || `${cleanName}-logo`;
-    }
-
-    // Mise à jour du nom du fichier sans changement de média
+    // --- 4️⃣ Mise à jour du nom du fichier sans changement de média ---
     if (!req.file && !body.media && req.body.fileName) {
       filteredData.mediaName = req.body.fileName
         .trim()
@@ -164,6 +170,7 @@ export const updateGuest = async (req, res) => {
         .toLowerCase();
     }
 
+    // --- 5️⃣ Enregistrement final ---
     const updatedGuest = await Guest.findByIdAndUpdate(
       req.params.id,
       filteredData,
