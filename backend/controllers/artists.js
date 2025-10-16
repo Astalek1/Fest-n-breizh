@@ -122,11 +122,12 @@ export const updateArtist = async (req, res) => {
 
     let newImageId = null;
     let newLogoId = null;
+    let updated = null;
 
     // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
-        // Vidéo = URL uniquement → suppression image + logo après update
+        // Vidéo = URL uniquement
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -181,11 +182,10 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-    // --- 4) Nettoyage post-update ---
+    // --- 3) Nettoyage avant update (aligné sur guests.js) ---
     if (sentNewMedia) {
-      // Passage vers vidéo → supprimer ancienne image et logo
       if (mediaType === "video") {
-        // Supprimer l’ancienne image (non réutilisable)
+        // Supprimer ancienne image
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
@@ -198,7 +198,7 @@ export const updateArtist = async (req, res) => {
           }
         }
 
-        // Supprimer le logo seulement s’il n’est plus utilisé
+        // Supprimer ancien logo s’il n’est plus utilisé
         if (oldLogoId) {
           const inUse = await isFileInUse(oldLogoId);
           if (inUse === false) {
@@ -241,7 +241,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement LOGO → LOGO
+      // Remplacement LOGO → LOGO (différents)
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -259,7 +259,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE (corrigé)
+      // Remplacement IMAGE → IMAGE
       if (mediaType === "image" && oldImageId) {
         if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
@@ -274,6 +274,12 @@ export const updateArtist = async (req, res) => {
         }
       }
     }
+
+    // --- 4) Mise à jour en base (après nettoyage) ---
+    updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
+      new: true,
+      runValidators: false,
+    });
 
     res.status(200).json(updated);
   } catch (error) {
