@@ -1,4 +1,3 @@
-// controllers/artists.js
 import Artist from "../models/Artists.js";
 import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
@@ -95,7 +94,7 @@ export const getOneArtist = async (req, res) => {
   }
 };
 
-// Modifier un artiste
+// === Modifier un artiste ===
 export const updateArtist = async (req, res) => {
   try {
     const existing = await Artist.findById(req.params.id);
@@ -103,6 +102,7 @@ export const updateArtist = async (req, res) => {
 
     const body = req.body.artist ? JSON.parse(req.body.artist) : req.body;
 
+    // Champs textuels
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
@@ -122,6 +122,7 @@ export const updateArtist = async (req, res) => {
     let newImageId = null;
     let newLogoId = null;
 
+    // --- 1) Préparer la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;
@@ -178,12 +179,15 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
+    // --- 2) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
-      runValidators: false, // permet la MAJ partielle
+      runValidators: false,
     });
 
+    // --- 3) Nettoyage ---
     if (sentNewMedia) {
+      // Passage vers vidéo → suppression image + logo
       if (mediaType === "video") {
         if (oldImageId) {
           try {
@@ -210,6 +214,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -221,6 +226,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -232,6 +238,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Remplacement LOGO → LOGO
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -248,6 +255,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Remplacement IMAGE → IMAGE
       if (
         mediaType === "image" &&
         oldImageId &&
