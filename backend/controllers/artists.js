@@ -240,19 +240,24 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // === Remplacement LOGO → LOGO ===
+      // === Remplacement LOGO → LOGO (corrigé et sûr) ===
       if (
         mediaType === "logo" &&
         oldLogoId &&
         newLogoId &&
         oldLogoId !== newLogoId
       ) {
+        // Attendre que la base soit bien mise à jour
+        const updatedAfter = await Artist.findById(req.params.id);
+
+        // Vérifier si le logo est encore utilisé ailleurs (exclure le document courant)
         const stillUsedElsewhere = await Artist.exists({
           _id: { $ne: req.params.id },
           logoFileId: oldLogoId,
         });
 
-        if (!stillUsedElsewhere) {
+        // Supprimer uniquement si le logo N’EST PLUS utilisé nulle part
+        if (!stillUsedElsewhere && updatedAfter.logoFileId !== oldLogoId) {
           try {
             await imagekit.deleteFile(oldLogoId);
             console.log("Ancien logo supprimé :", oldLogoId);
