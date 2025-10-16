@@ -181,12 +181,6 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-    // --- 3) Mise à jour en base ---
-    const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
-      new: true,
-      runValidators: false,
-    });
-
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
       // Passage vers vidéo → supprimer ancienne image et logo
