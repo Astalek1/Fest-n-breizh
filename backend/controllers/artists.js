@@ -254,8 +254,34 @@ export const updateArtist = async (req, res) => {
         newLogoId &&
         oldLogoId !== newLogoId
       ) {
-        const inUse = await isFileInUse(oldLogoId);
-        if (inUse === false) {
+        const stillUsedElsewhere = await Artist.exists({
+          _id: { $ne: req.params.id },
+          logoFileId: oldLogoId,
+        });
+
+        if (!stillUsedElsewhere) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+            console.log("Ancien logo supprimé :", oldLogoId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
+        }
+      }
+
+      // Remplacement LOGO → LOGO
+      if (
+        mediaType === "logo" &&
+        oldLogoId &&
+        newLogoId &&
+        oldLogoId !== newLogoId
+      ) {
+        const stillUsedElsewhere = await Artist.exists({
+          _id: { $ne: req.params.id },
+          logoFileId: oldLogoId,
+        });
+
+        if (!stillUsedElsewhere) {
           try {
             await imagekit.deleteFile(oldLogoId);
             console.log("Ancien logo supprimé :", oldLogoId);
