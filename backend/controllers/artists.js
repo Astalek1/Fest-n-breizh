@@ -7,11 +7,10 @@ const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) =>
   (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-//  Créer un nouvel artiste
+// === Créer un nouvel artiste ===
 export const newArtist = async (req, res) => {
   try {
     const body = JSON.parse(req.body.artist || "{}");
-
     const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
@@ -73,7 +72,7 @@ export const newArtist = async (req, res) => {
   }
 };
 
-// Récupérer tous les artistes
+// === Récupérer tous les artistes ===
 export const getAllArtists = async (req, res) => {
   try {
     const artists = await Artist.find();
@@ -83,7 +82,7 @@ export const getAllArtists = async (req, res) => {
   }
 };
 
-// Récupérer un artiste
+// === Récupérer un artiste ===
 export const getOneArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
@@ -118,9 +117,6 @@ export const updateArtist = async (req, res) => {
 
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
-
-    let newImageId = null;
-    let newLogoId = null;
 
     // --- 1) Préparer la mise à jour ---
     if (sentNewMedia) {
@@ -164,13 +160,11 @@ export const updateArtist = async (req, res) => {
           filtered.logoFileId = fileId;
           filtered.media = null;
           filtered.mediaFileId = null;
-          newLogoId = fileId;
         } else {
           filtered.media = url;
           filtered.mediaFileId = fileId;
           filtered.logo = null;
           filtered.logoFileId = null;
-          newImageId = fileId;
         }
 
         filtered.mediaName = fileName;
@@ -242,8 +236,8 @@ export const updateArtist = async (req, res) => {
       if (
         mediaType === "logo" &&
         oldLogoId &&
-        newLogoId &&
-        oldLogoId !== newLogoId
+        updated.logoFileId &&
+        oldLogoId !== updated.logoFileId
       ) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -259,8 +253,8 @@ export const updateArtist = async (req, res) => {
       if (
         mediaType === "image" &&
         oldImageId &&
-        newImageId &&
-        oldImageId !== newImageId
+        updated.mediaFileId &&
+        oldImageId !== updated.mediaFileId
       ) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -280,7 +274,7 @@ export const updateArtist = async (req, res) => {
   }
 };
 
-// Supprimer un artiste
+// === Supprimer un artiste ===
 export const deleteArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
