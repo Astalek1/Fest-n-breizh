@@ -228,13 +228,16 @@ export const updateArtist = async (req, res) => {
       }
 
       // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
-      if (mediaType === "image" && oldLogoId) {
-        const inUse = await isFileInUse(oldLogoId);
-        if (inUse === false) {
+      if (mediaType === "image" && oldImageId) {
+        if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
-            await imagekit.deleteFile(oldLogoId);
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée :", oldImageId);
           } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
+            console.error(
+              "Suppression ancienne image échouée :",
+              e?.message || e
+            );
           }
         }
       }
