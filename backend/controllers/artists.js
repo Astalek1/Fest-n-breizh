@@ -122,7 +122,6 @@ export const updateArtist = async (req, res) => {
 
     let newImageId = null;
     let newLogoId = null;
-    let updated = null;
 
     // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
@@ -182,10 +181,17 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-    // --- 3) Nettoyage avant update (aligné sur guests.js) ---
+    // --- 3) Mise à jour en base (comme guests.js) ---
+    const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
+      new: true,
+      runValidators: false,
+    });
+
+    // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
+      // Passage vers vidéo → supprimer ancienne image et logo
       if (mediaType === "video") {
-        // Supprimer ancienne image
+        // Supprimer ancienne image (non réutilisable)
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
@@ -241,7 +247,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement LOGO → LOGO (différents)
+      // Remplacement LOGO → LOGO
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -274,12 +280,6 @@ export const updateArtist = async (req, res) => {
         }
       }
     }
-
-    // --- 4) Mise à jour en base (après nettoyage) ---
-    updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
-      new: true,
-      runValidators: false,
-    });
 
     res.status(200).json(updated);
   } catch (error) {
