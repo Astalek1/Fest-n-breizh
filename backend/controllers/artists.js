@@ -95,7 +95,7 @@ export const getOneArtist = async (req, res) => {
   }
 };
 
-// === Modifier un artiste ===
+// === Modifier un artiste (identique à guests.js validé) ===
 export const updateArtist = async (req, res) => {
   try {
     const existing = await Artist.findById(req.params.id);
@@ -188,6 +188,7 @@ export const updateArtist = async (req, res) => {
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
+      // Passage vers vidéo → supprimer ancienne image et logo
       if (mediaType === "video") {
         if (oldImageId) {
           try {
@@ -214,6 +215,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -225,6 +227,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -236,6 +239,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Remplacement LOGO → LOGO
       if (
         mediaType === "logo" &&
         oldLogoId &&
@@ -252,6 +256,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Remplacement IMAGE → IMAGE (corrigé)
       if (mediaType === "image" && oldImageId) {
         if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
