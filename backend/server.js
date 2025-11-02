@@ -22,7 +22,7 @@ const app = express();
 app.use(express.json()); // permet de lire les données JSON envoyées au serveur
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*", // autorise les requêtes du frontend
+origin: process.env.CORS_ORIGIN || "*", // autorise les requêtes du frontendP
   })
 );
 
@@ -62,6 +62,8 @@ connectDB();
 
 // Démarrage serveur
 const PORT = process.env.PORT || 4000;
+console.log("ENV PORT =", process.env.PORT);
 app.listen(PORT, "0.0.0.0", () => {
+  console.log("BOUND =", PORT);
   console.log(`API running on http://localhost:${PORT}`);
 });
