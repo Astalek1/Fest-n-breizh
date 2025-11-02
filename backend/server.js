@@ -62,8 +62,6 @@ connectDB();
 
 // Démarrage serveur
 const PORT = process.env.PORT || 5000;
-console.log("ENV PORT =", process.env.PORT);
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("BOUND =", PORT);
   console.log(`API running on http://localhost:${PORT}`);
 });
