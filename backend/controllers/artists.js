@@ -97,7 +97,7 @@ export const getOneArtist = async (req, res) => {
   }
 };
 
-// Modifier un artiste //
+// Modifier un artiste
 export const updateArtist = async (req, res) => {
   try {
     const existing = await Artist.findById(req.params.id);
@@ -125,10 +125,21 @@ export const updateArtist = async (req, res) => {
     let newImageId = null;
     let newLogoId = null;
 
+    // --- 2.5) Vérification avant mise à jour ---
+    const inUse = await isFileInUse(oldLogoId);
+    return res.status(200).json({
+      debug: {
+        oldLogoId,
+        newLogoId,
+        mediaType,
+        sentNewMedia,
+        inUse,
+      },
+    });
+
     // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
-        // Passage vers vidéo : suppression image + logo
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -143,13 +154,11 @@ export const updateArtist = async (req, res) => {
         let fileName = null;
 
         if (isFileId(body.media)) {
-          // Utilisation d’un fichier existant
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
-          // Upload ou URL
           const up = await resolveMedia(
             body.media,
             req.file,
@@ -183,17 +192,6 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
 
-          // Remplacement LOGO → LOGO
-    console.log("DEBUG LOGO:", { oldLogoId, newLogoId, mediaType });
-
-// --- 2.5) Vérification avant mise à jour --- 
-
-const inUse = await isFileInUse(oldLogoId);
-return res.status(200).json({ debug: { oldLogoId, newLogoId, mediaType, sentNewMedia } });
-
-
-
-
     // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
@@ -202,16 +200,12 @@ return res.status(200).json({ debug: { oldLogoId, newLogoId, mediaType, sentNewM
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
-      // Passage vers vidéo → supprimer ancienne image et logo
       if (mediaType === "video") {
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
           } catch (e) {
-            console.error(
-              "Suppression ancienne image échouée :",
-              e?.message || e
-            );
+            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
         if (oldLogoId) {
@@ -220,28 +214,20 @@ return res.status(200).json({ debug: { oldLogoId, newLogoId, mediaType, sentNewM
             try {
               await imagekit.deleteFile(oldLogoId);
             } catch (e) {
-              console.error(
-                "Suppression ancien logo échouée :",
-                e?.message || e
-              );
+              console.error("Suppression ancien logo échouée :", e?.message || e);
             }
           }
         }
       }
 
-      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
         } catch (e) {
-          console.error(
-            "Suppression ancienne image échouée :",
-            e?.message || e
-          );
+          console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
 
-      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -253,17 +239,13 @@ return res.status(200).json({ debug: { oldLogoId, newLogoId, mediaType, sentNewM
         }
       }
 
-      // Remplacement IMAGE → IMAGE (corrigé)
       if (mediaType === "image" && oldImageId) {
         if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
             await imagekit.deleteFile(oldImageId);
             console.log("Ancienne image supprimée :", oldImageId);
           } catch (e) {
-            console.error(
-              "Suppression ancienne image échouée :",
-              e?.message || e
-            );
+            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
       }
@@ -275,6 +257,7 @@ return res.status(200).json({ debug: { oldLogoId, newLogoId, mediaType, sentNewM
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // suprimer un artiste //
 export const deleteArtist = async (req, res) => {
