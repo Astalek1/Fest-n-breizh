@@ -190,7 +190,8 @@ export const updateArtist = async (req, res) => {
 
  
 const inUse = await isFileInUse(oldLogoId);
-return res.status(200).json({ debug: { oldLogoId, newLogoId, inUse } });
+    console.log("TEST passage avant update:", { mediaType, sentNewMedia });
+
 
     // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
