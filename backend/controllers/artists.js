@@ -187,23 +187,10 @@ export const updateArtist = async (req, res) => {
     console.log("DEBUG LOGO:", { oldLogoId, newLogoId, mediaType });
 
 // --- 2.5) Vérification avant mise à jour --- 
-if (
-  mediaType === "logo" &&
-  oldLogoId &&
-  newLogoId &&
-  oldLogoId !== newLogoId
-) {
-  const inUse = await isFileInUse(oldLogoId);
-  console.log("Vérif ancien logo :", { oldLogoId, inUse });
-  if (inUse === false) {
-    try {
-      await imagekit.deleteFile(oldLogoId);
-      console.log("Ancien logo supprimé :", oldLogoId);
-    } catch (e) {
-      console.error("Suppression ancien logo échouée :", e?.message || e);
-    }
-  }
-}
+
+ 
+const inUse = await isFileInUse(oldLogoId);
+return res.status(200).json({ debug: { oldLogoId, newLogoId, inUse } });
 
     // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
