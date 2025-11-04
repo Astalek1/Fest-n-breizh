@@ -188,9 +188,9 @@ export const updateArtist = async (req, res) => {
 
 // --- 2.5) Vérification avant mise à jour --- 
 
- 
 const inUse = await isFileInUse(oldLogoId);
-    console.log("TEST passage avant update:", { mediaType, sentNewMedia });
+return res.status(200).json({ debug: { mediaType, sentNewMedia } });
+
 
 
     // --- 3) Mise à jour en base ---
