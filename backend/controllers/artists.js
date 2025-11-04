@@ -182,7 +182,23 @@ export const updateArtist = async (req, res) => {
     } else if (req.body.fileName) {
       filtered.mediaName = baseName;
     }
-
+      // Remplacement LOGO → LOGO
+    
+if (
+  mediaType === "logo" &&
+  oldLogoId &&
+  newLogoId &&
+  oldLogoId !== newLogoId
+) {
+  const inUse = await isFileInUse(oldLogoId);
+  if (inUse === false) {
+    try {
+      await imagekit.deleteFile(oldLogoId);
+    } catch (e) {
+      console.error("Suppression ancien logo échouée :", e?.message || e);
+    }
+  }
+}
     // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
@@ -232,23 +248,6 @@ export const updateArtist = async (req, res) => {
 
       // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
-        const inUse = await isFileInUse(oldLogoId);
-        if (inUse === false) {
-          try {
-            await imagekit.deleteFile(oldLogoId);
-          } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
-      }
-
-      // Remplacement LOGO → LOGO
-      if (
-        mediaType === "logo" &&
-        oldLogoId &&
-        newLogoId &&
-        oldLogoId !== newLogoId
-      ) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
           try {
