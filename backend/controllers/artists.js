@@ -183,7 +183,8 @@ export const updateArtist = async (req, res) => {
       filtered.mediaName = baseName;
     }
       // Remplacement LOGO → LOGO
-    
+    console.log("DEBUG LOGO:", { oldLogoId, newLogoId, mediaType });
+
 if (
   mediaType === "logo" &&
   oldLogoId &&
