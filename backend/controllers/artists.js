@@ -192,14 +192,9 @@ if (
   oldLogoId !== newLogoId
 ) {
   const inUse = await isFileInUse(oldLogoId);
-  if (inUse === false) {
-    try {
-      await imagekit.deleteFile(oldLogoId);
-    } catch (e) {
-      console.error("Suppression ancien logo échouée :", e?.message || e);
-    }
-  }
+  return res.status(200).json({ debug: { oldLogoId, newLogoId, inUse } });
 }
+ 
     // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
