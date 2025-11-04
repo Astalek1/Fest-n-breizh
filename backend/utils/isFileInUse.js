@@ -5,6 +5,8 @@ import Partner from "../models/Partners.js";
 import Announcement from "../models/Announcements.js";
 
 export const isFileInUse = async (fileId) => {
+  console.log("isFileInUse check:", fileId);
+
   if (!fileId) return false;
 
   const checks = await Promise.all([
@@ -16,6 +18,8 @@ export const isFileInUse = async (fileId) => {
       $and: [{ mediaFileId: fileId }, { mediaType: "logo" }],
     }),
   ]);
+  console.log("isFileInUse results:", checks);
+
 
   return checks.some(Boolean);
 };
