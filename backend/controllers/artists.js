@@ -86,7 +86,9 @@ export const getAllArtists = async (req, res) => {
   }
 };
 
-// Récupérer un artiste//
+
+
+// Récupérer un artiste
 export const getOneArtist = async (req, res) => {
   try {
     const artist = await Artist.findById(req.params.id);
@@ -124,18 +126,6 @@ export const updateArtist = async (req, res) => {
 
     let newImageId = null;
     let newLogoId = null;
-
-    // --- 2.5) Vérification avant mise à jour ---
-    const inUse = await isFileInUse(oldLogoId);
-    return res.status(200).json({
-      debug: {
-        oldLogoId,
-        newLogoId,
-        mediaType,
-        sentNewMedia,
-        inUse,
-      },
-    });
 
     // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
@@ -200,6 +190,7 @@ export const updateArtist = async (req, res) => {
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
+      // Passage vers vidéo → suppression ancienne image + logo
       if (mediaType === "video") {
         if (oldImageId) {
           try {
@@ -213,6 +204,7 @@ export const updateArtist = async (req, res) => {
           if (inUse === false) {
             try {
               await imagekit.deleteFile(oldLogoId);
+              console.log("Ancien logo supprimé :", oldLogoId);
             } catch (e) {
               console.error("Suppression ancien logo échouée :", e?.message || e);
             }
@@ -220,25 +212,44 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
+          console.log("Ancienne image supprimée :", oldImageId);
         } catch (e) {
           console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
 
+      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
           try {
             await imagekit.deleteFile(oldLogoId);
+            console.log("Ancien logo supprimé :", oldLogoId);
           } catch (e) {
             console.error("Suppression ancien logo échouée :", e?.message || e);
           }
         }
       }
 
+      // Remplacement LOGO → LOGO (vérification après mise à jour)
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
+        const inUse = await isFileInUse(oldLogoId);
+        console.log("Vérif post-update :", { oldLogoId, newLogoId, inUse });
+        if (inUse === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+            console.log("Ancien logo supprimé :", oldLogoId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
+        }
+      }
+
+      // Remplacement IMAGE → IMAGE
       if (mediaType === "image" && oldImageId) {
         if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
@@ -257,6 +268,7 @@ export const updateArtist = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 // suprimer un artiste //
