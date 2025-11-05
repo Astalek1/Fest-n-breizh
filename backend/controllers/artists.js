@@ -73,16 +73,6 @@ export const newArtist = async (req, res) => {
   }
 };
 
-// Récupérer tous les Artistes //
-export const getAllArtists = async (req, res) => {
-  try {
-    const artists = await Artist.find();
-    res.status(200).json(artists);
-  } catch {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
-  }
-};
-
 // Récupérer un artiste
 export const getOneArtist = async (req, res) => {
   try {
@@ -99,17 +89,6 @@ export const getAllArtists = async (req, res) => {
   try {
     const artists = await Artist.find();
     res.status(200).json(artists);
-  } catch {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
-  }
-};
-
-// Récupérer un artiste
-export const getOneArtist = async (req, res) => {
-  try {
-    const artist = await Artist.findById(req.params.id);
-    if (!artist) return res.status(404).json("artiste non trouvé");
-    res.status(200).json(artist);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
