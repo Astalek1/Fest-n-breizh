@@ -179,23 +179,16 @@ export const updateArtist = async (req, res) => {
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
-      // --- Remplacement IMAGE → IMAGE (version corrigée et robuste) ---
-      if (mediaType === "image" && oldImageId) {
+      // --- Remplacement IMAGE → IMAGE (suppression directe) ---
+      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
         try {
-          // Vérifie si l'ancienne image n'est plus utilisée
-          const stillUsed = await isFileInUse(oldImageId);
-
-          // Supprime seulement si elle n'est plus utilisée
-          if (stillUsed === false && oldImageId !== newImageId) {
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
-          } else {
-            console.log("Image conservée (encore utilisée ou inchangée) :", oldImageId);
-          }
+          await imagekit.deleteFile(oldImageId);
+          console.log("Ancienne image supprimée :", oldImageId);
         } catch (e) {
-          console.error("Erreur suppression ancienne image :", e?.message || e);
+          console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
+
       // Passage vers vidéo → suppression ancienne image + logo
       if (mediaType === "video") {
         if (oldImageId) {
