@@ -93,7 +93,6 @@ export const getOneArtist = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
-
 // Modifier un artiste
 export const updateArtist = async (req, res) => {
   try {
@@ -224,7 +223,7 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement LOGO → LOGO (vérification après mise à jour)
+      // Remplacement LOGO → LOGO
       if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         console.log("Vérif post-update :", { oldLogoId, newLogoId, inUse });
@@ -238,15 +237,13 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE
-      if (mediaType === "image" && oldImageId) {
-        if ((newImageId && oldImageId !== newImageId) || req.file) {
-          try {
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
-          } catch (e) {
-            console.error("Suppression ancienne image échouée :", e?.message || e);
-          }
+      // Remplacement IMAGE → IMAGE (corrigé)
+      if (mediaType === "image" && oldImageId && newImageId && oldImageId !== newImageId) {
+        try {
+          await imagekit.deleteFile(oldImageId);
+          console.log("Ancienne image supprimée :", oldImageId);
+        } catch (e) {
+          console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
     }
