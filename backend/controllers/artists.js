@@ -224,37 +224,33 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement LOGO → LOGO (vérification après mise à jour)
+      // Remplacement IMAGE → IMAGE (direct)
+      if (mediaType === "image" && oldImageId && newImageId && oldImageId !== newImageId) {
+        try {
+          await imagekit.deleteFile(oldImageId);
+          console.log("Ancienne image supprimée :", oldImageId);
+        } catch (e) {
+          console.error("Suppression ancienne image échouée :", e?.message || e);
+        }
+      }
+
+      // Remplacement LOGO → LOGO (sécurisé)
       if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
-        const inUse = await isFileInUse(oldLogoId);
-        console.log("Vérif post-update :", { oldLogoId, newLogoId, inUse });
-        if (inUse === false) {
-          try {
+        try {
+          const inUse = await isFileInUse(oldLogoId);
+          if (inUse === false) {
             await imagekit.deleteFile(oldLogoId);
             console.log("Ancien logo supprimé :", oldLogoId);
-          } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
-      }
-
-      // Remplacement IMAGE → IMAGE
-      // Remplacement IMAGE → IMAGE (version fiable)
-      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
-        try {
-          const stillUsed = await isFileInUse(oldImageId);
-          if (stillUsed === false) {
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
           } else {
-            console.log("Image conservée car encore utilisée :", oldImageId);
+            console.log("Logo conservé car encore utilisé :", oldLogoId);
           }
         } catch (e) {
-          console.error("Erreur suppression ancienne image :", e?.message || e);
+          console.error("Erreur suppression ancien logo :", e?.message || e);
         }
       }
-    }
+    } // <-- ferme bien le if(sentNewMedia)
 
+    // --- 5) Réponse finale ---
     res.status(200).json(updated);
   } catch (error) {
     console.error("updateArtist error:", error);
