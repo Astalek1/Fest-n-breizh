@@ -93,6 +93,28 @@ export const getOneArtist = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
+
+// Récupérer tous les Artistes
+export const getAllArtists = async (req, res) => {
+  try {
+    const artists = await Artist.find();
+    res.status(200).json(artists);
+  } catch {
+    res.status(500).json("Erreur serveur, base de données inaccessible");
+  }
+};
+
+// Récupérer un artiste
+export const getOneArtist = async (req, res) => {
+  try {
+    const artist = await Artist.findById(req.params.id);
+    if (!artist) return res.status(404).json("artiste non trouvé");
+    res.status(200).json(artist);
+  } catch {
+    res.status(500).json("Erreur serveur, base de données inaccessible");
+  }
+};
+
 // Modifier un artiste
 export const updateArtist = async (req, res) => {
   try {
@@ -110,7 +132,7 @@ export const updateArtist = async (req, res) => {
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      (filtered.name || existing.name).trim().replace(/\s+/g, "-").toLowerCase();
+      toSlug(filtered.name || existing.name);
 
     const mediaType = (body.mediaType || "").toLowerCase(); // image | logo | video
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
@@ -128,6 +150,7 @@ export const updateArtist = async (req, res) => {
         filtered.mediaFileId = null;
         filtered.logo = null;
         filtered.logoFileId = null;
+        filtered.mediaName = baseName;
       } else {
         const isLogo = mediaType === "logo";
         const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/artistes";
@@ -165,9 +188,11 @@ export const updateArtist = async (req, res) => {
 
         filtered.mediaName = fileName;
       }
+    } else if (req.body.fileName) {
+      filtered.mediaName = baseName;
     }
 
-    // --- 3) Mise à jour ---
+    // --- 3) Mise à jour en base ---
     const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
       new: true,
       runValidators: false,
@@ -180,7 +205,6 @@ export const updateArtist = async (req, res) => {
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
           } catch (e) {
             console.error("Suppression ancienne image échouée :", e?.message || e);
           }
@@ -221,18 +245,33 @@ export const updateArtist = async (req, res) => {
         }
       }
 
+      // Remplacement LOGO → LOGO (vérification après mise à jour)
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
+        const inUse = await isFileInUse(oldLogoId);
+        console.log("Vérif post-update :", { oldLogoId, newLogoId, inUse });
+        if (inUse === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+            console.log("Ancien logo supprimé :", oldLogoId);
+          } catch (e) {
+            console.error("Suppression ancien logo échouée :", e?.message || e);
+          }
+        }
+      }
+
       // Remplacement IMAGE → IMAGE
-      if (mediaType === "image" && oldImageId && newImageId && oldImageId !== newImageId) {
-        try {
-          await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée :", oldImageId);
-        } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
+      if (mediaType === "image" && oldImageId) {
+        if ((newImageId && oldImageId !== newImageId) || req.file) {
+          try {
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée :", oldImageId);
+          } catch (e) {
+            console.error("Suppression ancienne image échouée :", e?.message || e);
+          }
         }
       }
     }
 
-    // --- 5) Réponse ---
     res.status(200).json(updated);
   } catch (error) {
     console.error("updateArtist error:", error);
