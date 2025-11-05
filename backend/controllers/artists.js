@@ -275,6 +275,15 @@ export const deleteArtist = async (req, res) => {
         }
       }
     }
+    // --- Remplacement IMAGE → IMAGE (suppression directe) ---
+    if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+      try {
+        await imagekit.deleteFile(oldImageId);
+        console.log("Ancienne image supprimée :", oldImageId);
+      } catch (e) {
+        console.error("Suppression ancienne image échouée :", e?.message || e);
+      }
+    }
 
     res.status(200).json("Artiste supprimé avec succès");
   } catch (error) {
