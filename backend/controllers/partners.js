@@ -8,11 +8,7 @@ export const newPartner = async (req, res) => {
   try {
     const partnerData = JSON.parse(req.body.partner || "{}");
 
-    const cleanName = (
-      req.body.fileName ||
-      partnerData.fileName ||
-      "logo-partner"
-    )
+    const cleanName = (req.body.fileName || partnerData.fileName || "logo-partner")
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase();
@@ -82,12 +78,7 @@ export const updatePartner = async (req, res) => {
       if (body[k] !== undefined) filtered[k] = body[k];
     }
 
-    const baseName = (
-      req.body.fileName ||
-      body.fileName ||
-      existing.logoName ||
-      "logo-partner"
-    )
+    const baseName = (req.body.fileName || body.fileName || existing.logoName || "logo-partner")
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase();
@@ -118,12 +109,7 @@ export const updatePartner = async (req, res) => {
 
     // c) Nouveau logo (upload ou URL http)
     else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
-      const uploaded = await resolveMedia(
-        body.logo,
-        req.file,
-        "/festn_breizh/logos",
-        baseName
-      );
+      const uploaded = await resolveMedia(body.logo, req.file, "/festn_breizh/logos", baseName);
       if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
       filtered.logo = uploaded.url;

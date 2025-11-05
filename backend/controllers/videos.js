@@ -62,11 +62,10 @@ export const updateVideo = async (req, res) => {
       }
     }
 
-    const newDataVideo = await Video.findByIdAndUpdate(
-      req.params.id,
-      filteredData,
-      { new: true, runValidators: true }
-    );
+    const newDataVideo = await Video.findByIdAndUpdate(req.params.id, filteredData, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json(newDataVideo);
   } catch (error) {

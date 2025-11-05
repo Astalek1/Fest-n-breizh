@@ -9,21 +9,9 @@ const router = express.Router();
 router.get("/", announcementsCtrl.getAllAnnouncements);
 router.get("/:id", announcementsCtrl.getOneAnnouncement);
 
-router.post(
-  "/",
-  auth,
-  multer.single("media"),
-  resizeImage,
-  announcementsCtrl.newAnnouncement
-);
+router.post("/", auth, multer.single("media"), resizeImage, announcementsCtrl.newAnnouncement);
 
-router.put(
-  "/:id",
-  auth,
-  multer.single("media"),
-  resizeImage,
-  announcementsCtrl.updateAnnouncement
-);
+router.put("/:id", auth, multer.single("media"), resizeImage, announcementsCtrl.updateAnnouncement);
 
 router.delete("/:id", auth, announcementsCtrl.deleteAnnouncement);
 

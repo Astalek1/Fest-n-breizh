@@ -20,6 +20,5 @@ export const isFileInUse = async (fileId) => {
   ]);
   console.log("isFileInUse results:", checks);
 
-
   return checks.some(Boolean);
 };

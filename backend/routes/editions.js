@@ -23,11 +23,7 @@ router.put(
   editionsCtrl.updateGuestInEdition
 );
 
-router.delete(
-  "/:editionId/guests/:guestId",
-  auth,
-  editionsCtrl.deleteGuestFromEdition
-);
+router.delete("/:editionId/guests/:guestId", auth, editionsCtrl.deleteGuestFromEdition);
 
 // === Gestion des artistes d'une édition ===
 router.post(
@@ -46,11 +42,7 @@ router.put(
   editionsCtrl.updateArtistInEdition
 );
 
-router.delete(
-  "/:editionId/artists/:artistId",
-  auth,
-  editionsCtrl.deleteArtistFromEdition
-);
+router.delete("/:editionId/artists/:artistId", auth, editionsCtrl.deleteArtistFromEdition);
 
 // === Routes générales ===
 router.get("/", editionsCtrl.getAllEditions);

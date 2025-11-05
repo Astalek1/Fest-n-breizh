@@ -82,11 +82,7 @@ async function processOne(file, type) {
     const dual = await makeDualVersions(file.buffer, base, PRESETS[type]);
     Object.assign(file, dual);
   } else {
-    const single = await makeSingleVersion(
-      file.buffer,
-      base,
-      PRESETS[type] || PRESETS.default
-    );
+    const single = await makeSingleVersion(file.buffer, base, PRESETS[type] || PRESETS.default);
     Object.assign(file, single);
   }
 

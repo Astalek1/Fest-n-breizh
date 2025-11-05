@@ -28,11 +28,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
     ];
 
     // Si Sharp a généré deux versions ET que le dossier le demande
-    if (
-      file.bufferSmall &&
-      file.bufferLarge &&
-      dualVersionFolders.includes(folder)
-    ) {
+    if (file.bufferSmall && file.bufferLarge && dualVersionFolders.includes(folder)) {
       const [smallUpload, largeUpload] = await Promise.all([
         imagekit.upload({
           file: file.bufferSmall.toString("base64"),

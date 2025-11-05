@@ -10,23 +10,15 @@ export const newAnnouncement = async (req, res) => {
 
     const cleanName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      req.file?.originalname
-        ?.split(".")[0]
-        .replace(/\s+/g, "-")
-        .toLowerCase() ||
-      (data.title
-        ? data.title.replace(/\s+/g, "-").toLowerCase()
-        : `media-${Date.now()}`);
+      req.file?.originalname?.split(".")[0].replace(/\s+/g, "-").toLowerCase() ||
+      (data.title ? data.title.replace(/\s+/g, "-").toLowerCase() : `media-${Date.now()}`);
 
     let mediaResult = { url: null, fileId: null };
 
     if (data.mediaType === "video") {
       mediaResult.url = data.media || null;
     } else if (req.file || data.media) {
-      const folder =
-        data.mediaType === "logo"
-          ? "/festn_breizh/logos"
-          : "/festn_breizh/accueil";
+      const folder = data.mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/accueil";
       mediaResult = await resolveMedia(data.media, req.file, folder, cleanName);
     }
 
@@ -77,9 +69,7 @@ export const updateAnnouncement = async (req, res) => {
 
     let body = {};
     try {
-      body = req.body.announcement
-        ? JSON.parse(req.body.announcement)
-        : req.body;
+      body = req.body.announcement ? JSON.parse(req.body.announcement) : req.body;
     } catch {
       body = req.body || {};
     }
@@ -93,9 +83,7 @@ export const updateAnnouncement = async (req, res) => {
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       existing.mediaName ||
-      (body.title || existing.title || "media")
-        .replace(/\s+/g, "-")
-        .toLowerCase();
+      (body.title || existing.title || "media").replace(/\s+/g, "-").toLowerCase();
 
     const nextType = body.mediaType || existing.mediaType;
     const oldFileId = existing.mediaFileId;
@@ -122,12 +110,7 @@ export const updateAnnouncement = async (req, res) => {
         didChangeFile = oldFileId && oldFileId !== newFileId;
       } else if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
         // Nouveau logo
-        const uploaded = await resolveMedia(
-          body.media,
-          req.file,
-          "/festn_breizh/logos",
-          baseName
-        );
+        const uploaded = await resolveMedia(body.media, req.file, "/festn_breizh/logos", baseName);
         if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
         filtered.media = uploaded.url;
@@ -140,8 +123,7 @@ export const updateAnnouncement = async (req, res) => {
 
     // === Cas 3 : Photo ===
     else if (nextType === "photo") {
-      const hasNewFile =
-        !!req.file || (body.media && /^https?:\/\//i.test(body.media));
+      const hasNewFile = !!req.file || (body.media && /^https?:\/\//i.test(body.media));
 
       if (hasNewFile) {
         // Nouvelle photo ou remplacement
@@ -166,10 +148,7 @@ export const updateAnnouncement = async (req, res) => {
           try {
             await imagekit.deleteFile(oldFileId);
           } catch (e) {
-            console.error(
-              "Suppression ancienne photo échouée :",
-              e?.message || e
-            );
+            console.error("Suppression ancienne photo échouée :", e?.message || e);
           }
         }
       } else {
@@ -181,14 +160,10 @@ export const updateAnnouncement = async (req, res) => {
     }
 
     // Mise à jour en base
-    const updated = await Announcement.findByIdAndUpdate(
-      req.params.id,
-      filtered,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const updated = await Announcement.findByIdAndUpdate(req.params.id, filtered, {
+      new: true,
+      runValidators: true,
+    });
 
     // Suppression de l’ancien fichier si nécessaire (logos uniquement)
     if (didChangeFile && oldFileId && nextType === "logo") {

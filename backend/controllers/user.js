@@ -14,9 +14,7 @@ export const signup = async (req, res) => {
   } catch (error) {
     if (error.code === 11000) {
       // Gestion user déjà utilisé
-      return res
-        .status(400)
-        .json({ error: "nom d'utilisateur déjà utilisé !" });
+      return res.status(400).json({ error: "nom d'utilisateur déjà utilisé !" });
     }
     res.status(500).json({ error });
   }

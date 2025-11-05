@@ -4,8 +4,7 @@ import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
-const toSlug = (s) =>
-  (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
+const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
 // Créer un nouvel artiste//
 export const newArtist = async (req, res) => {
@@ -30,9 +29,7 @@ export const newArtist = async (req, res) => {
         mediaName: baseName,
       });
       await doc.save();
-      return res
-        .status(201)
-        .json({ message: "Artiste (vidéo) ajouté avec succès !" });
+      return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
     }
 
     // Dossier cible en fonction du type
@@ -85,8 +82,6 @@ export const getAllArtists = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
-
-
 
 // Récupérer un artiste
 export const getOneArtist = async (req, res) => {
@@ -149,14 +144,8 @@ export const updateArtist = async (req, res) => {
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
-          const up = await resolveMedia(
-            body.media,
-            req.file,
-            folder,
-            `${baseName}-${Date.now()}`
-          );
-          if (!up?.url)
-            return res.status(400).json("Média invalide ou introuvable");
+          const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
+          if (!up?.url) return res.status(400).json("Média invalide ou introuvable");
           url = up.url;
           fileId = up.fileId || null;
           fileName = up.fileName || baseName;
@@ -268,8 +257,6 @@ export const updateArtist = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 // suprimer un artiste //
 export const deleteArtist = async (req, res) => {

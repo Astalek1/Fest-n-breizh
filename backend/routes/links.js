@@ -11,13 +11,7 @@ router.get("/:id", linksCtrl.getOneLink);
 
 router.post("/", auth, multer.single("file"), resizeImage, linksCtrl.newLink);
 
-router.put(
-  "/:id",
-  auth,
-  multer.single("file"),
-  resizeImage,
-  linksCtrl.updateLink
-);
+router.put("/:id", auth, multer.single("file"), resizeImage, linksCtrl.updateLink);
 
 router.delete("/:id", auth, linksCtrl.deleteLink);
 

@@ -4,8 +4,7 @@ import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
-const toSlug = (s) =>
-  (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
+const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
 // Créer un nouvel invité //
 export const newGuest = async (req, res) => {
@@ -30,9 +29,7 @@ export const newGuest = async (req, res) => {
         mediaName: baseName,
       });
       await doc.save();
-      return res
-        .status(201)
-        .json({ message: "Invité (vidéo) ajouté avec succès !" });
+      return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !" });
     }
 
     // Dossier cible en fonction du type
@@ -150,14 +147,8 @@ export const updateGuest = async (req, res) => {
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
           // Upload ou URL
-          const up = await resolveMedia(
-            body.media,
-            req.file,
-            folder,
-            `${baseName}-${Date.now()}`
-          );
-          if (!up?.url)
-            return res.status(400).json("Média invalide ou introuvable");
+          const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
+          if (!up?.url) return res.status(400).json("Média invalide ou introuvable");
           url = up.url;
           fileId = up.fileId || null;
           fileName = up.fileName || baseName;
@@ -197,10 +188,7 @@ export const updateGuest = async (req, res) => {
           try {
             await imagekit.deleteFile(oldImageId);
           } catch (e) {
-            console.error(
-              "Suppression ancienne image échouée :",
-              e?.message || e
-            );
+            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
         if (oldLogoId) {
@@ -209,10 +197,7 @@ export const updateGuest = async (req, res) => {
             try {
               await imagekit.deleteFile(oldLogoId);
             } catch (e) {
-              console.error(
-                "Suppression ancien logo échouée :",
-                e?.message || e
-              );
+              console.error("Suppression ancien logo échouée :", e?.message || e);
             }
           }
         }
@@ -223,10 +208,7 @@ export const updateGuest = async (req, res) => {
         try {
           await imagekit.deleteFile(oldImageId);
         } catch (e) {
-          console.error(
-            "Suppression ancienne image échouée :",
-            e?.message || e
-          );
+          console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
 
@@ -243,12 +225,7 @@ export const updateGuest = async (req, res) => {
       }
 
       // Remplacement LOGO → LOGO
-      if (
-        mediaType === "logo" &&
-        oldLogoId &&
-        newLogoId &&
-        oldLogoId !== newLogoId
-      ) {
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
           try {
@@ -266,10 +243,7 @@ export const updateGuest = async (req, res) => {
             await imagekit.deleteFile(oldImageId);
             console.log("Ancienne image supprimée :", oldImageId);
           } catch (e) {
-            console.error(
-              "Suppression ancienne image échouée :",
-              e?.message || e
-            );
+            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
       }

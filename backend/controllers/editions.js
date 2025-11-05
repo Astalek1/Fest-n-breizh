@@ -11,14 +11,10 @@ export const createEdition = async (req, res) => {
     const editionData = JSON.parse(req.body.edition);
 
     if (!editionData.artists || editionData.artists.length < 1)
-      return res
-        .status(400)
-        .json("Une édition doit contenir au moins un artiste.");
+      return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
     if (!editionData.poster)
-      return res
-        .status(400)
-        .json("Une affiche est obligatoire pour créer une édition.");
+      return res.status(400).json("Une affiche est obligatoire pour créer une édition.");
 
     const poster = editionData.poster;
     const artistIds = [];
@@ -42,12 +38,7 @@ export const createEdition = async (req, res) => {
           ? artist.name.replace(/\s+/g, "-").toLowerCase()
           : `${Date.now()}`;
 
-        const uploaded = await resolveMedia(
-          null,
-          file,
-          "festn_breizh/artistes",
-          cleanName
-        );
+        const uploaded = await resolveMedia(null, file, "festn_breizh/artistes", cleanName);
         mediaUrl = uploaded.url;
         mediaFileId = uploaded.fileId;
       }
@@ -85,10 +76,7 @@ export const createEdition = async (req, res) => {
           ? guest.name.replace(/\s+/g, "-").toLowerCase()
           : `${Date.now()}`;
 
-        const folder =
-          guest.mediaType === "logo"
-            ? "festn_breizh/logos"
-            : "festn_breizh/invités";
+        const folder = guest.mediaType === "logo" ? "festn_breizh/logos" : "festn_breizh/invités";
 
         const uploaded = await resolveMedia(null, file, folder, cleanName);
         mediaUrl = uploaded.url;
@@ -123,9 +111,7 @@ export const createEdition = async (req, res) => {
 // trouver toutes les éditions //
 export const getAllEditions = async (req, res) => {
   try {
-    const editions = await Edition.find()
-      .populate("artists")
-      .populate("guests");
+    const editions = await Edition.find().populate("artists").populate("guests");
     res.status(200).json(editions);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
@@ -135,9 +121,7 @@ export const getAllEditions = async (req, res) => {
 // trouver une seule édition //
 export const getOneEdition = async (req, res) => {
   try {
-    const edition = await Edition.findById(req.params.id)
-      .populate("artists")
-      .populate("guests");
+    const edition = await Edition.findById(req.params.id).populate("artists").populate("guests");
     if (!edition) return res.status(404).json("Édition non trouvée");
     res.status(200).json(edition);
   } catch {
@@ -148,9 +132,7 @@ export const getOneEdition = async (req, res) => {
 // modifier une édition //
 export const updateEdition = async (req, res) => {
   try {
-    const editionData = req.body.edition
-      ? JSON.parse(req.body.edition)
-      : req.body;
+    const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
@@ -158,9 +140,7 @@ export const updateEdition = async (req, res) => {
       (!editionData.artists || editionData.artists.length < 1) &&
       (!existingEdition.artists || existingEdition.artists.length < 1)
     ) {
-      return res
-        .status(400)
-        .json("Une édition doit contenir au moins un artiste.");
+      return res.status(400).json("Une édition doit contenir au moins un artiste.");
     }
 
     const updatedArtistIds = [];
@@ -191,12 +171,7 @@ export const updateEdition = async (req, res) => {
             ? artist.name.replace(/\s+/g, "-").toLowerCase()
             : `${Date.now()}`;
 
-          const uploaded = await resolveMedia(
-            null,
-            file,
-            "festn_breizh/artistes",
-            cleanName
-          );
+          const uploaded = await resolveMedia(null, file, "festn_breizh/artistes", cleanName);
           mediaUrl = uploaded.url;
           mediaFileId = uploaded.fileId;
         }
@@ -243,10 +218,7 @@ export const updateEdition = async (req, res) => {
             ? guest.name.replace(/\s+/g, "-").toLowerCase()
             : `${Date.now()}`;
 
-          const folder =
-            guest.mediaType === "logo"
-              ? "festn_breizh/logos"
-              : "festn_breizh/invités";
+          const folder = guest.mediaType === "logo" ? "festn_breizh/logos" : "festn_breizh/invités";
 
           const uploaded = await resolveMedia(null, file, folder, cleanName);
           mediaUrl = uploaded.url;
@@ -343,17 +315,9 @@ export const addGuestToEdition = async (req, res) => {
     // Gestion du média (image ou logo)
     let mediaResult = null;
     if (req.file || guestData.media) {
-      const folder =
-        guestData.mediaType === "logo"
-          ? "festn_breizh/logos"
-          : "festn_breizh/invités";
+      const folder = guestData.mediaType === "logo" ? "festn_breizh/logos" : "festn_breizh/invités";
 
-      mediaResult = await resolveMedia(
-        guestData.media,
-        req.file,
-        folder,
-        cleanName
-      );
+      mediaResult = await resolveMedia(guestData.media, req.file, folder, cleanName);
     }
 
     const newGuest = new Guest({
@@ -394,17 +358,9 @@ export const updateGuestInEdition = async (req, res) => {
       guest.name;
 
     if (req.file || body.media) {
-      const folder =
-        body.mediaType === "logo"
-          ? "festn_breizh/logos"
-          : "festn_breizh/invités";
+      const folder = body.mediaType === "logo" ? "festn_breizh/logos" : "festn_breizh/invités";
 
-      const newMedia = await resolveMedia(
-        body.media,
-        req.file,
-        folder,
-        cleanName
-      );
+      const newMedia = await resolveMedia(body.media, req.file, folder, cleanName);
 
       if (guest.mediaFileId && guest.mediaFileId !== newMedia.fileId) {
         const inUse = await isFileInUse(guest.mediaFileId);
@@ -439,9 +395,7 @@ export const deleteGuestFromEdition = async (req, res) => {
     const guest = await Guest.findById(guestId);
     if (!guest) return res.status(404).json("Invité non trouvé");
 
-    edition.guests = edition.guests.filter(
-      (id) => id.toString() !== guestId.toString()
-    );
+    edition.guests = edition.guests.filter((id) => id.toString() !== guestId.toString());
     await edition.save();
 
     if (guest.mediaFileId) {
@@ -515,12 +469,7 @@ export const updateArtistInEdition = async (req, res) => {
       artist.name;
 
     if (req.file || body.media) {
-      const newMedia = await resolveMedia(
-        body.media,
-        req.file,
-        "festn_breizh/artistes",
-        cleanName
-      );
+      const newMedia = await resolveMedia(body.media, req.file, "festn_breizh/artistes", cleanName);
 
       if (artist.mediaFileId && artist.mediaFileId !== newMedia.fileId) {
         const inUse = await isFileInUse(artist.mediaFileId);
@@ -553,9 +502,7 @@ export const deleteArtistFromEdition = async (req, res) => {
     const artist = await Artist.findById(artistId);
     if (!artist) return res.status(404).json("Artiste non trouvé");
 
-    edition.artists = edition.artists.filter(
-      (id) => id.toString() !== artistId.toString()
-    );
+    edition.artists = edition.artists.filter((id) => id.toString() !== artistId.toString());
     await edition.save();
 
     if (artist.mediaFileId) {
