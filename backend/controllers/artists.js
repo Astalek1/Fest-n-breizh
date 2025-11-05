@@ -224,28 +224,22 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE (direct)
-      if (mediaType === "image" && oldImageId && newImageId && oldImageId !== newImageId) {
+      // Remplacement IMAGE → IMAGE (forcé et fiable)
+      if (mediaType === "image" && oldImageId) {
         try {
-          await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée :", oldImageId);
-        } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
-        }
-      }
-
-      // Remplacement LOGO → LOGO (sécurisé)
-      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
-        try {
-          const inUse = await isFileInUse(oldLogoId);
-          if (inUse === false) {
-            await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé :", oldLogoId);
+          // Vérifie si une nouvelle image a bien été uploadée ou choisie
+          if (newImageId && oldImageId !== newImageId) {
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée :", oldImageId);
+          } else if (req.file) {
+            // Cas où newImageId n’a pas encore été défini mais qu’un fichier a été uploadé
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée (via req.file) :", oldImageId);
           } else {
-            console.log("Logo conservé car encore utilisé :", oldLogoId);
+            console.log("Ancienne image conservée (aucune nouvelle image détectée).");
           }
         } catch (e) {
-          console.error("Erreur suppression ancien logo :", e?.message || e);
+          console.error("Suppression ancienne image échouée :", e?.message || e);
         }
       }
     } // <-- ferme bien le if(sentNewMedia)
