@@ -276,6 +276,15 @@ export const deleteArtist = async (req, res) => {
       }
     }
     // --- Remplacement IMAGE → IMAGE (suppression directe) ---
+    console.log(
+      "DEBUG IMAGE: oldImageId =",
+      oldImageId,
+      "| newImageId =",
+      newImageId,
+      "| req.file =",
+      !!req.file
+    );
+
     if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
       try {
         await imagekit.deleteFile(oldImageId);
