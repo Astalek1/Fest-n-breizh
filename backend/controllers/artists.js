@@ -226,22 +226,16 @@ export const updateArtist = async (req, res) => {
 
       // Remplacement IMAGE → IMAGE (version définitive)
       if (mediaType === "image" && oldImageId) {
-        const imageChanged =
-          (newImageId && oldImageId !== newImageId) ||
-          (req.file && oldImageId !== updated.mediaFileId);
-
-        if (imageChanged) {
+        if ((newImageId && oldImageId !== newImageId) || req.file) {
           try {
             await imagekit.deleteFile(oldImageId);
             console.log("Ancienne image supprimée :", oldImageId);
           } catch (e) {
             console.error("Suppression ancienne image échouée :", e?.message || e);
           }
-        } else {
-          console.log("Aucune suppression nécessaire :", oldImageId);
         }
       }
-    } // <-- ferme bien le if(sentNewMedia)
+    }
 
     // --- 5) Réponse finale ---
     res.status(200).json(updated);
