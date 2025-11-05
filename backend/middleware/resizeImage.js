@@ -1,4 +1,3 @@
-// middleware/resizeImage.js
 import sharp from "sharp";
 import path from "path";
 
@@ -32,10 +31,12 @@ async function makeDualVersions(buffer, base, { small, large }) {
 
   const [bufSmall, bufLarge] = await Promise.all([
     sharp(buffer)
+      .rotate() // ✅ corrige l’orientation des images (portrait/paysage)
       .resize({ width: small.w, fit: "inside", withoutEnlargement: true })
       .toFormat("webp", { quality: 75 })
       .toBuffer(),
     sharp(buffer)
+      .rotate() // ✅ même correction sur la version large
       .resize({ width: large.w, fit: "inside", withoutEnlargement: true })
       .toFormat("webp", { quality: 85 })
       .toBuffer(),
@@ -55,6 +56,7 @@ async function makeSingleVersion(buffer, base, { one }) {
   const filename = `${base}-${ts}.webp`;
 
   const out = await sharp(buffer)
+    .rotate() // ✅ indispensable pour corriger les images paysage
     .resize({
       width: one.w,
       height: one.h || null,
@@ -62,7 +64,6 @@ async function makeSingleVersion(buffer, base, { one }) {
       background: { r: 0, g: 0, b: 0, alpha: 0 },
       withoutEnlargement: true,
     })
-
     .toFormat("webp", { quality: 80 })
     .toBuffer();
 
