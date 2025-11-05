@@ -239,14 +239,18 @@ export const updateArtist = async (req, res) => {
       }
 
       // Remplacement IMAGE → IMAGE
-      if (mediaType === "image" && oldImageId) {
-        if ((newImageId && oldImageId !== newImageId) || req.file) {
-          try {
+      // Remplacement IMAGE → IMAGE (version fiable)
+      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+        try {
+          const stillUsed = await isFileInUse(oldImageId);
+          if (stillUsed === false) {
             await imagekit.deleteFile(oldImageId);
             console.log("Ancienne image supprimée :", oldImageId);
-          } catch (e) {
-            console.error("Suppression ancienne image échouée :", e?.message || e);
+          } else {
+            console.log("Image conservée car encore utilisée :", oldImageId);
           }
+        } catch (e) {
+          console.error("Erreur suppression ancienne image :", e?.message || e);
         }
       }
     }
