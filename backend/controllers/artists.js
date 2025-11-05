@@ -224,22 +224,21 @@ export const updateArtist = async (req, res) => {
         }
       }
 
-      // Remplacement IMAGE → IMAGE (forcé et fiable)
+      // Remplacement IMAGE → IMAGE (version définitive)
       if (mediaType === "image" && oldImageId) {
-        try {
-          // Vérifie si une nouvelle image a bien été uploadée ou choisie
-          if (newImageId && oldImageId !== newImageId) {
+        const imageChanged =
+          (newImageId && oldImageId !== newImageId) ||
+          (req.file && oldImageId !== updated.mediaFileId);
+
+        if (imageChanged) {
+          try {
             await imagekit.deleteFile(oldImageId);
             console.log("Ancienne image supprimée :", oldImageId);
-          } else if (req.file) {
-            // Cas où newImageId n’a pas encore été défini mais qu’un fichier a été uploadé
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée (via req.file) :", oldImageId);
-          } else {
-            console.log("Ancienne image conservée (aucune nouvelle image détectée).");
+          } catch (e) {
+            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
-        } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
+        } else {
+          console.log("Aucune suppression nécessaire :", oldImageId);
         }
       }
     } // <-- ferme bien le if(sentNewMedia)
