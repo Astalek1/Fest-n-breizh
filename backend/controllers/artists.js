@@ -179,6 +179,17 @@ export const updateArtist = async (req, res) => {
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
+      // Remplacement IMAGE → IMAGE (version définitive)
+      if (mediaType === "image" && oldImageId) {
+        if ((newImageId && oldImageId !== newImageId) || req.file) {
+          try {
+            await imagekit.deleteFile(oldImageId);
+            console.log("Ancienne image supprimée :", oldImageId);
+          } catch (e) {
+            console.error("Suppression ancienne image échouée :", e?.message || e);
+          }
+        }
+      }
       // Passage vers vidéo → suppression ancienne image + logo
       if (mediaType === "video") {
         if (oldImageId) {
@@ -220,18 +231,6 @@ export const updateArtist = async (req, res) => {
             console.log("Ancien logo supprimé :", oldLogoId);
           } catch (e) {
             console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
-      }
-
-      // Remplacement IMAGE → IMAGE (version définitive)
-      if (mediaType === "image" && oldImageId) {
-        if ((newImageId && oldImageId !== newImageId) || req.file) {
-          try {
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
-          } catch (e) {
-            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
       }
