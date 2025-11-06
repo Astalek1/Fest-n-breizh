@@ -66,6 +66,8 @@ export const createArtist = async (req, res) => {
     });
 
     await doc.save();
+    if (silent) return doc;
+
     res.status(201).json({ message: "Artiste ajouté avec succès !" });
   } catch (error) {
     console.error("newArtist error:", error);
