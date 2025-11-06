@@ -60,6 +60,7 @@ export const createEdition = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
   }
 };
+
 // === LIRE TOUTES LES ÉDITIONS ===
 export const getAllEditions = async (req, res) => {
   try {
