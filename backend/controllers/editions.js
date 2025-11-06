@@ -14,48 +14,32 @@ export const createEdition = async (req, res) => {
     if (!editionData.artists || editionData.artists.length < 1)
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
-    // === Création des artistes ===
     const artistDocs = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const file = req.files?.artistFiles?.[index] || null;
+      const mediaFile = req.files?.artistFiles?.[index] || null;
 
-      const newArtist = new Artist({
-        name: artistData.name,
-        role: artistData.role || null,
-        description: artistData.description || null,
-        media: artistData.media || null,
-        mediaFileId: artistData.mediaFileId || null,
-        logo: artistData.logo || null,
-        logoFileId: artistData.logoFileId || null,
-        mediaName: artistData.mediaName || artistData.name?.toLowerCase().replace(/\s+/g, "-"),
-        link: artistData.link || null,
+      const newArtist = await artistsCtrl.createArtist({
+        body: { artist: JSON.stringify(artistData) },
+        file: mediaFile,
+        silent: true,
       });
 
-      await newArtist.save();
-      artistDocs.push(newArtist);
+      if (newArtist?._id) artistDocs.push(newArtist);
     }
 
-    // === Création des invités ===
     const guestDocs = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const file = req.files?.guestFiles?.[index] || null;
+      const mediaFile = req.files?.guestFiles?.[index] || null;
 
-      const newGuest = new Guest({
-        name: guestData.name,
-        role: guestData.role || null,
-        description: guestData.description || null,
-        media: guestData.media || null,
-        mediaFileId: guestData.mediaFileId || null,
-        logo: guestData.logo || null,
-        logoFileId: guestData.logoFileId || null,
-        mediaName: guestData.mediaName || guestData.name?.toLowerCase().replace(/\s+/g, "-"),
+      const newGuest = await guestsCtrl.createGuest({
+        body: { guest: JSON.stringify(guestData) },
+        file: mediaFile,
+        silent: true,
       });
 
-      await newGuest.save();
-      guestDocs.push(newGuest);
+      if (newGuest?._id) guestDocs.push(newGuest);
     }
 
-    // === Création de l'édition ===
     const newEdition = new Edition({
       title: editionData.title,
       poster: editionData.poster,
@@ -65,15 +49,12 @@ export const createEdition = async (req, res) => {
 
     await newEdition.save();
 
-    // === Réponse ===
+    // On renvoie l'édition avec les artistes et invités complets
     const populatedEdition = await Edition.findById(newEdition._id)
       .populate("artists")
       .populate("guests");
 
-    res.status(201).json({
-      message: "Édition créée avec succès",
-      edition: populatedEdition,
-    });
+    res.status(201).json({ message: "Édition créée avec succès", edition: populatedEdition });
   } catch (error) {
     console.error("createEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
