@@ -1,6 +1,8 @@
 import Edition from "../models/Editions.js";
 import * as artistsCtrl from "./artists.js";
 import * as guestsCtrl from "./guests.js";
+import Artist from "../models/Artists.js";
+import Guest from "../models/Guests.js";
 
 // === CRÉER UNE NOUVELLE ÉDITION ===
 export const createEdition = async (req, res) => {
