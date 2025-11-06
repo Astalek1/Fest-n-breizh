@@ -13,19 +13,27 @@ export const createEdition = async (req, res) => {
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
     const artistIds = [];
-    const fakeRes = { status: () => ({ json: () => {} }) };
-
     for (const artistData of editionData.artists) {
-      const fakeReq = { body: { ...artistData }, file: req.file };
-      const artist = await artistsCtrl.createArtist(fakeReq, fakeRes, true);
-      artistIds.push(artist._id);
+      const fakeReq = { body: { artist: JSON.stringify(artistData) }, file: req.file };
+      const fakeRes = {
+        status: () => ({
+          json: (data) => data, // renvoie le doc si besoin
+        }),
+      };
+      const created = await artistsCtrl.createArtist(fakeReq, fakeRes);
+      if (created?._id) artistIds.push(created._id);
     }
 
     const guestIds = [];
     for (const guestData of editionData.guests || []) {
-      const fakeReq = { body: { ...guestData }, file: req.file };
-      const guest = await guestsCtrl.createGuest(fakeReq, fakeRes, true);
-      guestIds.push(guest._id);
+      const fakeReq = { body: { guest: JSON.stringify(guestData) }, file: req.file };
+      const fakeRes = {
+        status: () => ({
+          json: (data) => data,
+        }),
+      };
+      const created = await guestsCtrl.createGuest(fakeReq, fakeRes);
+      if (created?._id) guestIds.push(created._id);
     }
 
     const newEdition = new Edition({
