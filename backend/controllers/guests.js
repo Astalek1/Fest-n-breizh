@@ -67,7 +67,7 @@ export const createGuest = async (req, res, silent = false) => {
 
     await doc.save();
     if (silent) return doc;
-    res.status(201).json({ message: "Invité ajouté avec succès !" });
+    if (!silent && res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
   } catch (error) {
     console.error("newGuest error:", error);
     res.status(500).json({ error: error.message });
