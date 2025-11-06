@@ -127,6 +127,6 @@ export const deleteEdition = async (req, res) => {
     res.status(200).json("Édition supprimée avec succès");
   } catch (error) {
     console.error("deleteEdition error:", error);
-    res.status(500).json({ error: "Erreur serveur (deleteEdition)" });
+    res.status(500).json({ error: error.message || "Erreur serveur (deleteEdition)" });
   }
 };
