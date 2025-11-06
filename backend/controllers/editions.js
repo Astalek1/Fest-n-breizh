@@ -18,12 +18,13 @@ export const createEdition = async (req, res) => {
     for (const [index, artistData] of (editionData.artists || []).entries()) {
       const mediaFile = req.files?.artistFiles?.[index] || null;
 
-      const newArtist = await artistsCtrl.createArtist({
+      const fakeReq = {
         body: { artist: JSON.stringify(artistData) },
         file: mediaFile,
-        silent: true,
-      });
+      };
+      const fakeRes = { status: () => ({ json: () => {} }) };
 
+      const newArtist = await artistsCtrl.createArtist(fakeReq, fakeRes, true);
       if (newArtist?._id) artistDocs.push(newArtist);
     }
 
@@ -31,12 +32,13 @@ export const createEdition = async (req, res) => {
     for (const [index, guestData] of (editionData.guests || []).entries()) {
       const mediaFile = req.files?.guestFiles?.[index] || null;
 
-      const newGuest = await guestsCtrl.createGuest({
+      const fakeReq = {
         body: { guest: JSON.stringify(guestData) },
         file: mediaFile,
-        silent: true,
-      });
+      };
+      const fakeRes = { status: () => ({ json: () => {} }) };
 
+      const newGuest = await guestsCtrl.createGuest(fakeReq, fakeRes, true);
       if (newGuest?._id) guestDocs.push(newGuest);
     }
 
