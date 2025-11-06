@@ -16,21 +16,30 @@ export const createEdition = async (req, res) => {
 
     const artistIds = [];
     for (const artistData of editionData.artists || []) {
-      const fakeReq = { body: { artist: JSON.stringify(artistData) }, file: req.file };
+      const fakeReq = {
+        body: { artist: JSON.stringify(artistData) },
+        file: req.files?.artistFiles?.[editionData.artists.indexOf(artistData)] || null,
+      };
       const fakeRes = { status: () => ({ json: () => {} }) };
+
       await artistsCtrl.createArtist(fakeReq, fakeRes);
 
+      // On récupère le dernier artiste créé portant le même nom
       const createdArtist = await Artist.findOne({ name: artistData.name }).sort({ _id: -1 });
       if (createdArtist?._id) artistIds.push(createdArtist._id);
     }
 
     const guestIds = [];
     for (const guestData of editionData.guests || []) {
-      const fakeReq = { body: { guest: JSON.stringify(guestData) }, file: req.file };
+      const fakeReq = {
+        body: { guest: JSON.stringify(guestData) },
+        file: req.files?.guestFiles?.[editionData.guests.indexOf(guestData)] || null,
+      };
       const fakeRes = { status: () => ({ json: () => {} }) };
+
       await guestsCtrl.createGuest(fakeReq, fakeRes);
 
-      // On récupère le dernier invité créé avec le même nom
+      // On récupère le dernier invité créé portant le même nom
       const createdGuest = await Guest.findOne({ name: guestData.name }).sort({ _id: -1 });
       if (createdGuest?._id) guestIds.push(createdGuest._id);
     }
