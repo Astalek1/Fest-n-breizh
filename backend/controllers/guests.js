@@ -7,7 +7,7 @@ const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
 // Créer un nouvel invité //
-export const newGuest = async (req, res) => {
+export const createGuest = async (req, res) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
 

@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", artistsCtrl.getAllArtists);
 router.get("/:id", artistsCtrl.getOneArtist);
 
-router.post("/", auth, multer.single("media"), resizeImage, artistsCtrl.newArtist);
+router.post("/", auth, multer.single("media"), resizeImage, artistsCtrl.createArtist);
 
 router.put("/:id", auth, multer.single("media"), resizeImage, artistsCtrl.updateArtist);
 

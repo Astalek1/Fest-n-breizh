@@ -3,48 +3,12 @@ import auth from "../middleware/auth.js";
 import upload from "../middleware/multer.js";
 import resizeImage from "../middleware/resizeImage.js";
 import * as editionsCtrl from "../controllers/editions.js";
+import * as artistsCtrl from "../controllers/artists.js";
+import * as guestsCtrl from "../controllers/guests.js";
 
 const router = express.Router();
 
-// === Gestion des invités d'une édition ===
-router.post(
-  "/:editionId/guests",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.addGuestToEdition
-);
-
-router.put(
-  "/:editionId/guests/:guestId",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.updateGuestInEdition
-);
-
-router.delete("/:editionId/guests/:guestId", auth, editionsCtrl.deleteGuestFromEdition);
-
-// === Gestion des artistes d'une édition ===
-router.post(
-  "/:editionId/artists",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.addArtistToEdition
-);
-
-router.put(
-  "/:editionId/artists/:artistId",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.updateArtistInEdition
-);
-
-router.delete("/:editionId/artists/:artistId", auth, editionsCtrl.deleteArtistFromEdition);
-
-// === Routes générales ===
+// === GESTION DES ÉDITIONS ===
 router.get("/", editionsCtrl.getAllEditions);
 router.get("/:id", editionsCtrl.getOneEdition);
 
@@ -73,5 +37,43 @@ router.put(
 );
 
 router.delete("/:id", auth, editionsCtrl.deleteEdition);
+
+// === GESTION DES INVITÉS D'UNE ÉDITION ===
+router.post(
+  "/:editionId/guests",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  guestsCtrl.createGuest
+);
+
+router.put(
+  "/:editionId/guests/:guestId",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  guestsCtrl.updateGuest
+);
+
+router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
+
+// === GESTION DES ARTISTES D'UNE ÉDITION ===
+router.post(
+  "/:editionId/artists",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  artistsCtrl.createArtist
+);
+
+router.put(
+  "/:editionId/artists/:artistId",
+  auth,
+  upload.single("media"),
+  resizeImage,
+  artistsCtrl.updateArtist
+);
+
+router.delete("/:editionId/artists/:artistId", auth, artistsCtrl.deleteArtist);
 
 export default router;
