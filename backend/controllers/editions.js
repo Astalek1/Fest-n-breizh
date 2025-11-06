@@ -14,30 +14,48 @@ export const createEdition = async (req, res) => {
     if (!editionData.artists || editionData.artists.length < 1)
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
+    // === Création des artistes ===
     const artistDocs = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const fakeReq = {
-        body: { artist: JSON.stringify(artistData) },
-        file: req.files?.artistFiles?.[index] || null,
-      };
-      const fakeRes = { status: () => ({ json: () => {} }) };
-      await artistsCtrl.createArtist(fakeReq, fakeRes);
-      const newArtist = await Artist.findOne({ name: artistData.name }).sort({ _id: -1 });
-      if (newArtist) artistDocs.push(newArtist);
+      const file = req.files?.artistFiles?.[index] || null;
+
+      const newArtist = new Artist({
+        name: artistData.name,
+        role: artistData.role || null,
+        description: artistData.description || null,
+        media: artistData.media || null,
+        mediaFileId: artistData.mediaFileId || null,
+        logo: artistData.logo || null,
+        logoFileId: artistData.logoFileId || null,
+        mediaName: artistData.mediaName || artistData.name?.toLowerCase().replace(/\s+/g, "-"),
+        link: artistData.link || null,
+      });
+
+      await newArtist.save();
+      artistDocs.push(newArtist);
     }
 
+    // === Création des invités ===
     const guestDocs = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const fakeReq = {
-        body: { guest: JSON.stringify(guestData) },
-        file: req.files?.guestFiles?.[index] || null,
-      };
-      const fakeRes = { status: () => ({ json: () => {} }) };
-      await guestsCtrl.createGuest(fakeReq, fakeRes);
-      const newGuest = await Guest.findOne({ name: guestData.name }).sort({ _id: -1 });
-      if (newGuest) guestDocs.push(newGuest);
+      const file = req.files?.guestFiles?.[index] || null;
+
+      const newGuest = new Guest({
+        name: guestData.name,
+        role: guestData.role || null,
+        description: guestData.description || null,
+        media: guestData.media || null,
+        mediaFileId: guestData.mediaFileId || null,
+        logo: guestData.logo || null,
+        logoFileId: guestData.logoFileId || null,
+        mediaName: guestData.mediaName || guestData.name?.toLowerCase().replace(/\s+/g, "-"),
+      });
+
+      await newGuest.save();
+      guestDocs.push(newGuest);
     }
 
+    // === Création de l'édition ===
     const newEdition = new Edition({
       title: editionData.title,
       poster: editionData.poster,
@@ -47,6 +65,7 @@ export const createEdition = async (req, res) => {
 
     await newEdition.save();
 
+    // === Réponse ===
     const populatedEdition = await Edition.findById(newEdition._id)
       .populate("artists")
       .populate("guests");
