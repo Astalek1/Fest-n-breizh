@@ -113,6 +113,8 @@ export const deleteEdition = async (req, res) => {
     const edition = await Edition.findById(req.params.id);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
+    const fakeRes = { status: () => ({ json: () => {} }) };
+
     for (const artistId of edition.artists || []) {
       const fakeReq = { params: { id: artistId } };
       await artistsCtrl.deleteArtist(fakeReq, fakeRes, true);
