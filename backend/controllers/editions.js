@@ -14,51 +14,52 @@ export const createEdition = async (req, res) => {
     if (!editionData.artists || editionData.artists.length < 1)
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
-    const artistIds = [];
-    for (const artistData of editionData.artists || []) {
+    const artistDocs = [];
+    for (const [index, artistData] of (editionData.artists || []).entries()) {
       const fakeReq = {
         body: { artist: JSON.stringify(artistData) },
-        file: req.files?.artistFiles?.[editionData.artists.indexOf(artistData)] || null,
+        file: req.files?.artistFiles?.[index] || null,
       };
       const fakeRes = { status: () => ({ json: () => {} }) };
-
       await artistsCtrl.createArtist(fakeReq, fakeRes);
-
-      // On récupère le dernier artiste créé portant le même nom
-      const createdArtist = await Artist.findOne({ name: artistData.name }).sort({ _id: -1 });
-      if (createdArtist?._id) artistIds.push(createdArtist._id);
+      const newArtist = await Artist.findOne({ name: artistData.name }).sort({ _id: -1 });
+      if (newArtist) artistDocs.push(newArtist);
     }
 
-    const guestIds = [];
-    for (const guestData of editionData.guests || []) {
+    const guestDocs = [];
+    for (const [index, guestData] of (editionData.guests || []).entries()) {
       const fakeReq = {
         body: { guest: JSON.stringify(guestData) },
-        file: req.files?.guestFiles?.[editionData.guests.indexOf(guestData)] || null,
+        file: req.files?.guestFiles?.[index] || null,
       };
       const fakeRes = { status: () => ({ json: () => {} }) };
-
       await guestsCtrl.createGuest(fakeReq, fakeRes);
-
-      // On récupère le dernier invité créé portant le même nom
-      const createdGuest = await Guest.findOne({ name: guestData.name }).sort({ _id: -1 });
-      if (createdGuest?._id) guestIds.push(createdGuest._id);
+      const newGuest = await Guest.findOne({ name: guestData.name }).sort({ _id: -1 });
+      if (newGuest) guestDocs.push(newGuest);
     }
 
     const newEdition = new Edition({
       title: editionData.title,
       poster: editionData.poster,
-      artists: artistIds,
-      guests: guestIds,
+      artists: artistDocs.map((a) => a._id),
+      guests: guestDocs.map((g) => g._id),
     });
 
     await newEdition.save();
-    res.status(201).json({ message: "Édition créée avec succès", edition: newEdition });
+
+    const populatedEdition = await Edition.findById(newEdition._id)
+      .populate("artists")
+      .populate("guests");
+
+    res.status(201).json({
+      message: "Édition créée avec succès",
+      edition: populatedEdition,
+    });
   } catch (error) {
     console.error("createEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
   }
 };
-
 // === LIRE TOUTES LES ÉDITIONS ===
 export const getAllEditions = async (req, res) => {
   try {
