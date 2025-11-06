@@ -13,6 +13,8 @@ export const createEdition = async (req, res) => {
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
     const artistIds = [];
+    const fakeRes = { status: () => ({ json: () => {} }) };
+
     for (const artistData of editionData.artists) {
       const fakeReq = { body: { ...artistData }, file: req.file };
       const artist = await artistsCtrl.createArtist(fakeReq, fakeRes, true);
