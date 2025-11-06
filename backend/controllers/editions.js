@@ -13,32 +13,24 @@ export const createEdition = async (req, res) => {
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
 
     const artistIds = [];
-    for (const artistData of editionData.artists) {
+    for (const artistData of editionData.artists || []) {
       const fakeReq = { body: { artist: JSON.stringify(artistData) }, file: req.file };
-      const fakeRes = {
-        lastCreated: null,
-        status: () => ({
-          json: (data) => {
-            fakeRes.lastCreated = data;
-            return data;
-          },
-        }),
-      };
-
+      const fakeRes = { status: () => ({ json: () => {} }) };
       await artistsCtrl.createArtist(fakeReq, fakeRes);
-      if (fakeRes.lastCreated?._id) artistIdst.push(fakeRes.lastCreated._id);
+
+      const createdArtist = await Artist.findOne({ name: artistData.name }).sort({ _id: -1 });
+      if (createdArtist?._id) artistIds.push(createdArtist._id);
     }
 
     const guestIds = [];
     for (const guestData of editionData.guests || []) {
       const fakeReq = { body: { guest: JSON.stringify(guestData) }, file: req.file };
-      const fakeRes = {
-        status: () => ({
-          json: (data) => data,
-        }),
-      };
+      const fakeRes = { status: () => ({ json: () => {} }) };
       await guestsCtrl.createGuest(fakeReq, fakeRes);
-      if (fakeRes.lastCreated?._id) guestIds.push(fakeRes.lastCreated._id);
+
+      // On récupère le dernier invité créé avec le même nom
+      const createdGuest = await Guest.findOne({ name: guestData.name }).sort({ _id: -1 });
+      if (createdGuest?._id) guestIds.push(createdGuest._id);
     }
 
     const newEdition = new Edition({
