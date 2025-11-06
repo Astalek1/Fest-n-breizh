@@ -16,12 +16,17 @@ export const createEdition = async (req, res) => {
     for (const artistData of editionData.artists) {
       const fakeReq = { body: { artist: JSON.stringify(artistData) }, file: req.file };
       const fakeRes = {
+        lastCreated: null,
         status: () => ({
-          json: (data) => data, // renvoie le doc si besoin
+          json: (data) => {
+            fakeRes.lastCreated = data;
+            return data;
+          },
         }),
       };
-      const created = await artistsCtrl.createArtist(fakeReq, fakeRes);
-      if (created?._id) artistIds.push(created._id);
+
+      await artistsCtrl.createArtist(fakeReq, fakeRes);
+      if (fakeRes.lastCreated?._id) artistIdst.push(fakeRes.lastCreated._id);
     }
 
     const guestIds = [];
@@ -32,8 +37,8 @@ export const createEdition = async (req, res) => {
           json: (data) => data,
         }),
       };
-      const created = await guestsCtrl.createGuest(fakeReq, fakeRes);
-      if (created?._id) guestIds.push(created._id);
+      await guestsCtrl.createGuest(fakeReq, fakeRes);
+      if (fakeRes.lastCreated?._id) guestIds.push(fakeRes.lastCreated._id);
     }
 
     const newEdition = new Edition({
