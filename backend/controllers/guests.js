@@ -268,10 +268,11 @@ export const deleteGuest = async (req, res) => {
     // Supprime d’abord le document pour éviter les ré-lectures
     await Guest.findByIdAndDelete(req.params.id);
 
-    // Images : suppression directe (jamais réutilisées)
+    // Images : suppression directe
     if (imgId) {
       try {
         await imagekit.deleteFile(imgId);
+        console.log("Image supprimée : ", imgId);
       } catch (e) {
         console.error("Suppression image échouée :", e?.message || e);
       }
