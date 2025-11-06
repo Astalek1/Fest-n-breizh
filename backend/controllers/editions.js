@@ -26,7 +26,7 @@ export const createEdition = async (req, res) => {
       let mediaUrl = artist.media || null;
 
       let file = null;
-      if (guest.mediaType === "image" || guest.mediaType === "logo") {
+      if (artist.mediaType === "image" || artist.mediaType === "logo") {
         file = req.files?.artistFiles?.[artistFileIdx] || null;
         if (file) artistFileIdx += 1;
       }
@@ -64,7 +64,7 @@ export const createEdition = async (req, res) => {
       let mediaUrl = guest.media || null;
 
       let file = null;
-      if (guest.mediaType === "image") {
+      if (guest.mediaType === "image" || guest.mediaType === "logo") {
         file = req.files?.guestFiles?.[guestFileIdx] || null;
         if (file) guestFileIdx += 1;
       }
