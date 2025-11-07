@@ -17,7 +17,7 @@ export const createGuest = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(body.name);
 
-    // Cas vidéo (URL uniquement)
+    // === CAS VIDÉO ===
     if (mediaType === "video") {
       const doc = new Guest({
         name: body.name,
@@ -30,37 +30,43 @@ export const createGuest = async (req, res, silent = false) => {
       });
       await doc.save();
       if (silent) return doc;
-      if (!silent && res)
-        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !" });
+      if (res) return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !" });
     }
 
-    // Dossier cible en fonction du type
+    // === DÉTERMINATION DU DOSSIER ===
     const isLogo = mediaType === "logo";
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-    // Source du média : fileId existant, URL http(s) ou upload (req.file)
+    // === GESTION DU MÉDIA ===
     let url = null;
     let fileId = null;
     let fileName = null;
 
-    // Réutilisation d’un fichier existant (surtout pour logos)
     const existingId = body.mediaFileId || body.media;
     if (isFileId(existingId)) {
-      const details = await imagekit.getFileDetails(existingId);
+      try {
+        const details = await imagekit.getFileDetails(existingId);
+        url = details.url;
+        fileId = details.fileId;
+        fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
+      } catch (err) {
+        console.warn("⚠️ mediaFileId introuvable :", existingId);
+      }
+    }
 
-      url = details.url;
-      fileId = details.fileId;
-      fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
-    } else {
+    if (!url) {
       console.log("UPLOAD INVITÉ:", { name: body.name, mediaType, folder });
-
       const up = await resolveMedia(body.media, req.file, folder, baseName);
-      if (!up?.url) return res.status(400).json("Média invalide");
+      if (!up?.url) {
+        if (silent) throw new Error("Média invalide");
+        return res.status(400).json("Média invalide");
+      }
       url = up.url;
       fileId = up.fileId || null;
       fileName = up.fileName || baseName;
     }
 
+    // === ENREGISTREMENT DU DOCUMENT ===
     const doc = new Guest({
       name: body.name,
       description: body.description,
@@ -72,8 +78,9 @@ export const createGuest = async (req, res, silent = false) => {
     });
 
     await doc.save();
+
     if (silent) return doc;
-    if (!silent && res) res.status(201).json({ message: "invité ajouté avec succès !" });
+    if (res) res.status(201).json({ message: "Invité ajouté avec succès !" });
   } catch (error) {
     console.error("newGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });

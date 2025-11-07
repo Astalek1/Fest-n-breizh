@@ -6,7 +6,6 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// Créer un nouvel artiste//
 export const createArtist = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.artist || "{}");
@@ -17,7 +16,7 @@ export const createArtist = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(body.name);
 
-    // Cas vidéo (URL uniquement)
+    // === CAS VIDÉO ===
     if (mediaType === "video") {
       const doc = new Artist({
         name: body.name,
@@ -30,33 +29,43 @@ export const createArtist = async (req, res, silent = false) => {
       });
       await doc.save();
       if (silent) return doc;
-      if (!silent && res)
-        return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
+      if (res) return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
     }
 
-    // Dossier cible en fonction du type
+    // === DÉTERMINATION DU DOSSIER ===
     const isLogo = mediaType === "logo";
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/artistes";
 
-    // Source du média : fileId existant, URL http(s) ou upload (req.file)
+    // === GESTION DU MÉDIA ===
     let url = null;
     let fileId = null;
     let fileName = null;
 
-    if (isFileId(body.media)) {
-      // Réutilisation d’un fichier existant (surtout pour logos)
-      const details = await imagekit.getFileDetails(body.media);
-      url = details.url;
-      fileId = details.fileId;
-      fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
-    } else {
+    const existingId = body.mediaFileId || body.media;
+    if (isFileId(existingId)) {
+      try {
+        const details = await imagekit.getFileDetails(existingId);
+        url = details.url;
+        fileId = details.fileId;
+        fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
+      } catch (err) {
+        console.warn("⚠️ mediaFileId introuvable :", existingId);
+      }
+    }
+
+    if (!url) {
+      console.log("UPLOAD ARTISTE:", { name: body.name, mediaType, folder });
       const up = await resolveMedia(body.media, req.file, folder, baseName);
-      if (!up?.url) return res.status(400).json("Média invalide");
+      if (!up?.url) {
+        if (silent) throw new Error("Média invalide");
+        return res.status(400).json("Média invalide");
+      }
       url = up.url;
       fileId = up.fileId || null;
       fileName = up.fileName || baseName;
     }
 
+    // === ENREGISTREMENT DU DOCUMENT ===
     const doc = new Artist({
       name: body.name,
       description: body.description,
@@ -68,9 +77,9 @@ export const createArtist = async (req, res, silent = false) => {
     });
 
     await doc.save();
-    if (silent) return doc;
 
-    if (!silent && res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
+    if (silent) return doc;
+    if (res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
   } catch (error) {
     console.error("newArtist error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
