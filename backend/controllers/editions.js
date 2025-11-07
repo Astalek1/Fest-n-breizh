@@ -98,49 +98,82 @@ export const updateEdition = async (req, res) => {
   try {
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
     const existingEdition = await Edition.findById(req.params.id);
-    if (!existingEdition) return res.status(404).json("Édition non trouvée");
+    if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
     // --- ARTISTES ---
-    const artistIds = [];
+    const updatedArtists = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      if (!artistData._id && artistData.mediaType !== "video" && !artistData.mediaFileId) {
-        const mediaFile = req.files?.artistFiles?.[index] || null;
-        const newArtist = await artistsCtrl.createArtist(
-          { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
-          null,
-          true
-        );
-        if (newArtist?._id) artistIds.push(newArtist._id);
+      const mediaFile =
+        artistData.mediaType !== "video" && !artistData.mediaFileId
+          ? req.files?.artistFiles?.[index] || null
+          : null;
+
+      let artist;
+      if (artistData._id) {
+        // → Mise à jour d’un artiste existant
+        const fakeReq = {
+          params: { id: artistData._id },
+          body: { artist: JSON.stringify(artistData) },
+          file: mediaFile,
+        };
+        artist = await artistsCtrl.updateArtist(fakeReq, null, true);
       } else {
-        // Si l'artiste existe déjà, on garde son _id
-        artistIds.push(artistData._id);
+        // → Création d’un nouvel artiste
+        const fakeReq = {
+          body: { artist: JSON.stringify(artistData) },
+          file: mediaFile,
+        };
+        artist = await artistsCtrl.createArtist(fakeReq, null, true);
       }
+
+      if (artist?._id) updatedArtists.push(artist._id);
     }
 
     // --- INVITÉS ---
-    const guestIds = [];
+    const updatedGuests = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      if (!guestData._id && guestData.mediaType !== "video" && !guestData.mediaFileId) {
-        const mediaFile = req.files?.guestFiles?.[index] || null;
-        const newGuest = await guestsCtrl.createGuest(
-          { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
-          null,
-          true
-        );
-        if (newGuest?._id) guestIds.push(newGuest._id);
+      const mediaFile =
+        guestData.mediaType !== "video" && !guestData.mediaFileId
+          ? req.files?.guestFiles?.[index] || null
+          : null;
+
+      let guest;
+      if (guestData._id) {
+        // → Mise à jour d’un invité existant
+        const fakeReq = {
+          params: { id: guestData._id },
+          body: { guest: JSON.stringify(guestData) },
+          file: mediaFile,
+        };
+        guest = await guestsCtrl.updateGuest(fakeReq, null, true);
       } else {
-        guestIds.push(guestData._id);
+        // → Création d’un nouvel invité
+        const fakeReq = {
+          body: { guest: JSON.stringify(guestData) },
+          file: mediaFile,
+        };
+        guest = await guestsCtrl.createGuest(fakeReq, null, true);
       }
+
+      if (guest?._id) updatedGuests.push(guest._id);
     }
 
     // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = artistIds.filter(Boolean);
-    existingEdition.guests = guestIds.filter(Boolean);
+    existingEdition.artists = updatedArtists;
+    existingEdition.guests = updatedGuests;
 
     await existingEdition.save();
-    res.status(200).json({ message: "Édition mise à jour avec succès", edition: existingEdition });
+
+    console.log("✅ Édition mise à jour :", existingEdition._id);
+    console.log("→ Artistes :", updatedArtists);
+    console.log("→ Invités :", updatedGuests);
+
+    res.status(200).json({
+      message: "Édition mise à jour avec succès",
+      edition: existingEdition,
+    });
   } catch (error) {
     console.error("updateEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
