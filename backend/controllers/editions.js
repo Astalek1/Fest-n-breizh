@@ -99,57 +99,74 @@ export const updateEdition = async (req, res) => {
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
-    // --- ARTISTES ---
     const updatedArtists = [];
-    for (const [index, artistData] of (editionData.artists || []).entries()) {
-      if (!artistData._id) continue; // on ignore tout artiste sans _id
-
-      const mediaFile =
-        artistData.mediaType !== "video" && !artistData.mediaFileId
-          ? req.files?.artistFiles?.[index] || null
-          : null;
-
-      const updatedArtist = await artistsCtrl.updateArtist(
-        {
-          params: { id: artistData._id },
-          body: { artist: JSON.stringify(artistData) },
-          file: mediaFile || undefined,
-        },
-        null,
-        true
-      );
-
-      if (updatedArtist?._id) updatedArtists.push(updatedArtist._id);
-    }
-
-    // --- INVITÉS ---
     const updatedGuests = [];
-    for (const [index, guestData] of (editionData.guests || []).entries()) {
-      if (!guestData._id) continue; // on ignore tout invité sans _id
 
-      const mediaFile =
-        guestData.mediaType !== "video" && !guestData.mediaFileId
-          ? req.files?.guestFiles?.[index] || null
-          : null;
+    // === ARTISTES ===
+    for (const [index, artist] of (editionData.artists || []).entries()) {
+      const file = req.files?.artistFiles?.[index] || null;
 
-      const updatedGuest = await guestsCtrl.updateGuest(
-        {
-          params: { id: guestData._id },
-          body: { guest: JSON.stringify(guestData) },
-          file: mediaFile || undefined,
-        },
-        null,
-        true
-      );
+      let result;
+      if (artist._id) {
+        // → appel direct de la vraie fonction de mise à jour
+        result = await artistsCtrl.updateArtist(
+          {
+            params: { id: artist._id },
+            body: { artist: JSON.stringify(artist) },
+            file,
+          },
+          null,
+          true
+        );
+      } else {
+        // → cas où l’artiste n’a pas d’ID (rare, mais toléré)
+        result = await artistsCtrl.createArtist(
+          {
+            body: { artist: JSON.stringify(artist) },
+            file,
+          },
+          null,
+          true
+        );
+      }
 
-      if (updatedGuest?._id) updatedGuests.push(updatedGuest._id);
+      if (result?._id) updatedArtists.push(result._id);
     }
 
-    // --- MISE À JOUR DE L'ÉDITION ---
+    // === INVITÉS ===
+    for (const [index, guest] of (editionData.guests || []).entries()) {
+      const file = req.files?.guestFiles?.[index] || null;
+
+      let result;
+      if (guest._id) {
+        result = await guestsCtrl.updateGuest(
+          {
+            params: { id: guest._id },
+            body: { guest: JSON.stringify(guest) },
+            file,
+          },
+          null,
+          true
+        );
+      } else {
+        result = await guestsCtrl.createGuest(
+          {
+            body: { guest: JSON.stringify(guest) },
+            file,
+          },
+          null,
+          true
+        );
+      }
+
+      if (result?._id) updatedGuests.push(result._id);
+    }
+
+    // === MISE À JOUR DE L'ÉDITION ===
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = updatedArtists;
-    existingEdition.guests = updatedGuests;
+    existingEdition.artists = updatedArtists.length ? updatedArtists : existingEdition.artists;
+    existingEdition.guests = updatedGuests.length ? updatedGuests : existingEdition.guests;
 
     await existingEdition.save();
 
