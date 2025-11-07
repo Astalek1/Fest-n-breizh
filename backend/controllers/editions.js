@@ -92,7 +92,6 @@ export const getOneEdition = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
-
 // === METTRE À JOUR UNE ÉDITION ===
 export const updateEdition = async (req, res) => {
   try {
@@ -103,10 +102,11 @@ export const updateEdition = async (req, res) => {
     // --- ARTISTES ---
     const updatedArtists = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const mediaFile =
-        artistData.mediaType !== "video" && !artistData.mediaFileId
-          ? req.files?.artistFiles?.[index] || null
-          : null;
+      const hasFile =
+        artistData.mediaType !== "video" &&
+        !artistData.mediaFileId &&
+        !!req.files?.artistFiles?.[index];
+      const mediaFile = hasFile ? req.files.artistFiles[index] : null;
 
       let artist;
       if (artistData._id) {
@@ -114,16 +114,19 @@ export const updateEdition = async (req, res) => {
         const fakeReq = {
           params: { id: artistData._id },
           body: { artist: JSON.stringify(artistData) },
-          file: mediaFile,
+          file: mediaFile || undefined,
         };
         artist = await artistsCtrl.updateArtist(fakeReq, null, true);
-      } else {
-        // → Création d’un nouvel artiste
+      } else if (hasFile) {
+        // → Création d’un nouvel artiste seulement si fichier fourni
         const fakeReq = {
           body: { artist: JSON.stringify(artistData) },
           file: mediaFile,
         };
         artist = await artistsCtrl.createArtist(fakeReq, null, true);
+      } else {
+        // Aucun fichier = pas de création
+        continue;
       }
 
       if (artist?._id) updatedArtists.push(artist._id);
@@ -132,10 +135,11 @@ export const updateEdition = async (req, res) => {
     // --- INVITÉS ---
     const updatedGuests = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const mediaFile =
-        guestData.mediaType !== "video" && !guestData.mediaFileId
-          ? req.files?.guestFiles?.[index] || null
-          : null;
+      const hasFile =
+        guestData.mediaType !== "video" &&
+        !guestData.mediaFileId &&
+        !!req.files?.guestFiles?.[index];
+      const mediaFile = hasFile ? req.files.guestFiles[index] : null;
 
       let guest;
       if (guestData._id) {
@@ -143,16 +147,19 @@ export const updateEdition = async (req, res) => {
         const fakeReq = {
           params: { id: guestData._id },
           body: { guest: JSON.stringify(guestData) },
-          file: mediaFile,
+          file: mediaFile || undefined,
         };
         guest = await guestsCtrl.updateGuest(fakeReq, null, true);
-      } else {
-        // → Création d’un nouvel invité
+      } else if (hasFile) {
+        // → Création d’un nouvel invité seulement si fichier fourni
         const fakeReq = {
           body: { guest: JSON.stringify(guestData) },
           file: mediaFile,
         };
         guest = await guestsCtrl.createGuest(fakeReq, null, true);
+      } else {
+        // Aucun fichier = pas de création
+        continue;
       }
 
       if (guest?._id) updatedGuests.push(guest._id);
