@@ -27,24 +27,24 @@ export const createEdition = async (req, res) => {
       if (newArtist?._id) artistDocs.push(newArtist);
     }
 
-    // --- DEBUG fichiers invités (à supprimer après test)
-    console.log("DEBUG req.files.guestFiles length:", req.files?.guestFiles?.length);
-    if (Array.isArray(req.files?.guestFiles)) {
-      req.files.guestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
-    }
-
     // --- INVITÉS ---
     const guestDocs = [];
+    const uploadedGuestFiles = req.files?.guestFiles || [];
+    let fileCursor = 0; // Curseur pour parcourir les fichiers réellement envoyés
+
+    console.log("DEBUG req.files.guestFiles length:", uploadedGuestFiles.length);
+    uploadedGuestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
+
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const mediaFile =
-        guestData.mediaType !== "video" && !guestData.mediaFileId
-          ? req.files?.guestFiles?.[index] || null
-          : null;
+      // Prend un fichier seulement si nécessaire (image ou logo sans mediaFileId)
+      const needsFile = guestData.mediaType !== "video" && !guestData.mediaFileId;
+      const mediaFile = needsFile ? uploadedGuestFiles[fileCursor++] || null : null;
 
       console.log("DEBUG guest index:", index, {
         hasFile: !!mediaFile,
         mediaType: guestData.mediaType,
-        guestFilesKeys: Object.keys(req.files || {}),
+        guestFilesCount: uploadedGuestFiles.length,
+        fileCursor,
       });
 
       const newGuest = await guestsCtrl.createGuest(
@@ -52,6 +52,7 @@ export const createEdition = async (req, res) => {
         null,
         true
       );
+
       if (newGuest?._id) guestDocs.push(newGuest);
     }
 
