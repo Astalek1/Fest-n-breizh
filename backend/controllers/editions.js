@@ -27,33 +27,10 @@ export const createEdition = async (req, res) => {
       if (newArtist?._id) artistDocs.push(newArtist);
     }
 
-    // ✅ Correction d’alignement des fichiers invités (ordre de correspondance)
-    if (Array.isArray(req.files?.guestFiles) && Array.isArray(editionData.guests)) {
-      const syncedGuestFiles = [];
-
-      for (const guest of editionData.guests) {
-        if (guest.mediaType === "video" || guest.mediaFileId) {
-          // Aucun fichier à associer (vidéo ou logo déjà existant)
-          syncedGuestFiles.push(null);
-          continue;
-        }
-
-        // On cherche le fichier dont le nom contient une partie du fileName
-        const match = req.files.guestFiles.find((f) => {
-          const base = guest.fileName?.toLowerCase() || "";
-          return f.originalname.toLowerCase().includes(base);
-        });
-
-        syncedGuestFiles.push(match || null);
-      }
-
-      // Remplace la liste brute par la version synchronisée
-      req.files.guestFiles = syncedGuestFiles;
-
-      console.log(
-        "✅ Guest files resynchronisés :",
-        syncedGuestFiles.map((f) => f?.originalname || null)
-      );
+    // --- DEBUG fichiers invités (à supprimer après test)
+    console.log("DEBUG req.files.guestFiles length:", req.files?.guestFiles?.length);
+    if (Array.isArray(req.files?.guestFiles)) {
+      req.files.guestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
     }
 
     // --- INVITÉS ---
@@ -64,7 +41,6 @@ export const createEdition = async (req, res) => {
           ? req.files?.guestFiles?.[index] || null
           : null;
 
-      // a suprimer apres test
       console.log("DEBUG guest index:", index, {
         hasFile: !!mediaFile,
         mediaType: guestData.mediaType,
