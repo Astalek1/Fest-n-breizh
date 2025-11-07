@@ -29,7 +29,9 @@ export const createArtist = async (req, res, silent = false) => {
         mediaName: baseName,
       });
       await doc.save();
-      return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
+      if (silent) return doc;
+      if (!silent && res)
+        return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
     }
 
     // Dossier cible en fonction du type
@@ -71,7 +73,7 @@ export const createArtist = async (req, res, silent = false) => {
     if (!silent && res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
   } catch (error) {
     console.error("newArtist error:", error);
-    res.status(500).json({ error: error.message });
+    if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
