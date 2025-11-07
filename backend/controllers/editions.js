@@ -103,33 +103,34 @@ export const updateEdition = async (req, res) => {
     // --- ARTISTES ---
     const artistDocs = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const mediaFile =
-        artistData.mediaType !== "video" && !artistData.mediaFileId
-          ? req.files?.artistFiles?.[index] || null
-          : null;
-
-      const newArtist = await artistsCtrl.createArtist(
-        { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
-        null,
-        true
-      );
-      if (newArtist?._id) artistDocs.push(newArtist);
+      // on garde les artistes existants si pas de changement de média
+      if (!artistData._id && artistData.mediaType !== "video" && !artistData.mediaFileId) {
+        const mediaFile = req.files?.artistFiles?.[index] || null;
+        const newArtist = await artistsCtrl.createArtist(
+          { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
+          null,
+          true
+        );
+        if (newArtist?._id) artistDocs.push(newArtist);
+      } else {
+        artistDocs.push(artistData);
+      }
     }
 
     // --- INVITÉS ---
     const guestDocs = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const mediaFile =
-        guestData.mediaType !== "video" && !guestData.mediaFileId
-          ? req.files?.guestFiles?.[index] || null
-          : null;
-
-      const newGuest = await guestsCtrl.createGuest(
-        { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
-        null,
-        true
-      );
-      if (newGuest?._id) guestDocs.push(newGuest);
+      if (!guestData._id && guestData.mediaType !== "video" && !guestData.mediaFileId) {
+        const mediaFile = req.files?.guestFiles?.[index] || null;
+        const newGuest = await guestsCtrl.createGuest(
+          { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
+          null,
+          true
+        );
+        if (newGuest?._id) guestDocs.push(newGuest);
+      } else {
+        guestDocs.push(guestData);
+      }
     }
 
     // --- MISE À JOUR DE L'ÉDITION ---
