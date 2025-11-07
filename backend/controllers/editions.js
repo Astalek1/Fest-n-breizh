@@ -100,58 +100,11 @@ export const updateEdition = async (req, res) => {
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
-    if (
-      (!editionData.artists || editionData.artists.length < 1) &&
-      (!existingEdition.artists || existingEdition.artists.length < 1)
-    ) {
-      return res.status(400).json("Une édition doit contenir au moins un artiste.");
-    }
-
-    // --- ARTISTES ---
-    const updatedArtistIds = [];
-    for (const artistData of editionData.artists || []) {
-      const fakeReq = {
-        params: { id: artistData._id },
-        body: { artist: JSON.stringify(artistData) },
-        file: req.file,
-      };
-
-      let artist;
-      if (artistData._id) {
-        artist = await artistsCtrl.updateArtist(fakeReq, null, true);
-      } else {
-        artist = await artistsCtrl.createArtist(fakeReq, null, true);
-      }
-
-      if (artist?._id) updatedArtistIds.push(artist._id);
-    }
-
-    // --- INVITÉS ---
-    const guestDocs = [];
-    for (const guestData of editionData.guests || []) {
-      const fileKey = guestData.fileName;
-      const mediaFile = (req.files?.guestFiles || []).find((f) => f.originalname.includes(fileKey));
-
-      const guestReq = {
-        body: { guest: JSON.stringify(guestData) },
-        file: mediaFile || null,
-      };
-
-      const newGuest = guestData._id
-        ? await guestsCtrl.updateGuest(guestReq, null, true)
-        : await guestsCtrl.createGuest(guestReq, null, true);
-
-      if (newGuest?._id) guestDocs.push(newGuest);
-    }
-
-    // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = updatedArtistIds;
-    existingEdition.guests = guestDocs;
 
     await existingEdition.save();
-    res.status(200).json(existingEdition);
+    res.status(200).json({ message: "Édition mise à jour avec succès", edition: existingEdition });
   } catch (error) {
     console.error("updateEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
