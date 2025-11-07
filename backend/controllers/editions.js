@@ -16,7 +16,7 @@ export const createEdition = async (req, res) => {
     for (const [index, artistData] of (editionData.artists || []).entries()) {
       const mediaFile =
         artistData.mediaType !== "video" && !artistData.mediaFileId
-          ? req.files?.artistFiles?.[artistDocs.length] || null
+          ? req.files?.artistFiles?.[index] || null
           : null;
 
       const newArtist = await artistsCtrl.createArtist(
@@ -32,7 +32,7 @@ export const createEdition = async (req, res) => {
     for (const [index, guestData] of (editionData.guests || []).entries()) {
       const mediaFile =
         guestData.mediaType !== "video" && !guestData.mediaFileId
-          ? req.files?.guestFiles?.[guestDocs.length] || null
+          ? req.files?.guestFiles?.[index] || null
           : null;
 
       const newGuest = await guestsCtrl.createGuest(
