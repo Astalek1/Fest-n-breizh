@@ -92,9 +92,15 @@ export const getOneEdition = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
+
+// === METTRE À JOUR UNE ÉDITION ===
 export const updateEdition = async (req, res) => {
   try {
+    console.log("=== DÉBUT updateEdition ===");
+
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
+    console.log("editionData keys:", Object.keys(editionData));
+
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
@@ -102,58 +108,71 @@ export const updateEdition = async (req, res) => {
     const updatedGuests = [];
 
     // === ARTISTES ===
-    for (const [index, artist] of (editionData.artists || []).entries()) {
-      if (!artist._id) continue;
+    console.log("=== ARTISTES ===");
+    for (const [index, artistData] of (editionData.artists || []).entries()) {
+      console.log(`→ artiste[${index}]`, artistData);
+
+      if (!artistData._id) {
+        console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
+        continue;
+      }
 
       const file = req.files?.artistFiles?.[index] || null;
-      const artistUpdate = { ...artist };
+      console.log(`file artiste[${index}] présent ?`, !!file);
 
-      // Si un fichier est fourni, on appelle directement le contrôleur
-      if (file) {
-        const updated = await artistsCtrl.updateArtist(
-          { params: { id: artist._id }, body: { artist: JSON.stringify(artist) }, file },
-          null,
-          true
-        );
-        if (updated?._id) updatedArtists.push(updated._id);
-      } else {
-        // Sinon mise à jour directe sans média
-        const updated = await Artist.findByIdAndUpdate(artist._id, artistUpdate, { new: true });
-        if (updated?._id) updatedArtists.push(updated._id);
-      }
+      const fakeReq = {
+        params: { id: artistData._id },
+        body: { artist: JSON.stringify(artistData) },
+        file,
+      };
+
+      const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
+      console.log(`résultat updateArtist[${index}]:`, updated ? updated._id : "aucun retour");
+
+      if (updated?._id) updatedArtists.push(updated._id);
     }
 
     // === INVITÉS ===
-    for (const [index, guest] of (editionData.guests || []).entries()) {
-      if (!guest._id) continue;
+    console.log("=== INVITÉS ===");
+    for (const [index, guestData] of (editionData.guests || []).entries()) {
+      console.log(`→ invité[${index}]`, guestData);
+
+      if (!guestData._id) {
+        console.log(`❌ invité[${index}] ignoré (pas d'_id)`);
+        continue;
+      }
 
       const file = req.files?.guestFiles?.[index] || null;
-      const guestUpdate = { ...guest };
+      console.log(`file invité[${index}] présent ?`, !!file);
 
-      if (file) {
-        const updated = await guestsCtrl.updateGuest(
-          { params: { id: guest._id }, body: { guest: JSON.stringify(guest) }, file },
-          null,
-          true
-        );
-        if (updated?._id) updatedGuests.push(updated._id);
-      } else {
-        const updated = await Guest.findByIdAndUpdate(guest._id, guestUpdate, { new: true });
-        if (updated?._id) updatedGuests.push(updated._id);
-      }
+      const fakeReq = {
+        params: { id: guestData._id },
+        body: { guest: JSON.stringify(guestData) },
+        file,
+      };
+
+      const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
+      console.log(`résultat updateGuest[${index}]:`, updated ? updated._id : "aucun retour");
+
+      if (updated?._id) updatedGuests.push(updated._id);
     }
 
-    // === MISE À JOUR ÉDITION ===
+    // === RÉSUMÉ ===
+    console.log("Résultat final → artistes:", updatedArtists);
+    console.log("Résultat final → invités:", updatedGuests);
+
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = updatedArtists.length ? updatedArtists : existingEdition.artists;
-    existingEdition.guests = updatedGuests.length ? updatedGuests : existingEdition.guests;
+
+    if (updatedArtists.length) existingEdition.artists = updatedArtists;
+    if (updatedGuests.length) existingEdition.guests = updatedGuests;
 
     await existingEdition.save();
 
     console.log("✅ Édition mise à jour :", existingEdition._id);
     console.log("→ Artistes :", updatedArtists);
     console.log("→ Invités :", updatedGuests);
+    console.log("=== FIN updateEdition ===");
 
     res.status(200).json({
       message: "Édition mise à jour avec succès",
