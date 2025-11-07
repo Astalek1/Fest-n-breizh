@@ -27,16 +27,10 @@ export const createEdition = async (req, res) => {
       if (newArtist?._id) artistDocs.push(newArtist);
     }
     // a suprimer apres test
-    console.log(
-      "DEBUG req.files.guestFiles:",
-      Array.isArray(req.files?.guestFiles)
-        ? req.files.guestFiles.map((f) => ({
-            originalname: f.originalname,
-            size: f.size,
-            fieldname: f.fieldname,
-          }))
-        : req.files
-    );
+    console.log("DEBUG req.files.guestFiles length:", req.files?.guestFiles?.length);
+    if (Array.isArray(req.files?.guestFiles)) {
+      req.files.guestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
+    }
 
     // --- INVITÉS ---
     const guestDocs = [];
