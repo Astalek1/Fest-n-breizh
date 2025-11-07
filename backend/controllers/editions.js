@@ -109,22 +109,27 @@ export const updateEdition = async (req, res) => {
 
     const updatedArtistIds = [];
     for (const artistData of editionData.artists || []) {
-      const fakeReq = { params: { id: artistData._id }, body: { ...artistData }, file: req.file };
+      const fakeReq = {
+        params: { id: artistData._id },
+        body: { artist: JSON.stringify(artistData) },
+        file: req.file,
+      };
       const artist = artistData._id
-        ? await artistsCtrl.updateArtist(fakeReq, fakeRes, true)
-        : await artistsCtrl.createArtist(fakeReq, fakeRes, true);
+        ? await artistsCtrl.updateArtist(fakeReq, null, true)
+        : await artistsCtrl.createArtist(fakeReq, null, true);
       updatedArtistIds.push(artist._id);
     }
 
+    const guestDocs = [];
     for (const guestData of editionData.guests || []) {
-      const fileKey = guestData.fileName; // ex: "media-test-guest-image"
+      const fileKey = guestData.fileName;
       const mediaFile = (req.files?.guestFiles || []).find((f) => f.originalname.includes(fileKey));
 
-      const newGuest = await guestsCtrl.createGuest({
-        body: { guest: JSON.stringify(guestData) },
-        file: mediaFile,
-        silent: true,
-      });
+      const newGuest = await guestsCtrl.createGuest(
+        { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
+        null,
+        true
+      );
 
       if (newGuest?._id) guestDocs.push(newGuest);
     }
@@ -132,13 +137,13 @@ export const updateEdition = async (req, res) => {
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
     existingEdition.artists = updatedArtistIds;
-    existingEdition.guests = updatedGuestIds;
+    existingEdition.guests = guestDocs;
 
     await existingEdition.save();
     res.status(200).json(existingEdition);
   } catch (error) {
     console.error("updateEdition error:", error);
-    res.status(500).json({ error: "Erreur serveur (updateEdition)" });
+    res.status(500).json({ error: error.message });
   }
 };
 
