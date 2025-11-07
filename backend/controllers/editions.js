@@ -107,6 +107,7 @@ export const updateEdition = async (req, res) => {
       return res.status(400).json("Une édition doit contenir au moins un artiste.");
     }
 
+    // --- ARTISTES ---
     const updatedArtistIds = [];
     for (const artistData of editionData.artists || []) {
       const fakeReq = {
@@ -114,26 +115,36 @@ export const updateEdition = async (req, res) => {
         body: { artist: JSON.stringify(artistData) },
         file: req.file,
       };
-      const artist = artistData._id
-        ? await artistsCtrl.updateArtist(fakeReq, null, true)
-        : await artistsCtrl.createArtist(fakeReq, null, true);
-      updatedArtistIds.push(artist._id);
+
+      let artist;
+      if (artistData._id) {
+        artist = await artistsCtrl.updateArtist(fakeReq, null, true);
+      } else {
+        artist = await artistsCtrl.createArtist(fakeReq, null, true);
+      }
+
+      if (artist?._id) updatedArtistIds.push(artist._id);
     }
 
+    // --- INVITÉS ---
     const guestDocs = [];
     for (const guestData of editionData.guests || []) {
       const fileKey = guestData.fileName;
       const mediaFile = (req.files?.guestFiles || []).find((f) => f.originalname.includes(fileKey));
 
-      const newGuest = await guestsCtrl.createGuest(
-        { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
-        null,
-        true
-      );
+      const guestReq = {
+        body: { guest: JSON.stringify(guestData) },
+        file: mediaFile || null,
+      };
+
+      const newGuest = guestData._id
+        ? await guestsCtrl.updateGuest(guestReq, null, true)
+        : await guestsCtrl.createGuest(guestReq, null, true);
 
       if (newGuest?._id) guestDocs.push(newGuest);
     }
 
+    // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
     existingEdition.artists = updatedArtistIds;
@@ -143,7 +154,7 @@ export const updateEdition = async (req, res) => {
     res.status(200).json(existingEdition);
   } catch (error) {
     console.error("updateEdition error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Erreur serveur (updateEdition)" });
   }
 };
 
