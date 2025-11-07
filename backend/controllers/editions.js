@@ -8,55 +8,51 @@ import Guest from "../models/Guests.js";
 export const createEdition = async (req, res) => {
   try {
     const editionData = JSON.parse(req.body.edition);
+    if (!editionData.title || !editionData.poster)
+      return res.status(400).json({ error: "Titre et affiche requis." });
 
-    if (!editionData.title) return res.status(400).json("Le titre est obligatoire.");
-    if (!editionData.poster) return res.status(400).json("Une affiche est obligatoire.");
-    if (!editionData.artists || editionData.artists.length < 1)
-      return res.status(400).json("Une édition doit contenir au moins un artiste.");
-
+    // --- ARTISTES ---
     const artistDocs = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const mediaFile = req.files?.artistFiles?.[index] || null;
+      const mediaFile =
+        artistData.mediaType !== "video" && !artistData.mediaFileId
+          ? req.files?.artistFiles?.[artistDocs.length] || null
+          : null;
 
-      const fakeReq = {
-        body: { artist: JSON.stringify(artistData) },
-        file: mediaFile,
-      };
-      const fakeRes = { status: () => ({ json: () => {} }) };
-
-      const newArtist = await artistsCtrl.createArtist(fakeReq, fakeRes, true);
+      const newArtist = await artistsCtrl.createArtist(
+        { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
+        null,
+        true
+      );
       if (newArtist?._id) artistDocs.push(newArtist);
     }
 
+    // --- INVITÉS ---
     const guestDocs = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const mediaFile = req.files?.guestFiles?.[index] || null;
+      const mediaFile =
+        guestData.mediaType !== "video" && !guestData.mediaFileId
+          ? req.files?.guestFiles?.[guestDocs.length] || null
+          : null;
 
-      const fakeReq = {
-        body: { guest: JSON.stringify(guestData) },
-        file: mediaFile,
-      };
-      const fakeRes = { status: () => ({ json: () => {} }) };
-
-      const newGuest = await guestsCtrl.createGuest(fakeReq, fakeRes, true);
+      const newGuest = await guestsCtrl.createGuest(
+        { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
+        null,
+        true
+      );
       if (newGuest?._id) guestDocs.push(newGuest);
     }
 
+    // --- CRÉATION DE L'ÉDITION ---
     const newEdition = new Edition({
       title: editionData.title,
       poster: editionData.poster,
-      artists: artistDocs.map((a) => a._id),
-      guests: guestDocs.map((g) => g._id),
+      artists: artistDocs,
+      guests: guestDocs,
     });
 
     await newEdition.save();
-
-    // On renvoie l'édition avec les artistes et invités complets
-    const populatedEdition = await Edition.findById(newEdition._id)
-      .populate("artists")
-      .populate("guests");
-
-    res.status(201).json({ message: "Édition créée avec succès", edition: populatedEdition });
+    res.status(201).json({ message: "Édition créée avec succès", edition: newEdition });
   } catch (error) {
     console.error("createEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
@@ -107,13 +103,17 @@ export const updateEdition = async (req, res) => {
       updatedArtistIds.push(artist._id);
     }
 
-    const updatedGuestIds = [];
     for (const guestData of editionData.guests || []) {
-      const fakeReq = { params: { id: guestData._id }, body: { ...guestData }, file: req.file };
-      const guest = guestData._id
-        ? await guestsCtrl.updateGuest(fakeReq, fakeRes, true)
-        : await guestsCtrl.createGuest(fakeReq, fakeRes, true);
-      updatedGuestIds.push(guest._id);
+      const fileKey = guestData.fileName; // ex: "media-test-guest-image"
+      const mediaFile = (req.files?.guestFiles || []).find((f) => f.originalname.includes(fileKey));
+
+      const newGuest = await guestsCtrl.createGuest({
+        body: { guest: JSON.stringify(guestData) },
+        file: mediaFile,
+        silent: true,
+      });
+
+      if (newGuest?._id) guestDocs.push(newGuest);
     }
 
     existingEdition.title = editionData.title || existingEdition.title;
