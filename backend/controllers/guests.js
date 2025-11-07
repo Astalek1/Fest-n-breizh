@@ -43,9 +43,11 @@ export const createGuest = async (req, res, silent = false) => {
     let fileId = null;
     let fileName = null;
 
-    if (isFileId(body.media)) {
-      // Réutilisation d’un fichier existant (surtout pour logos)
-      const details = await imagekit.getFileDetails(body.media);
+    // Réutilisation d’un fichier existant (surtout pour logos)
+    const existingId = body.mediaFileId || body.media;
+    if (isFileId(existingId)) {
+      const details = await imagekit.getFileDetails(existingId);
+
       url = details.url;
       fileId = details.fileId;
       fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
