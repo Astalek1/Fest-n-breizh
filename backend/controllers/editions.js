@@ -100,8 +100,17 @@ export const updateEdition = async (req, res) => {
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
+    // --- MISE À JOUR DES ARTISTES ---
+    const updatedArtists = await artistsCtrl.handleEditionArtists(editionData.artists, req.files);
+
+    // --- MISE À JOUR DES INVITÉS ---
+    const updatedGuests = await guestsCtrl.handleEditionGuests(editionData.guests, req.files);
+
+    // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
+    existingEdition.artists = updatedArtists;
+    existingEdition.guests = updatedGuests;
 
     await existingEdition.save();
     res.status(200).json({ message: "Édition mise à jour avec succès", edition: existingEdition });
