@@ -101,9 +101,8 @@ export const updateEdition = async (req, res) => {
     if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
     // --- ARTISTES ---
-    const artistDocs = [];
+    const artistIds = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      // on garde les artistes existants si pas de changement de média
       if (!artistData._id && artistData.mediaType !== "video" && !artistData.mediaFileId) {
         const mediaFile = req.files?.artistFiles?.[index] || null;
         const newArtist = await artistsCtrl.createArtist(
@@ -111,14 +110,15 @@ export const updateEdition = async (req, res) => {
           null,
           true
         );
-        if (newArtist?._id) artistDocs.push(newArtist);
+        if (newArtist?._id) artistIds.push(newArtist._id);
       } else {
-        artistDocs.push(artistData);
+        // Si l'artiste existe déjà, on garde son _id
+        artistIds.push(artistData._id);
       }
     }
 
     // --- INVITÉS ---
-    const guestDocs = [];
+    const guestIds = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
       if (!guestData._id && guestData.mediaType !== "video" && !guestData.mediaFileId) {
         const mediaFile = req.files?.guestFiles?.[index] || null;
@@ -127,17 +127,17 @@ export const updateEdition = async (req, res) => {
           null,
           true
         );
-        if (newGuest?._id) guestDocs.push(newGuest);
+        if (newGuest?._id) guestIds.push(newGuest._id);
       } else {
-        guestDocs.push(guestData);
+        guestIds.push(guestData._id);
       }
     }
 
     // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = artistDocs;
-    existingEdition.guests = guestDocs;
+    existingEdition.artists = artistIds.filter(Boolean);
+    existingEdition.guests = guestIds.filter(Boolean);
 
     await existingEdition.save();
     res.status(200).json({ message: "Édition mise à jour avec succès", edition: existingEdition });
