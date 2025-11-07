@@ -99,93 +99,63 @@ export const updateEdition = async (req, res) => {
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
-    // === 1. TRAITEMENT DES ARTISTES ===
-    const newArtistIds = [];
-
+    // --- ARTISTES ---
+    const updatedArtists = [];
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const hasFile =
-        artistData.mediaType !== "video" &&
-        !artistData.mediaFileId &&
-        !!req.files?.artistFiles?.[index];
-      const mediaFile = hasFile ? req.files.artistFiles[index] : null;
+      if (!artistData._id) continue; // on ignore tout artiste sans _id
 
-      let artist;
-      if (artistData._id) {
-        // ----- ARTISTE EXISTANT → MISE À JOUR -----
-        const fakeReq = {
+      const mediaFile =
+        artistData.mediaType !== "video" && !artistData.mediaFileId
+          ? req.files?.artistFiles?.[index] || null
+          : null;
+
+      const updatedArtist = await artistsCtrl.updateArtist(
+        {
           params: { id: artistData._id },
           body: { artist: JSON.stringify(artistData) },
           file: mediaFile || undefined,
-        };
-        artist = await artistsCtrl.updateArtist(fakeReq, null, true);
-      } else if (hasFile || artistData.mediaType === "video") {
-        // ----- NOUVEL ARTISTE -----
-        const fakeReq = {
-          body: { artist: JSON.stringify(artistData) },
-          file: mediaFile,
-        };
-        artist = await artistsCtrl.createArtist(fakeReq, null, true);
-      }
+        },
+        null,
+        true
+      );
 
-      if (artist?._id) newArtistIds.push(artist._id);
+      if (updatedArtist?._id) updatedArtists.push(updatedArtist._id);
     }
 
-    // Supprimer les anciens artistes non présents dans la nouvelle liste
-    const oldArtistIds = existingEdition.artists.map((id) => id.toString());
-    const toDeleteArtists = oldArtistIds.filter((id) => !newArtistIds.includes(id));
-    if (toDeleteArtists.length > 0) {
-      await Artist.deleteMany({ _id: { $in: toDeleteArtists } });
-    }
-
-    // === 2. TRAITEMENT DES INVITÉS ===
-    const newGuestIds = [];
-
+    // --- INVITÉS ---
+    const updatedGuests = [];
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      const hasFile =
-        guestData.mediaType !== "video" &&
-        !guestData.mediaFileId &&
-        !!req.files?.guestFiles?.[index];
-      const mediaFile = hasFile ? req.files.guestFiles[index] : null;
+      if (!guestData._id) continue; // on ignore tout invité sans _id
 
-      let guest;
-      if (guestData._id) {
-        // ----- INVITÉ EXISTANT → MISE À JOUR -----
-        const fakeReq = {
+      const mediaFile =
+        guestData.mediaType !== "video" && !guestData.mediaFileId
+          ? req.files?.guestFiles?.[index] || null
+          : null;
+
+      const updatedGuest = await guestsCtrl.updateGuest(
+        {
           params: { id: guestData._id },
           body: { guest: JSON.stringify(guestData) },
           file: mediaFile || undefined,
-        };
-        guest = await guestsCtrl.updateGuest(fakeReq, null, true);
-      } else if (hasFile || guestData.mediaType === "video") {
-        // ----- NOUVEL INVITÉ -----
-        const fakeReq = {
-          body: { guest: JSON.stringify(guestData) },
-          file: mediaFile,
-        };
-        guest = await guestsCtrl.createGuest(fakeReq, null, true);
-      }
+        },
+        null,
+        true
+      );
 
-      if (guest?._id) newGuestIds.push(guest._id);
+      if (updatedGuest?._id) updatedGuests.push(updatedGuest._id);
     }
 
-    // Supprimer les anciens invités non présents dans la nouvelle liste
-    const oldGuestIds = existingEdition.guests.map((id) => id.toString());
-    const toDeleteGuests = oldGuestIds.filter((id) => !newGuestIds.includes(id));
-    if (toDeleteGuests.length > 0) {
-      await Guest.deleteMany({ _id: { $in: toDeleteGuests } });
-    }
-
-    // === 3. MISE À JOUR DE L'ÉDITION ===
+    // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = newArtistIds;
-    existingEdition.guests = newGuestIds;
+    existingEdition.artists = updatedArtists;
+    existingEdition.guests = updatedGuests;
 
     await existingEdition.save();
 
     console.log("✅ Édition mise à jour :", existingEdition._id);
-    console.log("→ Artistes :", newArtistIds);
-    console.log("→ Invités :", newGuestIds);
+    console.log("→ Artistes :", updatedArtists);
+    console.log("→ Invités :", updatedGuests);
 
     res.status(200).json({
       message: "Édition mise à jour avec succès",
