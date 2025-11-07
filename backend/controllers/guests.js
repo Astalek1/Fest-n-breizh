@@ -48,6 +48,8 @@ export const createGuest = async (req, res, silent = false) => {
       fileId = details.fileId;
       fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
     } else {
+      console.log("UPLOAD INVITÉ:", { name: body.name, mediaType, folder });
+
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) return res.status(400).json("Média invalide");
       url = up.url;
@@ -67,7 +69,7 @@ export const createGuest = async (req, res, silent = false) => {
 
     await doc.save();
     if (silent) return doc;
-    if (!silent && res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
+    if (!silent && res) res.status(201).json({ message: "invité ajouté avec succès !" });
   } catch (error) {
     console.error("newGuest error:", error);
     res.status(500).json({ error: error.message });
