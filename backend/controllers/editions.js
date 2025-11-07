@@ -101,10 +101,10 @@ export const updateEdition = async (req, res) => {
     if (!existingEdition) return res.status(404).json("Édition non trouvée");
 
     // --- MISE À JOUR DES ARTISTES ---
-    const updatedArtists = await artistsCtrl.handleEditionArtists(editionData.artists, req.files);
+    const updatedArtists = await artistsCtrl.updateArtist(editionData.artists, req.files);
 
     // --- MISE À JOUR DES INVITÉS ---
-    const updatedGuests = await guestsCtrl.handleEditionGuests(editionData.guests, req.files);
+    const updatedGuests = await guestsCtrl.updateGuest(editionData.guests, req.files);
 
     // --- MISE À JOUR DE L'ÉDITION ---
     existingEdition.title = editionData.title || existingEdition.title;
