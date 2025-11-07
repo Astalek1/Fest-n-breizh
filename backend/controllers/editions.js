@@ -102,71 +102,49 @@ export const updateEdition = async (req, res) => {
     const updatedArtists = [];
     const updatedGuests = [];
 
-    // === ARTISTES ===
-    for (const [index, artist] of (editionData.artists || []).entries()) {
+    // === ARTISTES EXISTANTS ===
+    for (const [index, artistData] of (editionData.artists || []).entries()) {
+      if (!artistData._id) continue; // on ignore ceux sans ID
+
       const file = req.files?.artistFiles?.[index] || null;
 
-      let result;
-      if (artist._id) {
-        // → appel direct de la vraie fonction de mise à jour
-        result = await artistsCtrl.updateArtist(
-          {
-            params: { id: artist._id },
-            body: { artist: JSON.stringify(artist) },
-            file,
-          },
-          null,
-          true
-        );
-      } else {
-        // → cas où l’artiste n’a pas d’ID (rare, mais toléré)
-        result = await artistsCtrl.createArtist(
-          {
-            body: { artist: JSON.stringify(artist) },
-            file,
-          },
-          null,
-          true
-        );
-      }
+      const updatedArtist = await artistsCtrl.updateArtist(
+        {
+          params: { id: artistData._id },
+          body: { artist: JSON.stringify(artistData) },
+          file: file || undefined,
+        },
+        null,
+        true
+      );
 
-      if (result?._id) updatedArtists.push(result._id);
+      if (updatedArtist?._id) updatedArtists.push(updatedArtist._id);
     }
 
-    // === INVITÉS ===
-    for (const [index, guest] of (editionData.guests || []).entries()) {
+    // === INVITÉS EXISTANTS ===
+    for (const [index, guestData] of (editionData.guests || []).entries()) {
+      if (!guestData._id) continue; // pas d'ID → pas de mise à jour
+
       const file = req.files?.guestFiles?.[index] || null;
 
-      let result;
-      if (guest._id) {
-        result = await guestsCtrl.updateGuest(
-          {
-            params: { id: guest._id },
-            body: { guest: JSON.stringify(guest) },
-            file,
-          },
-          null,
-          true
-        );
-      } else {
-        result = await guestsCtrl.createGuest(
-          {
-            body: { guest: JSON.stringify(guest) },
-            file,
-          },
-          null,
-          true
-        );
-      }
+      const updatedGuest = await guestsCtrl.updateGuest(
+        {
+          params: { id: guestData._id },
+          body: { guest: JSON.stringify(guestData) },
+          file: file || undefined,
+        },
+        null,
+        true
+      );
 
-      if (result?._id) updatedGuests.push(result._id);
+      if (updatedGuest?._id) updatedGuests.push(updatedGuest._id);
     }
 
     // === MISE À JOUR DE L'ÉDITION ===
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
-    existingEdition.artists = updatedArtists.length ? updatedArtists : existingEdition.artists;
-    existingEdition.guests = updatedGuests.length ? updatedGuests : existingEdition.guests;
+    if (updatedArtists.length) existingEdition.artists = updatedArtists;
+    if (updatedGuests.length) existingEdition.guests = updatedGuests;
 
     await existingEdition.save();
 
