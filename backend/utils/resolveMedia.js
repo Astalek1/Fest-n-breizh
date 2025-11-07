@@ -1,6 +1,12 @@
 import imagekit from "../config/imageKit.js";
 
 export const resolveMedia = async (media, file, folder, cleanName) => {
+  console.log("DEBUG resolveMedia input:", {
+    hasFile: !!file,
+    hasBuffer: !!file?.buffer,
+    folder,
+    cleanName,
+  });
   try {
     // 0. Si le fichier contient déjà une URL (cas déjà uploadé / traité)
     if (file?.url && file?.fileId) {

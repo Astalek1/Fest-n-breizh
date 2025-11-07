@@ -58,6 +58,9 @@ export const createGuest = async (req, res, silent = false) => {
       console.log("UPLOAD INVITÉ:", { name: body.name, mediaType, folder });
       console.log("req.file présent ?", !!req.file);
 
+      // a suprimer apres test
+      console.log("DEBUG createGuest → req.file:", !!req.file, "mediaType:", mediaType);
+
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) {
         if (silent) throw new Error("Média invalide");

@@ -35,6 +35,13 @@ export const createEdition = async (req, res) => {
           ? req.files?.guestFiles?.[index] || null
           : null;
 
+      // a suprimer apres test
+      console.log("DEBUG guest index:", index, {
+        hasFile: !!mediaFile,
+        mediaType: guestData.mediaType,
+        guestFilesKeys: Object.keys(req.files || {}),
+      });
+
       const newGuest = await guestsCtrl.createGuest(
         { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
         null,
