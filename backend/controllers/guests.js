@@ -9,7 +9,8 @@ const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${
 // === CRÉER UN INVITÉ ===
 export const createGuest = async (req, res, silent = false) => {
   try {
-    const body = JSON.parse(req.body.guest || "{}");
+    // Si le champ "guest" est un JSON brut, on le parse, sinon on garde req.body directement
+    const body = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
 
     const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
     const baseName =
