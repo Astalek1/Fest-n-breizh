@@ -9,8 +9,14 @@ const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${
 // === CRÉER UN INVITÉ ===
 export const createGuest = async (req, res, silent = false) => {
   try {
-    // Si le champ "guest" est un JSON brut, on le parse, sinon on garde req.body directement
-    const body = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
+    const baseBody = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
+
+    // fusionne tous les champs (cas Postman ou front React)
+    const body = { ...baseBody, ...req.body };
+
+    if (!body.name || !body.description) {
+      return res.status(400).json({ error: "Nom et description obligatoires" });
+    }
 
     // On fusionne les champs envoyés directement dans req.body (comme mediaType ou fileName)
     const merged = { ...body, ...req.body };
@@ -70,6 +76,13 @@ export const createGuest = async (req, res, silent = false) => {
       fileId = up.fileId || null;
       fileName = up.fileName || baseName;
     }
+    console.log("DEBUG BODY FINAL:", {
+      name: body.name,
+      description: body.description,
+      url,
+      fileId,
+      fileName,
+    });
 
     const doc = new Guest({
       name: body.name,
