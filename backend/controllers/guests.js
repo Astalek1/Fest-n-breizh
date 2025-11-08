@@ -6,7 +6,7 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// Créer un nouvel invité //
+// === CRÉER UN INVITÉ ===
 export const createGuest = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
@@ -69,7 +69,6 @@ export const createGuest = async (req, res, silent = false) => {
       fileName = up.fileName || baseName;
     }
 
-    // === ENREGISTREMENT DU DOCUMENT ===
     const doc = new Guest({
       name: body.name,
       description: body.description,
@@ -85,12 +84,12 @@ export const createGuest = async (req, res, silent = false) => {
     if (silent) return doc;
     if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
   } catch (error) {
-    console.error("newGuest error:", error);
+    console.error("createGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// Récupérer tous les invités //
+// === RÉCUPÉRER TOUS LES INVITÉS ===
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -100,7 +99,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// Récupérer un invité //
+// === RÉCUPÉRER UN INVITÉ ===
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -111,13 +110,13 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// Modifier un invité //
+// === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
   try {
     const existing = await Guest.findById(req.params.id);
     if (!existing) {
-      if (!silent && res) return res.status(404).json("innvité non trouvé");
-      else throw new Error("invité non trouvé");
+      if (!silent && res) return res.status(404).json("Invité non trouvé");
+      else throw new Error("Invité non trouvé");
     }
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
@@ -133,7 +132,7 @@ export const updateGuest = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    const mediaType = (body.mediaType || "").toLowerCase(); // image | logo | video
+    const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
     const oldImageId = existing.mediaFileId || null;
@@ -145,7 +144,6 @@ export const updateGuest = async (req, res, silent = false) => {
     // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
-        // Passage vers vidéo : suppression image + logo
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -160,13 +158,11 @@ export const updateGuest = async (req, res, silent = false) => {
         let fileName = null;
 
         if (isFileId(body.media)) {
-          // Utilisation d’un fichier existant
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
-          // Upload ou URL
           const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
           if (!up?.url) return res.status(400).json("Média invalide ou introuvable");
           url = up.url;
@@ -202,7 +198,24 @@ export const updateGuest = async (req, res, silent = false) => {
 
     // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
-      // Passage vers vidéo → supprimer ancienne image et logo
+      console.log("DEBUG GUEST MEDIA:", {
+        mediaType,
+        oldImageId,
+        newImageId,
+        oldLogoId,
+        newLogoId,
+        reqFile: !!req.file,
+      });
+
+      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+        try {
+          await imagekit.deleteFile(oldImageId);
+          console.log("Ancienne image supprimée :", oldImageId);
+        } catch (e) {
+          console.error("Suppression ancienne image échouée :", e?.message || e);
+        }
+      }
+
       if (mediaType === "video") {
         if (oldImageId) {
           try {
@@ -223,7 +236,6 @@ export const updateGuest = async (req, res, silent = false) => {
         }
       }
 
-      // Passage vers LOGO → supprimer ancienne IMAGE
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -232,7 +244,6 @@ export const updateGuest = async (req, res, silent = false) => {
         }
       }
 
-      // Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé
       if (mediaType === "image" && oldLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
@@ -244,26 +255,14 @@ export const updateGuest = async (req, res, silent = false) => {
         }
       }
 
-      // Remplacement LOGO → LOGO
       if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
         const inUse = await isFileInUse(oldLogoId);
         if (inUse === false) {
           try {
             await imagekit.deleteFile(oldLogoId);
+            console.log("Ancien logo supprimé :", oldLogoId);
           } catch (e) {
             console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
-      }
-
-      // Remplacement IMAGE → IMAGE (corrigé)
-      if (mediaType === "image" && oldImageId) {
-        if ((newImageId && oldImageId !== newImageId) || req.file) {
-          try {
-            await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée :", oldImageId);
-          } catch (e) {
-            console.error("Suppression ancienne image échouée :", e?.message || e);
           }
         }
       }
@@ -274,15 +273,11 @@ export const updateGuest = async (req, res, silent = false) => {
     res.status(200).json(updated);
   } catch (error) {
     console.error("updateGuest error:", error);
-    if (!silent && res) {
-      res.status(500).json({ error: error.message });
-    } else {
-      throw error;
-    }
+    if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// suprimer un invité //
+// === SUPPRIMER UN INVITÉ ===
 export const deleteGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -291,20 +286,16 @@ export const deleteGuest = async (req, res) => {
     const imgId = guest.mediaFileId || null;
     const logoId = guest.logoFileId || null;
 
-    // Supprime d’abord le document pour éviter les ré-lectures
     await Guest.findByIdAndDelete(req.params.id);
 
-    // Images : suppression directe
     if (imgId) {
       try {
         await imagekit.deleteFile(imgId);
-        console.log("Image supprimée : ", imgId);
       } catch (e) {
         console.error("Suppression image échouée :", e?.message || e);
       }
     }
 
-    // Logos : suppression conditionnelle (peuvent être réutilisés)
     if (logoId) {
       const inUse = await isFileInUse(logoId);
       if (inUse === false) {
