@@ -163,9 +163,11 @@ export const updateEdition = async (req, res) => {
       );
 
       const file =
-        req.files?.guestFiles?.[index] ||
-        (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
-        null;
+        (req.files?.guestFiles || []).find(
+          (f) =>
+            f.originalname.includes(guest.fileName) ||
+            f.originalname.toLowerCase().includes(guest.name?.toLowerCase() || "")
+        ) || null;
 
       console.log(`file invité[${index}] présent ?`, !!file);
 
