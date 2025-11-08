@@ -107,7 +107,7 @@ export const getAllArtists = async (req, res) => {
   }
 };
 // Modifier un artiste
-export const updateArtist = async (req, res) => {
+export const updateArtist = async (req, res, silent = false) => {
   try {
     const existing = await Artist.findById(req.params.id);
     if (!existing) return res.status(404).json("artiste non trouvé");
@@ -272,6 +272,7 @@ export const updateArtist = async (req, res) => {
     }
 
     // --- 5) Réponse finale ---
+    if (silent) return updated;
     res.status(200).json(updated);
   } catch (error) {
     console.error("updateArtist error:", error);

@@ -114,7 +114,7 @@ export const getOneGuest = async (req, res) => {
 };
 
 // Modifier un invité //
-export const updateGuest = async (req, res) => {
+export const updateGuest = async (req, res, silent = false) => {
   try {
     const existing = await Guest.findById(req.params.id);
     if (!existing) return res.status(404).json("Invité non trouvé");
@@ -268,9 +268,11 @@ export const updateGuest = async (req, res) => {
       }
     }
 
+    // --- 5) Réponse finale ---
+    if (silent) return updated;
     res.status(200).json(updated);
   } catch (error) {
-    console.error("updateGuest error:", error);
+    console.error("updateArtist error:", error);
     res.status(500).json({ error: error.message });
   }
 };
