@@ -75,9 +75,12 @@ export const createEdition = async (req, res) => {
 // === LIRE TOUTES LES ÉDITIONS ===
 export const getAllEditions = async (req, res) => {
   try {
+    console.log("DEBUG getAllEditions start");
     const editions = await Edition.find().populate("artists").populate("guests");
+    console.log("DEBUG editions found:", editions.length);
     res.status(200).json(editions);
-  } catch {
+  } catch (err) {
+    console.error("getAllEditions error:", err);
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
