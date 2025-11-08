@@ -30,6 +30,12 @@ export const createGuest = async (req, res, silent = false) => {
         logoFileId: null,
         mediaName: baseName,
       });
+      console.log("DEBUG new Guest =>", {
+        name: body.name,
+        description: body.description,
+        media: isLogo ? null : url,
+      });
+
       await doc.save();
 
       if (silent) return doc;
