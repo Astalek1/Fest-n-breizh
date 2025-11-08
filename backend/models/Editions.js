@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import "../models/Artists.js";
+import "../models/Guests.js";
 
 const editionsSchema = mongoose.Schema({
   title: { type: String, required: true },
