@@ -37,6 +37,17 @@ export const createGuest = async (req, res, silent = false) => {
       });
 
       await doc.save();
+      if (req.body.editionId) {
+        try {
+          const Edition = (await import("../models/Edition.js")).default;
+          await Edition.findByIdAndUpdate(req.body.editionId, {
+            $push: { guests: doc._id },
+          });
+          console.log("✅ Invité lié à l’édition :", req.body.editionId);
+        } catch (err) {
+          console.error("❌ Erreur liaison invité/édition :", err.message);
+        }
+      }
 
       if (silent) return doc;
       if (res)
