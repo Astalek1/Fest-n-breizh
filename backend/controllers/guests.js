@@ -155,7 +155,7 @@ export const updateGuest = async (req, res, silent = false) => {
         filtered.mediaName = baseName;
       } else {
         const isLogo = mediaType === "logo";
-        const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invites";
+        const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
         let url = null;
         let fileId = null;
