@@ -162,12 +162,22 @@ export const updateEdition = async (req, res) => {
         })) || "Aucun fichier reçu"
       );
 
+      const allGuestFiles = req.files?.guestFiles || [];
+
       const file =
-        (req.files?.guestFiles || []).find(
+        allGuestFiles.find(
           (f) =>
-            f.originalname.includes(guest.fileName) ||
+            f.originalname.includes(guest.fileName || "") ||
             f.originalname.toLowerCase().includes(guest.name?.toLowerCase() || "")
-        ) || null;
+        ) ||
+        allGuestFiles.find((f) =>
+          guest.mediaType === "image"
+            ? f.mimetype.startsWith("image/")
+            : guest.mediaType === "logo"
+            ? f.mimetype.startsWith("image/")
+            : false
+        ) ||
+        null;
 
       console.log(`file invité[${index}] présent ?`, !!file);
 
