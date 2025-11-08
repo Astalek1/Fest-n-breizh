@@ -80,7 +80,25 @@ export const createGuest = async (req, res, silent = false) => {
     }
 
     // === ENREGISTREMENT DU DOCUMENT ===
-    console.log("DEBUG BEFORE SAVE:", body.name, body.description);
+    console.log("==== DEBUG CHECKPOINT ====");
+    console.log("body:", body);
+    console.log("url:", url);
+    console.log("fileId:", fileId);
+    console.log("fileName:", fileName);
+    console.log("isLogo:", isLogo);
+    console.log(
+      "req.file:",
+      req.file
+        ? { fieldname: req.file.fieldname, mimetype: req.file.mimetype, size: req.file.size }
+        : "Aucun fichier reçu"
+    );
+    console.log("===========================");
+
+    if (!body.name || !body.description) {
+      console.error("❌ body.name ou body.description manquant !");
+    } else {
+      console.log("✅ body.name et body.description détectés !");
+    }
 
     const doc = new Guest({
       name: body.name,
@@ -92,7 +110,9 @@ export const createGuest = async (req, res, silent = false) => {
       mediaName: fileName,
     });
 
+    console.log("=== DEBUG BEFORE SAVE DOC ===", doc);
     await doc.save();
+    console.log("=== DEBUG AFTER SAVE ===");
 
     if (silent) return doc;
     if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", artist: doc });
