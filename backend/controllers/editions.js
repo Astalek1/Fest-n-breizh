@@ -165,17 +165,20 @@ export const updateEdition = async (req, res) => {
       const allGuestFiles = req.files?.guestFiles || [];
 
       const file =
+        allGuestFiles.find((f) =>
+          f.originalname.toLowerCase().includes((guest.fileName || guest.name || "").toLowerCase())
+        ) ||
         allGuestFiles.find(
           (f) =>
-            f.originalname.includes(guest.fileName || "") ||
-            f.originalname.toLowerCase().includes(guest.name?.toLowerCase() || "")
+            guest.mediaType === "image" &&
+            f.mimetype.startsWith("image/") &&
+            !f.originalname.toLowerCase().includes("logo")
         ) ||
-        allGuestFiles.find((f) =>
-          guest.mediaType === "image"
-            ? f.mimetype.startsWith("image/")
-            : guest.mediaType === "logo"
-            ? f.mimetype.startsWith("image/")
-            : false
+        allGuestFiles.find(
+          (f) =>
+            guest.mediaType === "logo" &&
+            f.mimetype.startsWith("image/") &&
+            f.originalname.toLowerCase().includes("logo")
         ) ||
         null;
 
