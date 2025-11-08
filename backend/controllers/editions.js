@@ -107,6 +107,11 @@ export const updateEdition = async (req, res) => {
     const updatedArtists = [];
     const updatedGuests = [];
 
+    // Faux res pour les appels internes (évite le crash sans modifier les autres contrôleurs)
+    const fakeRes = {
+      status: () => ({ json: () => {} }),
+    };
+
     // === ARTISTES ===
     console.log("=== ARTISTES ===");
     for (const [index, artistData] of (editionData.artists || []).entries()) {
@@ -126,7 +131,7 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
+      const updated = await artistsCtrl.updateArtist(fakeReq, fakeRes, true);
       console.log(`résultat updateArtist[${index}]:`, updated ? updated._id : "aucun retour");
 
       if (updated?._id) updatedArtists.push(updated._id);
@@ -151,7 +156,7 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
+      const updated = await guestsCtrl.updateGuest(fakeReq, fakeRes, true);
       console.log(`résultat updateGuest[${index}]:`, updated ? updated._id : "aucun retour");
 
       if (updated?._id) updatedGuests.push(updated._id);
