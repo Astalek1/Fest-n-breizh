@@ -9,9 +9,8 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// On exporte une fonction configurée pour 1 seul fichier “file”
-export const uploadSingle = upload.single("file");
-
-console.log("Multer middleware chargé avec single('file')");
-
+// Export par défaut : l'objet multer (comme avant, pour compatibilité globale)
 export default upload;
+
+// Export optionnel : middleware déjà configuré pour 1 fichier "media"
+export const uploadSingle = upload.single("media");
