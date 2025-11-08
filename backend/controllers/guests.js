@@ -7,23 +7,16 @@ const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
 // === CRÉER UN INVITÉ ===
+
 export const createGuest = async (req, res, silent = false) => {
   try {
-    const baseBody = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
+    const body = JSON.parse(req.body.artist || "{}");
 
-    // fusionne tous les champs (cas Postman ou front React)
-    const body = { ...baseBody, ...req.body };
-
-    if (!body.name || !body.description) {
-      return res.status(400).json({ error: "Nom et description obligatoires" });
-    }
-
-    // On fusionne les champs envoyés directement dans req.body (comme mediaType ou fileName)
-    const merged = { ...body, ...req.body };
-
-    const mediaType = (merged.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
+    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
     const baseName =
-      merged.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() || toSlug(merged.name);
+      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
+      toSlug(body.name);
 
     // === CAS VIDÉO ===
     if (mediaType === "video") {
@@ -40,7 +33,9 @@ export const createGuest = async (req, res, silent = false) => {
 
       if (silent) return doc;
       if (res)
-        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !", guest: doc });
+        return res
+          .status(201)
+          .json({ message: "Invité (vidéo) ajouté avec succès !", artist: doc });
       return;
     }
 
@@ -66,7 +61,7 @@ export const createGuest = async (req, res, silent = false) => {
     }
 
     if (!url) {
-      console.log("UPLOAD INVITÉ:", { name: body.name, mediaType, folder });
+      console.log("UPLOAD INVITES:", { name: body.name, mediaType, folder });
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) {
         if (silent) throw new Error("Média invalide");
@@ -76,14 +71,8 @@ export const createGuest = async (req, res, silent = false) => {
       fileId = up.fileId || null;
       fileName = up.fileName || baseName;
     }
-    console.log("DEBUG BODY FINAL:", {
-      name: body.name,
-      description: body.description,
-      url,
-      fileId,
-      fileName,
-    });
 
+    // === ENREGISTREMENT DU DOCUMENT ===
     const doc = new Guest({
       name: body.name,
       description: body.description,
@@ -97,9 +86,9 @@ export const createGuest = async (req, res, silent = false) => {
     await doc.save();
 
     if (silent) return doc;
-    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
+    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", artist: doc });
   } catch (error) {
-    console.error("createGuest error:", error);
+    console.error("newGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
