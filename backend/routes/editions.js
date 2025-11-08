@@ -44,7 +44,7 @@ router.post(
   auth,
   upload.single("media"),
   resizeImage,
-  guestsCtrl.createGuest
+  editionsCtrl.addGuestToEdition
 );
 
 router.put(
