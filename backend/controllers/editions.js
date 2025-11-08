@@ -93,20 +93,27 @@ export const getOneEdition = async (req, res) => {
   }
 };
 
-// === METTRE À JOUR UNE ÉDITION (logs condensés) ===
+// === METTRE À JOUR UNE ÉDITION (analyse complète + logs détaillés) ===
 export const updateEdition = async (req, res) => {
   try {
     console.log("\n=== DÉBUT updateEdition ===");
 
+    // --- Lecture des données ---
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
+    console.log("editionData keys:", Object.keys(editionData));
+
     const existingEdition = await Edition.findById(req.params.id);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
     const updatedArtists = [];
     const updatedGuests = [];
 
-    // --- ARTISTES ---
+    // ===================== ARTISTES =====================
+    console.log("=== ARTISTES ===");
+
     for (const [index, artist] of (editionData.artists || []).entries()) {
+      console.log(`→ artiste[${index}]`, artist);
+
       if (!artist._id) {
         console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
         continue;
@@ -116,6 +123,8 @@ export const updateEdition = async (req, res) => {
         req.files?.artistFiles?.[index] ||
         (req.files?.artistFiles || []).find((f) => f.originalname.includes(artist.fileName)) ||
         null;
+
+      console.log(`file artiste[${index}] présent ?`, !!file);
 
       const fakeReq = {
         params: { id: artist._id },
@@ -132,8 +141,9 @@ export const updateEdition = async (req, res) => {
       }
     }
 
-    // === INVITÉS ===
+    // ===================== INVITÉS =====================
     console.log("=== INVITÉS ===");
+
     for (const [index, guest] of (editionData.guests || []).entries()) {
       console.log(`→ invité[${index}]`, guest);
 
@@ -142,6 +152,16 @@ export const updateEdition = async (req, res) => {
         continue;
       }
 
+      // --- LOG COMPLET DES FICHIERS REÇUS ---
+      console.log(
+        `DEBUG fichiers reçus pour invité[${index}]:`,
+        req.files?.guestFiles?.map((f) => ({
+          originalname: f.originalname,
+          mimetype: f.mimetype,
+          size: f.size,
+        })) || "Aucun fichier reçu"
+      );
+
       const file =
         req.files?.guestFiles?.[index] ||
         (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
@@ -149,7 +169,7 @@ export const updateEdition = async (req, res) => {
 
       console.log(`file invité[${index}] présent ?`, !!file);
 
-      // --- AJOUT : log détaillé pour traquer l’origine du bug ---
+      // --- TEST DEBUG : détection du mediaType réel ---
       const inferredType =
         guest.mediaType?.toLowerCase() || (guest.fileName?.includes("image") ? "image" : "logo");
 
@@ -160,6 +180,19 @@ export const updateEdition = async (req, res) => {
         inferredType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités"
       );
       console.log(`DEBUG invité[${index}] → fileName:`, guest.fileName);
+
+      // --- TEST SUPPLÉMENTAIRE : analyse du comportement erroné ---
+      if (file && inferredType === "image") {
+        console.log(
+          `⚠️ TEST DEBUG CRITIQUE → invité[${index}] possède un fichier image mais risque de finir dans logo :`,
+          {
+            fileDetected: file.originalname,
+            typeDétecté: inferredType,
+            mediaTypeInitial: guest.mediaType,
+            filePathAttendu: "/festn_breizh/invités",
+          }
+        );
+      }
 
       const fakeReq = {
         params: { id: guest._id },
@@ -181,11 +214,12 @@ export const updateEdition = async (req, res) => {
       }
     }
 
-    // --- MISE À JOUR ÉDITION ---
+    // ===================== MISE À JOUR ÉDITION =====================
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
     if (updatedGuests.length) existingEdition.guests = updatedGuests;
+
     await existingEdition.save();
 
     console.log(`✅ Édition mise à jour (${existingEdition._id})`);
