@@ -121,8 +121,10 @@ export const updateEdition = async (req, res) => {
         console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
         continue;
       }
+      const file = (req.files?.guestFiles || []).find((f) =>
+        f.originalname.includes(guestData.fileName)
+      );
 
-      const file = req.files?.artistFiles?.[index] || null;
       console.log(`file artiste[${index}] présent ?`, !!file);
 
       const fakeReq = {
@@ -147,7 +149,10 @@ export const updateEdition = async (req, res) => {
         continue;
       }
 
-      const file = req.files?.guestFiles?.[index] || null;
+      const file = (req.files?.guestFiles || []).find((f) =>
+        f.originalname.includes(guestData.fileName)
+      );
+
       console.log(`file invité[${index}] présent ?`, !!file);
 
       const fakeReq = {
