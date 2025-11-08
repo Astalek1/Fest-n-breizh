@@ -80,6 +80,8 @@ export const createGuest = async (req, res, silent = false) => {
     }
 
     // === ENREGISTREMENT DU DOCUMENT ===
+    console.log("DEBUG BEFORE SAVE:", body.name, body.description);
+
     const doc = new Guest({
       name: body.name,
       description: body.description,
