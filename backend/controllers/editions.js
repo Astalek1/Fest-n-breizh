@@ -134,7 +134,7 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      const updated = await artistsCtrl.updateArtist(fakeReq, fakeRes, true);
+      const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
       console.log(`résultat updateArtist[${index}]:`, updated ? updated._id : "aucun retour");
 
       if (updated?._id) updatedArtists.push(updated._id);
@@ -163,7 +163,7 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      const updated = await guestsCtrl.updateGuest(fakeReq, fakeRes, true);
+      const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
       console.log(`résultat updateGuest[${index}]:`, updated ? updated._id : "aucun retour");
 
       if (updated?._id) updatedGuests.push(updated._id);
