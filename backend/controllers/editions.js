@@ -132,8 +132,11 @@ export const updateEdition = async (req, res) => {
       }
     }
 
-    // --- INVITÉS ---
+    // === INVITÉS ===
+    console.log("=== INVITÉS ===");
     for (const [index, guest] of (editionData.guests || []).entries()) {
+      console.log(`→ invité[${index}]`, guest);
+
       if (!guest._id) {
         console.log(`❌ invité[${index}] ignoré (pas d'_id)`);
         continue;
@@ -144,18 +147,37 @@ export const updateEdition = async (req, res) => {
         (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
         null;
 
+      console.log(`file invité[${index}] présent ?`, !!file);
+
+      // --- AJOUT : log détaillé pour traquer l’origine du bug ---
+      const inferredType =
+        guest.mediaType?.toLowerCase() || (guest.fileName?.includes("image") ? "image" : "logo");
+
+      console.log(`DEBUG invité[${index}] → mediaType avant envoi:`, guest.mediaType);
+      console.log(`DEBUG invité[${index}] → mediaType après inférence:`, inferredType);
+      console.log(
+        `DEBUG invité[${index}] → folder attendu:`,
+        inferredType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités"
+      );
+      console.log(`DEBUG invité[${index}] → fileName:`, guest.fileName);
+
       const fakeReq = {
         params: { id: guest._id },
-        body: { guest: JSON.stringify({ ...guest, mediaType: guest.mediaType || "image" }) },
+        body: {
+          guest: JSON.stringify({
+            ...guest,
+            mediaType: inferredType,
+          }),
+        },
         file,
       };
 
       try {
         const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
-        console.log(`→ invité[${index}] ${guest.name} ${updated ? "✅" : "⚠️ échec"}`);
+        console.log(`résultat updateGuest[${index}]:`, updated ? updated._id : "aucun retour");
         if (updated?._id) updatedGuests.push(updated._id);
-      } catch (e) {
-        console.error(`⚠️ updateGuest[${index}] ${guest.name}:`, e.message);
+      } catch (err) {
+        console.error(`❌ Erreur updateGuest[${index}] (${guest.name}) →`, err.message);
       }
     }
 
