@@ -9,4 +9,4 @@ const guestsSchema = mongoose.Schema({
   logoFileId: { type: String },
   mediaName: { type: String },
 });
-export default mongoose.model("guests", guestsSchema);
+export default mongoose.model("Guests", guestsSchema);
