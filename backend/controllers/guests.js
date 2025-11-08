@@ -272,8 +272,12 @@ export const updateGuest = async (req, res, silent = false) => {
     if (silent) return updated;
     res.status(200).json(updated);
   } catch (error) {
-    console.error("updateArtist error:", error);
-    res.status(500).json({ error: error.message });
+    console.error("updateGuest error:", error);
+    if (!silent && res) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw error;
+    }
   }
 };
 

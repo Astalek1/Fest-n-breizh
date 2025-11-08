@@ -276,7 +276,11 @@ export const updateArtist = async (req, res, silent = false) => {
     res.status(200).json(updated);
   } catch (error) {
     console.error("updateArtist error:", error);
-    res.status(500).json({ error: error.message });
+    if (!silent && res) {
+      res.status(500).json({ error: error.message });
+    } else {
+      throw error;
+    }
   }
 };
 
