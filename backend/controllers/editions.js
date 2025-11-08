@@ -35,13 +35,12 @@ export const createEdition = async (req, res) => {
     // --- INVITÉS ---
     const guestDocs = [];
     const uploadedGuestFiles = req.files?.guestFiles || [];
-    let fileCursor = 0; // Curseur pour parcourir les fichiers réellement envoyés
+    let fileCursor = 0;
 
     console.log("DEBUG req.files.guestFiles length:", uploadedGuestFiles.length);
     uploadedGuestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
 
     for (const [index, guestData] of (editionData.guests || []).entries()) {
-      // Prend un fichier seulement si nécessaire (image ou logo sans mediaFileId)
       const needsFile = guestData.mediaType !== "video" && !guestData.mediaFileId;
       const mediaFile = needsFile ? uploadedGuestFiles[fileCursor++] || null : null;
 
@@ -70,7 +69,10 @@ export const createEdition = async (req, res) => {
     });
 
     await newEdition.save();
-    res.status(201).json({ message: "Édition créée avec succès", edition: newEdition });
+    res.status(201).json({
+      message: "Édition créée avec succès",
+      edition: newEdition,
+    });
   } catch (error) {
     console.error("createEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
@@ -101,12 +103,50 @@ export const getOneEdition = async (req, res) => {
   }
 };
 
-// === METTRE À JOUR UNE ÉDITION (analyse complète + logs détaillés) ===
+// === AJOUTER UN INVITÉ À UNE ÉDITION EXISTANTE ===
+export const addGuestToEdition = async (req, res) => {
+  try {
+    console.log("=== Route guests POST appelée ===");
+
+    const { editionId } = req.params;
+    console.log("DEBUG editionId:", editionId);
+
+    const edition = await Edition.findById(editionId);
+    if (!edition) {
+      console.log("❌ Aucune édition trouvée pour cet ID");
+      return res.status(404).json({ error: "Édition non trouvée" });
+    }
+
+    console.log("DEBUG création de l'invité...");
+    const newGuest = await guestsCtrl.createGuest(req, null, true);
+
+    if (!newGuest || !newGuest._id) {
+      console.log("❌ Erreur lors de la création de l'invité");
+      return res.status(400).json({ error: "Impossible de créer l'invité" });
+    }
+
+    console.log("✅ Invité créé :", newGuest._id);
+
+    edition.guests.push(newGuest._id);
+    await edition.save();
+
+    console.log(`✅ Invité ajouté à l'édition ${editionId}`);
+    res.status(201).json({
+      message: "Invité ajouté avec succès à l'édition",
+      guest: newGuest,
+      editionId,
+    });
+  } catch (error) {
+    console.error("addGuestToEdition error:", error);
+    res.status(500).json({ error: "Erreur serveur (addGuestToEdition)" });
+  }
+};
+
+// === METTRE À JOUR UNE ÉDITION ===
 export const updateEdition = async (req, res) => {
   try {
     console.log("\n=== DÉBUT updateEdition ===");
 
-    // --- Lecture des données ---
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
     console.log("editionData keys:", Object.keys(editionData));
 
@@ -116,135 +156,38 @@ export const updateEdition = async (req, res) => {
     const updatedArtists = [];
     const updatedGuests = [];
 
-    // ===================== ARTISTES =====================
     console.log("=== ARTISTES ===");
-
     for (const [index, artist] of (editionData.artists || []).entries()) {
-      console.log(`→ artiste[${index}]`, artist);
-
-      if (!artist._id) {
-        console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
-        continue;
-      }
-
+      if (!artist._id) continue;
       const file =
         req.files?.artistFiles?.[index] ||
         (req.files?.artistFiles || []).find((f) => f.originalname.includes(artist.fileName)) ||
         null;
-
-      console.log(`file artiste[${index}] présent ?`, !!file);
-
       const fakeReq = {
         params: { id: artist._id },
         body: { artist: JSON.stringify(artist) },
         file,
       };
-
-      try {
-        const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
-        console.log(`→ artiste[${index}] ${artist.name} ${updated ? "✅" : "⚠️ échec"}`);
-        if (updated?._id) updatedArtists.push(updated._id);
-      } catch (e) {
-        console.error(`⚠️ updateArtist[${index}] ${artist.name}:`, e.message);
-      }
+      const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
+      if (updated?._id) updatedArtists.push(updated._id);
     }
 
-    // ===================== INVITÉS =====================
     console.log("=== INVITÉS ===");
-
     for (const [index, guest] of (editionData.guests || []).entries()) {
-      console.log(`→ invité[${index}]`, guest);
-
-      if (!guest._id) {
-        console.log(`❌ invité[${index}] ignoré (pas d'_id)`);
-        continue;
-      }
-
-      // --- LOG COMPLET DES FICHIERS REÇUS ---
-      console.log(
-        `DEBUG fichiers reçus pour invité[${index}]:`,
-        req.files?.guestFiles?.map((f) => ({
-          originalname: f.originalname,
-          mimetype: f.mimetype,
-          size: f.size,
-        })) || "Aucun fichier reçu"
-      );
-
-      const allGuestFiles = req.files?.guestFiles || [];
-
+      if (!guest._id) continue;
       const file =
-        allGuestFiles.find((f) =>
-          f.originalname.toLowerCase().includes((guest.fileName || guest.name || "").toLowerCase())
-        ) ||
-        allGuestFiles.find(
-          (f) =>
-            guest.mediaType === "image" &&
-            f.mimetype.startsWith("image/") &&
-            !f.originalname.toLowerCase().includes("logo")
-        ) ||
-        allGuestFiles.find(
-          (f) =>
-            guest.mediaType === "logo" &&
-            f.mimetype.startsWith("image/") &&
-            f.originalname.toLowerCase().includes("logo")
-        ) ||
+        req.files?.guestFiles?.[index] ||
+        (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
         null;
-
-      console.log(`file invité[${index}] présent ?`, !!file);
-
-      // --- TEST DEBUG : détection du mediaType réel ---
-      const inferredType =
-        guest.mediaType?.toLowerCase() || (guest.fileName?.includes("image") ? "image" : "logo");
-
-      console.log(`DEBUG invité[${index}] → mediaType avant envoi:`, guest.mediaType);
-      console.log(`DEBUG invité[${index}] → mediaType après inférence:`, inferredType);
-      console.log(
-        `DEBUG invité[${index}] → folder attendu:`,
-        inferredType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/invités"
-      );
-      console.log(`DEBUG invité[${index}] → fileName:`, guest.fileName);
-
-      // --- TEST SUPPLÉMENTAIRE : analyse du comportement erroné ---
-      if (file && inferredType === "image") {
-        console.log(
-          `⚠️ TEST DEBUG CRITIQUE → invité[${index}] possède un fichier image mais risque de finir dans logo :`,
-          {
-            fileDetected: file.originalname,
-            typeDétecté: inferredType,
-            mediaTypeInitial: guest.mediaType,
-            filePathAttendu: "/festn_breizh/invités",
-          }
-        );
-      }
-      // --- Vérification stricte pour éviter les doublons de logos existants ---
-      if (guest.mediaFileId && guest.mediaType === "logo") {
-        console.log(
-          `⚠️ INVITÉ[${index}] a un logo existant (ID: ${guest.mediaFileId}), on ignore tout upload pour éviter le doublon.`
-        );
-        file = null; // On désactive le fichier uploadé
-      }
-
       const fakeReq = {
         params: { id: guest._id },
-        body: {
-          guest: JSON.stringify({
-            ...guest,
-            mediaType: inferredType,
-          }),
-        },
+        body: { guest: JSON.stringify(guest) },
         file,
       };
-
-      try {
-        const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
-        console.log(`résultat updateGuest[${index}]:`, updated ? updated._id : "aucun retour");
-        if (updated?._id) updatedGuests.push(updated._id);
-      } catch (err) {
-        console.error(`❌ Erreur updateGuest[${index}] (${guest.name}) →`, err.message);
-      }
+      const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
+      if (updated?._id) updatedGuests.push(updated._id);
     }
 
-    // ===================== MISE À JOUR ÉDITION =====================
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
@@ -253,10 +196,6 @@ export const updateEdition = async (req, res) => {
     await existingEdition.save();
 
     console.log(`✅ Édition mise à jour (${existingEdition._id})`);
-    console.log("→ Artistes :", updatedArtists.length);
-    console.log("→ Invités :", updatedGuests.length);
-    console.log("=== FIN updateEdition ===\n");
-
     res.status(200).json({
       message: "Édition mise à jour avec succès",
       edition: existingEdition,
