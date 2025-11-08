@@ -121,9 +121,10 @@ export const updateEdition = async (req, res) => {
         console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
         continue;
       }
-      const file = (req.files?.artistFilesFiles || []).find((f) =>
-        f.originalname.includes(artistDataData.fileName)
-      );
+      const file =
+        req.files?.artistFiles?.[index] ||
+        (req.files?.artistFiles || []).find((f) => f.originalname.includes(artistData.fileName)) ||
+        null;
 
       console.log(`file artiste[${index}] présent ?`, !!file);
 
@@ -149,9 +150,10 @@ export const updateEdition = async (req, res) => {
         continue;
       }
 
-      const file = (req.files?.guestFiles || []).find((f) =>
-        f.originalname.includes(guestData.fileName)
-      );
+      const file =
+        req.files?.guestFiles?.[index] ||
+        (req.files?.guestFiles || []).find((f) => f.originalname.includes(guestData.fileName)) ||
+        null;
 
       console.log(`file invité[${index}] présent ?`, !!file);
 
