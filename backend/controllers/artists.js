@@ -21,15 +21,20 @@ export const createArtist = async (req, res, silent = false) => {
       const doc = new Artist({
         name: body.name,
         description: body.description,
-        media: body.media || null, // URL vidéo
+        media: body.media || null,
         mediaFileId: null,
         logo: null,
         logoFileId: null,
         mediaName: baseName,
       });
       await doc.save();
+
       if (silent) return doc;
-      if (res) return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès !" });
+      if (res)
+        return res
+          .status(201)
+          .json({ message: "Artiste (vidéo) ajouté avec succès !", artist: doc });
+      return;
     }
 
     // === DÉTERMINATION DU DOSSIER ===
@@ -79,7 +84,7 @@ export const createArtist = async (req, res, silent = false) => {
     await doc.save();
 
     if (silent) return doc;
-    if (res) res.status(201).json({ message: "Artiste ajouté avec succès !" });
+    if (res) return res.status(201).json({ message: "Artiste ajouté avec succès !", artist: doc });
   } catch (error) {
     console.error("newArtist error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });

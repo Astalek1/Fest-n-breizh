@@ -22,15 +22,18 @@ export const createGuest = async (req, res, silent = false) => {
       const doc = new Guest({
         name: body.name,
         description: body.description,
-        media: body.media || null, // URL vidéo
+        media: body.media || null,
         mediaFileId: null,
         logo: null,
         logoFileId: null,
         mediaName: baseName,
       });
       await doc.save();
+
       if (silent) return doc;
-      if (res) return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !" });
+      if (res)
+        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès !", guest: doc });
+      return;
     }
 
     // === DÉTERMINATION DU DOSSIER ===
@@ -56,11 +59,6 @@ export const createGuest = async (req, res, silent = false) => {
 
     if (!url) {
       console.log("UPLOAD INVITÉ:", { name: body.name, mediaType, folder });
-      console.log("req.file présent ?", !!req.file);
-
-      // a suprimer apres test
-      console.log("DEBUG createGuest → req.file:", !!req.file, "mediaType:", mediaType);
-
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) {
         if (silent) throw new Error("Média invalide");
@@ -85,7 +83,7 @@ export const createGuest = async (req, res, silent = false) => {
     await doc.save();
 
     if (silent) return doc;
-    if (res) res.status(201).json({ message: "Invité ajouté avec succès !" });
+    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
   } catch (error) {
     console.error("newGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
