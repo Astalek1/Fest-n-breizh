@@ -9,9 +9,9 @@ const router = express.Router();
 router.get("/", guestsCtrl.getAllGuests);
 router.get("/:id", guestsCtrl.getOneGuest);
 
-router.post("/", auth, multer.single("media"), resizeImage, guestsCtrl.createGuest);
+router.post("/", auth, multer.single("file"), resizeImage, guestsCtrl.createGuest);
 
-router.put("/:id", auth, multer.single("media"), resizeImage, guestsCtrl.updateGuest);
+router.put("/:id", auth, multer.single("file"), resizeImage, guestsCtrl.updateGuest);
 
 router.delete("/:id", auth, guestsCtrl.deleteGuest);
 
