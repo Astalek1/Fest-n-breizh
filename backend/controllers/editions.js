@@ -1,8 +1,13 @@
 import Edition from "../models/Editions.js";
 import * as artistsCtrl from "./artists.js";
 import * as guestsCtrl from "./guests.js";
-import "../models/Artists.js";
-import "../models/Guests.js";
+import mongoose from "mongoose";
+import Guest from "../models/Guests.js";
+import Artist from "../models/Artists.js";
+
+// Forcer l’enregistrement si Mongoose n’a pas encore les modèles
+if (!mongoose.models.Guest) mongoose.model("Guest", Guest.schema);
+if (!mongoose.models.Artist) mongoose.model("Artist", Artist.schema);
 
 // === CRÉER UNE NOUVELLE ÉDITION ===
 export const createEdition = async (req, res) => {
