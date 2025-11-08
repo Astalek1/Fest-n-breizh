@@ -110,7 +110,10 @@ export const getAllArtists = async (req, res) => {
 export const updateArtist = async (req, res, silent = false) => {
   try {
     const existing = await Artist.findById(req.params.id);
-    if (!existing) return res.status(404).json("artiste non trouvé");
+    if (!existing) {
+      if (!silent && res) return res.status(404).json("artiste non trouvé");
+      else throw new Error("artiste non trouvé");
+    }
 
     const body = req.body.artist ? JSON.parse(req.body.artist) : req.body;
 

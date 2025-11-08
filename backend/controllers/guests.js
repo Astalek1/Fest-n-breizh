@@ -117,7 +117,10 @@ export const getOneGuest = async (req, res) => {
 export const updateGuest = async (req, res, silent = false) => {
   try {
     const existing = await Guest.findById(req.params.id);
-    if (!existing) return res.status(404).json("Invité non trouvé");
+    if (!existing) {
+      if (!silent && res) return res.status(404).json("innvité non trouvé");
+      else throw new Error("invité non trouvé");
+    }
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
 
