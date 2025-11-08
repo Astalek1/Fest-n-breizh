@@ -208,6 +208,13 @@ export const updateEdition = async (req, res) => {
           }
         );
       }
+      // --- Vérification stricte pour éviter les doublons de logos existants ---
+      if (guest.mediaFileId && guest.mediaType === "logo") {
+        console.log(
+          `⚠️ INVITÉ[${index}] a un logo existant (ID: ${guest.mediaFileId}), on ignore tout upload pour éviter le doublon.`
+        );
+        file = null; // On désactive le fichier uploadé
+      }
 
       const fakeReq = {
         params: { id: guest._id },
