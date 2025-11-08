@@ -12,11 +12,12 @@ export const createGuest = async (req, res, silent = false) => {
     // Si le champ "guest" est un JSON brut, on le parse, sinon on garde req.body directement
     const body = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
 
-    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
+    // On fusionne les champs envoyés directement dans req.body (comme mediaType ou fileName)
+    const merged = { ...body, ...req.body };
+
+    const mediaType = (merged.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
     const baseName =
-      req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
-      toSlug(body.name);
+      merged.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() || toSlug(merged.name);
 
     // === CAS VIDÉO ===
     if (mediaType === "video") {
