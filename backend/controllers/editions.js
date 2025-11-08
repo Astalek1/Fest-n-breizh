@@ -121,8 +121,8 @@ export const updateEdition = async (req, res) => {
         console.log(`❌ artiste[${index}] ignoré (pas d'_id)`);
         continue;
       }
-      const file = (req.files?.guestFiles || []).find((f) =>
-        f.originalname.includes(guestData.fileName)
+      const file = (req.files?.artistFilesFiles || []).find((f) =>
+        f.originalname.includes(artistDataData.fileName)
       );
 
       console.log(`file artiste[${index}] présent ?`, !!file);
