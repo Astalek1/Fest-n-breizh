@@ -50,10 +50,7 @@ router.post(
 router.put(
   "/:editionId/guests/:guestId",
   auth,
-  upload.fields([
-    { name: "media", maxCount: 1 },
-    { name: "guestFiles", maxCount: 10 },
-  ]),
+  upload.single("media"),
   resizeImage,
   editionsCtrl.updateEdition
 );
