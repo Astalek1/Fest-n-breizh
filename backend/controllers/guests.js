@@ -189,6 +189,17 @@ export const updateGuest = async (req, res, silent = false) => {
     let newLogoId = null;
 
     // --- 2) Préparation de la mise à jour ---
+    console.log(
+      "DEBUG sentNewMedia:",
+      sentNewMedia,
+      "| req.file:",
+      !!req.file,
+      "| body.media:",
+      !!body.media,
+      "| mediaType:",
+      mediaType
+    );
+
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;
@@ -210,7 +221,6 @@ export const updateGuest = async (req, res, silent = false) => {
         let fileId = null;
         let fileName = null;
 
-        console.log("DEBUG reuse test:", body.media, "isFileId:", isFileId(body.media));
         if (isFileId(body.media)) {
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
