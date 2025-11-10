@@ -341,13 +341,15 @@ export const updateGuest = async (req, res, silent = false) => {
 // === SUPPRIMER UN INVITÉ ===
 export const deleteGuest = async (req, res) => {
   try {
-    const guest = await Guest.findById(req.params.id);
+    const guestId = req.params.guestId || req.params.id;
+    const guest = await Guest.findById(guestId);
+
     if (!guest) return res.status(404).json("Invité non trouvé");
 
     const imgId = guest.mediaFileId || null;
     const logoId = guest.logoFileId || null;
 
-    await Guest.findByIdAndDelete(req.params.id);
+    await Guest.findByIdAndDelete(guestId);
 
     if (imgId) {
       try {
