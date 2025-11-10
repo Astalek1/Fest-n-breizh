@@ -42,10 +42,7 @@ router.delete("/:id", auth, editionsCtrl.deleteEdition);
 router.post(
   "/:editionId/guests",
   auth,
-  upload.fields([
-    { name: "media", maxCount: 1 },
-    { name: "guestFiles", maxCount: 10 },
-  ]),
+  upload.fields([{ name: "media", maxCount: 10 }]),
   resizeImage,
   editionsCtrl.addGuestToEdition
 );
