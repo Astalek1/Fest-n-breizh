@@ -166,6 +166,8 @@ export const updateGuest = async (req, res, silent = false) => {
     }
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
+
+    if (!body.media && req.body.media) body.media = req.body.media;
     if (!body.mediaType && req.body.mediaType) body.mediaType = req.body.mediaType;
 
     // --- 1) Champs textuels ---
