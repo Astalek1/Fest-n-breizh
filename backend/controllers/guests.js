@@ -197,14 +197,13 @@ export const updateGuest = async (req, res, silent = false) => {
         filtered.logoFileId = null;
         filtered.mediaName = baseName;
       } else {
+        const isLogo = mediaType === "logo";
         console.log(
           "DEBUG updateGuest mediaType:",
           mediaType,
           "→ dossier:",
           isLogo ? "logos" : "invités"
         );
-
-        const isLogo = mediaType === "logo";
         const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
         let url = null;
