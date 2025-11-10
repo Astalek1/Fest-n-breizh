@@ -113,10 +113,10 @@ export const addGuestToEdition = async (req, res) => {
     if (!edition) return res.status(404).json("Édition non trouvée");
 
     // Vérifie si on a plusieurs invités (tableau) ou un seul
-    const multiple = Array.isArray(req.body.guests);
+    const multiple = Array.isArray(req.body.guest);
     const guestsData = multiple
-      ? req.body.guests.map((g) => (typeof g === "string" ? JSON.parse(g) : g))
-      : [req.body.guest ? JSON.parse(req.body.guest) : req.body];
+      ? req.body.guest.map((g) => (typeof g === "string" ? JSON.parse(g) : g))
+      : [typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body];
 
     const files = req.files?.media || (req.file ? [req.file] : []);
     const createdGuests = [];
