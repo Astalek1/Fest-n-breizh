@@ -114,7 +114,9 @@ export const getAllArtists = async (req, res) => {
 // Modifier un artiste
 export const updateArtist = async (req, res, silent = false) => {
   try {
-    const existing = await Artist.findById(req.params.id);
+    const artistId = req.params.artistId || req.params.id;
+    const existing = await Artist.findById(artistId);
+
     if (!existing) {
       if (!silent && res) return res.status(404).json("artiste non trouvé");
       else throw new Error("artiste non trouvé");

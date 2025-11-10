@@ -157,7 +157,9 @@ export const getOneGuest = async (req, res) => {
 // === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
   try {
-    const existing = await Guest.findById(req.params.id);
+    const guestId = req.params.guestId || req.params.id;
+    const existing = await Guest.findById(guestId);
+
     if (!existing) {
       if (!silent && res) return res.status(404).json("Invité non trouvé");
       else throw new Error("Invité non trouvé");

@@ -9,8 +9,6 @@ const router = express.Router();
 router.get("/", guestsCtrl.getAllGuests);
 router.get("/:id", guestsCtrl.getOneGuest);
 
-console.log("Route guests POST appelée");
-
 router.post("/", auth, multer.single("media"), resizeImage, guestsCtrl.createGuest);
 
 router.put("/:id", auth, multer.single("media"), resizeImage, guestsCtrl.updateGuest);
