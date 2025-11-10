@@ -144,6 +144,18 @@ export const addGuestToEdition = async (req, res) => {
 
 // === METTRE À JOUR UNE ÉDITION ===
 export const updateEdition = async (req, res) => {
+  const { editionId, guestId } = req.params;
+
+  if (guestId) {
+    console.log("🔁 Mode édition invité spécifique");
+    const fakeReq = {
+      params: { id: guestId },
+      body: req.body,
+      file: req.file,
+    };
+    return await guestsCtrl.updateGuest(fakeReq, res, false);
+  }
+
   console.log("\n🧩 CHECKPOINT 0 – Entrée dans updateEdition()");
   try {
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
