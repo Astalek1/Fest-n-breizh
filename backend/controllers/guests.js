@@ -255,10 +255,15 @@ export const updateGuest = async (req, res, silent = false) => {
 
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
         try {
-          await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée :", oldImageId);
+          const details = await imagekit.getFileDetails(oldImageId).catch(() => null);
+          if (details) {
+            await imagekit.deleteFile(oldImageId);
+            console.log("✅ Ancienne image supprimée :", oldImageId);
+          } else {
+            console.warn("⚠️ Ancienne image déjà inexistante :", oldImageId);
+          }
         } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
+          console.error("Erreur suppression ancienne image :", e?.message || e);
         }
       }
 
