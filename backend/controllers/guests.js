@@ -320,8 +320,16 @@ export const updateGuest = async (req, res, silent = false) => {
     }
 
     // --- 5) Réponse finale ---
-    if (silent) return updated;
-    res.status(200).json(updated);
+    if (silent) {
+      console.log("✅ updateGuest (mode silencieux) terminé :", updated?._id);
+      return updated;
+    }
+
+    if (res && !silent) {
+      console.log("✅ updateGuest terminé :", updated?._id);
+      res.status(200).json(updated);
+      return;
+    }
   } catch (error) {
     console.error("updateGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
