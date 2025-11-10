@@ -103,7 +103,7 @@ export const getOneEdition = async (req, res) => {
   }
 };
 
-// === AJOUTER UN OU PLUSIEURS INVITÉS À UNE ÉDITION ===
+// === AJOUTER UN INVITÉ À UNE ÉDITION ===
 export const addGuestToEdition = async (req, res) => {
   try {
     console.log("🧩 Entrée dans addGuestToEdition()");
@@ -112,44 +112,33 @@ export const addGuestToEdition = async (req, res) => {
     const edition = await Edition.findById(editionId);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    // Vérifie si on a plusieurs invités (tableau) ou un seul
-    const multiple = Array.isArray(req.body.guest);
-    const guestsData = multiple
-      ? req.body.guest.map((g) => (typeof g === "string" ? JSON.parse(g) : g))
-      : [typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body];
+    // Traitement du body (string JSON ou objet direct)
+    const guestData = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
 
-    const files = req.files?.media || (req.file ? [req.file] : []);
-    const createdGuests = [];
+    // Récupération du fichier envoyé (image/logo/vidéo)
+    const file = req.file || (req.files?.media ? req.files.media[0] : null);
 
-    for (const [index, guestData] of guestsData.entries()) {
-      const file = files[index] || null;
+    // Création de l’invité
+    const fakeReq = {
+      params: {},
+      body: guestData,
+      file,
+    };
 
-      const fakeReq = {
-        params: {},
-        body: guestData,
-        file,
-      };
+    const createdGuest = await guestsCtrl.createGuest(fakeReq, null, true);
 
-      const createdGuest = await guestsCtrl.createGuest(fakeReq, null, true);
-      if (createdGuest?._id) {
-        createdGuests.push(createdGuest._id);
-        edition.guests.push(createdGuest._id);
-      }
+    if (!createdGuest?._id) {
+      return res.status(400).json({ message: "Échec de la création de l’invité" });
     }
 
+    // Ajout à l’édition
+    edition.guests.push(createdGuest._id);
     await edition.save();
-    console.log(`✅ ${createdGuests.length} invité(s) ajouté(s) à l'édition ${editionId}`);
 
-    if (createdGuests.length === 0) {
-      return res.status(400).json({
-        message: "Échec : aucun invité n’a été ajouté",
-        guests: [],
-      });
-    }
-
+    console.log(`✅ Invité ajouté à l’édition ${editionId}`);
     res.status(201).json({
-      message: `${createdGuests.length} invité(s) ajouté(s) avec succès`,
-      guests: createdGuests,
+      message: "Invité ajouté avec succès",
+      guest: createdGuest,
     });
   } catch (error) {
     console.error("addGuestToEdition error:", error);
