@@ -52,7 +52,6 @@ router.put(
   auth,
   upload.fields([
     { name: "media", maxCount: 1 },
-    { name: "artistFiles", maxCount: 10 },
     { name: "guestFiles", maxCount: 10 },
   ]),
   resizeImage,

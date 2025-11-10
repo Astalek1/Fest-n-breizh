@@ -149,7 +149,7 @@ export const updateEdition = async (req, res) => {
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
     console.log("CHECKPOINT 1 – editionData keys:", Object.keys(editionData));
 
-    const existingEdition = await Edition.findById(req.params.id);
+    const existingEdition = await Edition.findById(req.params.editionId || req.params.id);
     console.log("CHECKPOINT 2 – Edition trouvée:", !!existingEdition);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
