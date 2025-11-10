@@ -153,6 +153,12 @@ export const updateEdition = async (req, res) => {
       body: req.body,
       file: req.file,
     };
+
+    console.log("🎯 DEBUG updateEdition -> guest update:");
+    console.log("req.file:", !!req.file);
+    console.log("req.body keys:", Object.keys(req.body));
+    console.log("guestId:", guestId);
+
     return await guestsCtrl.updateGuest(fakeReq, res, false);
   }
 
