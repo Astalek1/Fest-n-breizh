@@ -126,7 +126,7 @@ export const addGuestToEdition = async (req, res) => {
 
       const fakeReq = {
         params: {},
-        body: { guest: JSON.stringify(guestData) },
+        body: guestData,
         file,
       };
 
@@ -139,6 +139,13 @@ export const addGuestToEdition = async (req, res) => {
 
     await edition.save();
     console.log(`✅ ${createdGuests.length} invité(s) ajouté(s) à l'édition ${editionId}`);
+
+    if (createdGuests.length === 0) {
+      return res.status(400).json({
+        message: "Échec : aucun invité n’a été ajouté",
+        guests: [],
+      });
+    }
 
     res.status(201).json({
       message: `${createdGuests.length} invité(s) ajouté(s) avec succès`,
