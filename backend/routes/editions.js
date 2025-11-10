@@ -52,7 +52,7 @@ router.put(
   auth,
   upload.single("media"),
   resizeImage,
-  guestsCtrl.updateGuest
+  editionsCtrl.updateEdition
 );
 
 router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
