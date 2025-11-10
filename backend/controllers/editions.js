@@ -113,7 +113,16 @@ export const addGuestToEdition = async (req, res) => {
     if (!edition) return res.status(404).json("Édition non trouvée");
 
     // Traitement du body (string JSON ou objet direct)
-    const guestData = typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body;
+    let guestData;
+    try {
+      guestData =
+        typeof req.body.guest === "string"
+          ? JSON.parse(req.body.guest)
+          : req.body.guest || req.body;
+    } catch (e) {
+      console.warn("⚠️ Impossible de parser req.body.guest, contenu brut:", req.body.guest);
+      guestData = req.body.guest || req.body || {};
+    }
 
     // Récupération du fichier envoyé (image/logo/vidéo)
     const file = req.file || (req.files?.media ? req.files.media[0] : null);
