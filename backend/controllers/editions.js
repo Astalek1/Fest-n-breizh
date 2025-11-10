@@ -213,7 +213,7 @@ export const updateEdition = async (req, res) => {
 
       const fakeReq = {
         params: { id: guest._id },
-        body: { guest: JSON.stringify(guest) },
+        body: { guest: JSON.stringify(guest), mediaType: guest.mediaType },
         file,
       };
 
