@@ -118,7 +118,7 @@ export const addGuestToEdition = async (req, res) => {
       ? req.body.guests.map((g) => (typeof g === "string" ? JSON.parse(g) : g))
       : [req.body.guest ? JSON.parse(req.body.guest) : req.body];
 
-    const files = req.files?.guestFiles || (req.file ? [req.file] : []);
+    const files = req.files?.media || (req.file ? [req.file] : []);
     const createdGuests = [];
 
     for (const [index, guestData] of guestsData.entries()) {
