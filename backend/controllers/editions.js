@@ -112,35 +112,29 @@ export const addGuestToEdition = async (req, res) => {
     const edition = await Edition.findById(editionId);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    // Traitement du body (string JSON ou objet direct)
-    let guestData;
-    try {
-      guestData =
-        typeof req.body.guest === "string"
-          ? JSON.parse(req.body.guest)
-          : req.body.guest || req.body;
-    } catch (e) {
-      console.warn("⚠️ Impossible de parser req.body.guest, contenu brut:", req.body.guest);
-      guestData = req.body.guest || req.body || {};
-    }
+    // ✅ Récupération et parsing du body (gestion Postman)
+    const guestData =
+      typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body.guest || req.body;
 
-    // Récupération du fichier envoyé (image/logo/vidéo)
+    console.log("DEBUG guest body:", guestData);
+
+    // ✅ Récupération du fichier média
     const file = req.file || (req.files?.media ? req.files.media[0] : null);
 
-    // Création de l’invité
+    // ✅ Construction d'une requête factice pour createGuest()
     const fakeReq = {
       params: {},
-      body: guestData,
+      body: { guest: JSON.stringify(guestData) }, // 🔥 c’est ce qui manquait
       file,
     };
 
+    // ✅ Création de l’invité
     const createdGuest = await guestsCtrl.createGuest(fakeReq, null, true);
-
     if (!createdGuest?._id) {
       return res.status(400).json({ message: "Échec de la création de l’invité" });
     }
 
-    // Ajout à l’édition
+    // ✅ Ajout à l’édition
     edition.guests.push(createdGuest._id);
     await edition.save();
 
