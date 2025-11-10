@@ -144,65 +144,92 @@ export const addGuestToEdition = async (req, res) => {
 
 // === METTRE À JOUR UNE ÉDITION ===
 export const updateEdition = async (req, res) => {
+  console.log("\n🧩 CHECKPOINT 0 – Entrée dans updateEdition()");
   try {
-    console.log("\n=== DÉBUT updateEdition ===");
-
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
-    console.log("editionData keys:", Object.keys(editionData));
+    console.log("CHECKPOINT 1 – editionData keys:", Object.keys(editionData));
 
     const existingEdition = await Edition.findById(req.params.id);
+    console.log("CHECKPOINT 2 – Edition trouvée:", !!existingEdition);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
     const updatedArtists = [];
     const updatedGuests = [];
 
-    console.log("=== ARTISTES ===");
+    // === ARTISTES ===
+    console.log("CHECKPOINT 3 – Début boucle ARTISTES");
     for (const [index, artist] of (editionData.artists || []).entries()) {
+      console.log(`CHECKPOINT 3.${index} – Traitement artiste ${artist._id || "sans ID"}`);
       if (!artist._id) continue;
+
       const file =
         req.files?.artistFiles?.[index] ||
         (req.files?.artistFiles || []).find((f) => f.originalname.includes(artist.fileName)) ||
         null;
+      console.log(`CHECKPOINT 3.${index}.1 – Fichier trouvé:`, !!file);
+
       const fakeReq = {
         params: { id: artist._id },
         body: { artist: JSON.stringify(artist) },
         file,
       };
+
+      console.log(`CHECKPOINT 3.${index}.2 – Appel updateArtist()`);
       const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
+      console.log(`CHECKPOINT 3.${index}.3 – Résultat updateArtist:`, !!updated);
+
       if (updated?._id) updatedArtists.push(updated._id);
     }
 
-    console.log("=== INVITÉS ===");
+    // === INVITÉS ===
+    console.log("CHECKPOINT 4 – Début boucle INVITÉS");
     for (const [index, guest] of (editionData.guests || []).entries()) {
+      console.log(`CHECKPOINT 4.${index} – Traitement invité ${guest._id || "sans ID"}`);
       if (!guest._id) continue;
+
       const file =
         req.files?.guestFiles?.[index] ||
         (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
         null;
+      console.log(`CHECKPOINT 4.${index}.1 – Fichier trouvé:`, !!file);
+
       const fakeReq = {
         params: { id: guest._id },
         body: { guest: JSON.stringify(guest) },
         file,
       };
+
+      console.log(`CHECKPOINT 4.${index}.2 – Appel updateGuest()`);
       const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
+      console.log(`CHECKPOINT 4.${index}.3 – Résultat updateGuest:`, !!updated);
+
       if (updated?._id) updatedGuests.push(updated._id);
     }
 
+    console.log("CHECKPOINT 5 – Fin des boucles, maj Edition");
+
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
+
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
     if (updatedGuests.length) existingEdition.guests = updatedGuests;
 
+    console.log("CHECKPOINT 6 – Sauvegarde de l’édition en base");
     await existingEdition.save();
 
-    console.log(`✅ Édition mise à jour (${existingEdition._id})`);
+    console.log(`✅ CHECKPOINT 7 – Édition mise à jour (${existingEdition._id})`);
+
     res.status(200).json({
       message: "Édition mise à jour avec succès",
       edition: existingEdition,
     });
+
+    console.log("CHECKPOINT 8 – Réponse envoyée");
   } catch (error) {
-    console.error("updateEdition error:", error);
+    console.error("❌ updateEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
+  } finally {
+    console.log("🧩 CHECKPOINT 9 – FIN FONCTION REELLE updateEdition()");
   }
 };
 
