@@ -61,7 +61,7 @@ router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
 router.post(
   "/:editionId/artists",
   auth,
-  upload.single("media"),
+  upload.single([{ name: "media", maxCount: 10 }]),
   resizeImage,
   artistsCtrl.createArtist
 );
