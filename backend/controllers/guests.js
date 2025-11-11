@@ -7,7 +7,6 @@ const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
 // === CRÉER UN INVITÉ ===
-
 export const createGuest = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
@@ -21,31 +20,27 @@ export const createGuest = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(body.name);
 
-    // === CAS VIDÉO ===
-    if (mediaType === "video") {
+    // === CAS VIDÉO (URL YouTube ou autre) ===
+    if (mediaType === "video" && body.media) {
+      console.log("🎬 Invité avec vidéo, aucun upload requis");
       const doc = new Guest({
         name: body.name,
         description: body.description,
-        media: body.media || null,
+        media: body.media,
         mediaFileId: null,
         logo: null,
         logoFileId: null,
         mediaName: baseName,
       });
-      console.log("DEBUG new Guest =>", {
-        name: body.name,
-        description: body.description,
-        media: isLogo ? null : url,
-      });
-
       await doc.save();
+
       if (req.body.editionId) {
         try {
           const Edition = (await import("../models/Edition.js")).default;
           await Edition.findByIdAndUpdate(req.body.editionId, {
             $push: { guests: doc._id },
           });
-          console.log("✅ Invité lié à l’édition :", req.body.editionId);
+          console.log("✅ Invité (vidéo) lié à l’édition :", req.body.editionId);
         } catch (err) {
           console.error("❌ Erreur liaison invité/édition :", err.message);
         }
@@ -53,17 +48,40 @@ export const createGuest = async (req, res, silent = false) => {
 
       if (silent) return doc;
       if (res)
-        return res
-          .status(201)
-          .json({ message: "Invité (vidéo) ajouté avec succès !", artist: doc });
+        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès", guest: doc });
       return;
     }
 
     // === DÉTERMINATION DU DOSSIER ===
-
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-    // === GESTION DU MÉDIA ===
+    // === GESTION DU LOGO EXISTANT ===
+    if (isLogo && isFileId(body.media)) {
+      console.log("📎 Logo existant détecté, liaison sans upload");
+      const details = await imagekit.getFileDetails(body.media).catch(() => null);
+      if (!details) throw new Error("Logo existant introuvable");
+
+      const doc = new Guest({
+        name: body.name,
+        description: body.description,
+        logo: details.url,
+        logoFileId: details.fileId,
+        media: null,
+        mediaFileId: null,
+        mediaName: baseName,
+      });
+
+      await doc.save();
+
+      if (silent) return doc;
+      if (res)
+        return res
+          .status(201)
+          .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
+      return;
+    }
+
+    // === UPLOAD (image ou nouveau logo) ===
     let url = null;
     let fileId = null;
     let fileName = null;
@@ -78,47 +96,6 @@ export const createGuest = async (req, res, silent = false) => {
       } catch (err) {
         console.warn("⚠️ mediaFileId introuvable :", existingId);
       }
-    }
-
-    // --- CAS VIDÉO OU LOGO EXISTANT ---
-    if (mediaType === "video" && body.media) {
-      console.log("🎬 Invité avec vidéo, aucun upload requis");
-      const doc = new Guest({
-        name: body.name,
-        description: body.description,
-        media: body.media,
-        mediaFileId: null,
-        logo: null,
-        logoFileId: null,
-        mediaName: baseName,
-      });
-      await doc.save();
-      if (silent) return doc;
-      if (res)
-        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès", guest: doc });
-      return;
-    }
-
-    if (isLogo && isFileId(body.media)) {
-      console.log("📎 Logo existant détecté, liaison sans upload");
-      const details = await imagekit.getFileDetails(body.media).catch(() => null);
-      if (!details) throw new Error("Logo existant introuvable");
-      const doc = new Guest({
-        name: body.name,
-        description: body.description,
-        logo: details.url,
-        logoFileId: details.fileId,
-        media: null,
-        mediaFileId: null,
-        mediaName: baseName,
-      });
-      await doc.save();
-      if (silent) return doc;
-      if (res)
-        return res
-          .status(201)
-          .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
-      return;
     }
 
     if (!url) {
@@ -169,7 +146,7 @@ export const createGuest = async (req, res, silent = false) => {
     console.log("=== DEBUG AFTER SAVE ===");
 
     if (silent) return doc;
-    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", artist: doc });
+    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
   } catch (error) {
     console.error("newGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
