@@ -11,6 +11,8 @@ const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${
 export const createGuest = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
+    const isLogo = (body.mediaType || "").toLowerCase() === "logo";
+
     console.log("DEBUG guest body:", body);
 
     const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
@@ -58,7 +60,7 @@ export const createGuest = async (req, res, silent = false) => {
     }
 
     // === DÉTERMINATION DU DOSSIER ===
-    const isLogo = mediaType === "logo";
+
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
     // === GESTION DU MÉDIA ===
@@ -76,6 +78,47 @@ export const createGuest = async (req, res, silent = false) => {
       } catch (err) {
         console.warn("⚠️ mediaFileId introuvable :", existingId);
       }
+    }
+
+    // --- CAS VIDÉO OU LOGO EXISTANT ---
+    if (mediaType === "video" && body.media) {
+      console.log("🎬 Invité avec vidéo, aucun upload requis");
+      const doc = new Guest({
+        name: body.name,
+        description: body.description,
+        media: body.media,
+        mediaFileId: null,
+        logo: null,
+        logoFileId: null,
+        mediaName: baseName,
+      });
+      await doc.save();
+      if (silent) return doc;
+      if (res)
+        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès", guest: doc });
+      return;
+    }
+
+    if (isLogo && isFileId(body.media)) {
+      console.log("📎 Logo existant détecté, liaison sans upload");
+      const details = await imagekit.getFileDetails(body.media).catch(() => null);
+      if (!details) throw new Error("Logo existant introuvable");
+      const doc = new Guest({
+        name: body.name,
+        description: body.description,
+        logo: details.url,
+        logoFileId: details.fileId,
+        media: null,
+        mediaFileId: null,
+        mediaName: baseName,
+      });
+      await doc.save();
+      if (silent) return doc;
+      if (res)
+        return res
+          .status(201)
+          .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
+      return;
     }
 
     if (!url) {
