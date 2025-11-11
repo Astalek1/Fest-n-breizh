@@ -18,24 +18,36 @@ export const createEdition = async (req, res) => {
 
     // --- ARTISTES ---
     const artistDocs = [];
+    const uploadedArtistFiles = req.files?.artistFiles || [];
+    let fileCursor = 0;
+
+    console.log("DEBUG req.files.artistFiles length:", uploadedArtistFiles.length);
+    uploadedArtistFiles.forEach((f, i) => console.log(`artistFiles[${i}] →`, f.originalname));
+
     for (const [index, artistData] of (editionData.artists || []).entries()) {
-      const mediaFile =
-        artistData.mediaType !== "video" && !artistData.mediaFileId
-          ? req.files?.artistFiles?.[index] || null
-          : null;
+      const needsFile = artistData.mediaType !== "video" && !artistData.mediaFileId;
+      const mediaFile = needsFile ? uploadedArtistFiles[fileCursor++] || null : null;
+
+      console.log("DEBUG guest index:", index, {
+        hasFile: !!mediaFile,
+        mediaType: artistData.mediaType,
+        artistFilesCount: uploadedArtistFiles.length,
+        fileCursor,
+      });
 
       const newArtist = await artistsCtrl.createArtist(
         { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
         null,
         true
       );
+
       if (newArtist?._id) artistDocs.push(newArtist);
     }
 
     // --- INVITÉS ---
     const guestDocs = [];
     const uploadedGuestFiles = req.files?.guestFiles || [];
-    let fileCursor = 0;
+    fileCursor = 0;
 
     console.log("DEBUG req.files.guestFiles length:", uploadedGuestFiles.length);
     uploadedGuestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
@@ -100,6 +112,54 @@ export const getOneEdition = async (req, res) => {
     res.status(200).json(edition);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");
+  }
+};
+
+// === AJOUTER UN ARTISTE À UNE ÉDITION ===
+export const addArtistToEdition = async (req, res) => {
+  try {
+    console.log("🧩 Entrée dans addArtistToEdition()");
+    const { editionId } = req.params;
+
+    const edition = await Edition.findById(editionId);
+    if (!edition) return res.status(404).json("Édition non trouvée");
+
+    // ✅ Récupération et parsing du body (gestion Postman)
+    const artistData =
+      typeof req.body.artist === "string"
+        ? JSON.parse(req.body.artist)
+        : req.body.artist || req.body;
+
+    console.log("DEBUG artist body:", artistData);
+
+    // ✅ Récupération du fichier média
+    const file = req.file || (req.files?.media ? req.files.media[0] : null);
+
+    // ✅ Construction d'une requête factice pour createGuest()
+    const fakeReq = {
+      params: {},
+      body: { artist: JSON.stringify(artistData) }, // 🔥 c’est ce qui manquait
+      file,
+    };
+
+    // ✅ Création de l'artiste
+    const createdArtist = await artistsCtrl.createArtist(fakeReq, null, true);
+    if (!createdArtist?._id) {
+      return res.status(400).json({ message: "Échec de la création de l’artiste" });
+    }
+
+    // ✅ Ajout à l’édition
+    edition.artists.push(createdArtist._id);
+    await edition.save();
+
+    console.log(`✅ Artiste ajouté à l’édition ${editionId}`);
+    res.status(201).json({
+      message: "Artiste ajouté avec succès",
+      artist: createdArtist,
+    });
+  } catch (error) {
+    console.error("addArtistToEdition error:", error);
+    res.status(500).json({ error: "Erreur serveur (addArtistToEdition)" });
   }
 };
 
