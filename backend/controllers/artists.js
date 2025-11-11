@@ -6,45 +6,72 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
+// Créér un artiste //
 export const createArtist = async (req, res, silent = false) => {
   try {
-    const body = JSON.parse(req.body.artist || "{}");
-
-    const mediaType = (body.mediaType || "").toLowerCase(); // "image" | "logo" | "video"
+    const body = JSON.parse(req.body.guest || "{}");
+    const mediaType = (body.mediaType || "").toLowerCase();
+    const isLogo = mediaType === "logo";
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(body.name);
 
     // === CAS VIDÉO ===
-    if (mediaType === "video") {
+    if (mediaType === "video" && body.media) {
       const doc = new Artist({
         name: body.name,
         description: body.description,
-        media: body.media || null,
+        media: body.media,
         mediaFileId: null,
         logo: null,
         logoFileId: null,
         mediaName: baseName,
       });
+
+      await doc.save();
+
+      if (req.body.editionId) {
+        const Edition = (await import("../models/Edition.js")).default;
+        await Edition.findByIdAndUpdate(req.body.editionId, { $push: { artists: doc._id } });
+      }
+
+      if (silent) return doc;
+      if (res)
+        return res.status(201).json({ message: "Artiste (vidéo) ajouté avec succès", artist: doc });
+      return;
+    }
+
+    // === CAS LOGO EXISTANT ===
+    if (isLogo && isFileId(body.media)) {
+      const details = await imagekit.getFileDetails(body.media).catch(() => null);
+      if (!details) throw new Error("Logo existant introuvable sur ImageKit");
+
+      const doc = new Artist({
+        name: body.name,
+        description: body.description,
+        logo: details.url,
+        logoFileId: details.fileId,
+        media: null,
+        mediaFileId: null,
+        mediaName: baseName,
+      });
+
       await doc.save();
 
       if (silent) return doc;
       if (res)
         return res
           .status(201)
-          .json({ message: "Artiste (vidéo) ajouté avec succès !", artist: doc });
+          .json({ message: "Artiste (logo existant) ajouté avec succès", artist: doc });
       return;
     }
 
-    // === DÉTERMINATION DU DOSSIER ===
-    const isLogo = mediaType === "logo";
+    // === CAS UPLOAD (image ou nouveau logo) ===
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/artistes";
-
-    // === GESTION DU MÉDIA ===
-    let url = null;
-    let fileId = null;
-    let fileName = null;
+    let url = null,
+      fileId = null,
+      fileName = null;
 
     const existingId = body.mediaFileId || body.media;
     if (isFileId(existingId)) {
@@ -53,13 +80,10 @@ export const createArtist = async (req, res, silent = false) => {
         url = details.url;
         fileId = details.fileId;
         fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
-      } catch (err) {
-        console.warn("⚠️ mediaFileId introuvable :", existingId);
-      }
+      } catch {}
     }
 
     if (!url) {
-      console.log("UPLOAD ARTISTE:", { name: body.name, mediaType, folder });
       const up = await resolveMedia(body.media, req.file, folder, baseName);
       if (!up?.url) {
         if (silent) throw new Error("Média invalide");
@@ -70,7 +94,6 @@ export const createArtist = async (req, res, silent = false) => {
       fileName = up.fileName || baseName;
     }
 
-    // === ENREGISTREMENT DU DOCUMENT ===
     const doc = new Artist({
       name: body.name,
       description: body.description,
@@ -86,23 +109,11 @@ export const createArtist = async (req, res, silent = false) => {
     if (silent) return doc;
     if (res) return res.status(201).json({ message: "Artiste ajouté avec succès !", artist: doc });
   } catch (error) {
-    console.error("newArtist error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// Récupérer un artiste
-export const getOneArtist = async (req, res) => {
-  try {
-    const artist = await Artist.findById(req.params.id);
-    if (!artist) return res.status(404).json("artiste non trouvé");
-    res.status(200).json(artist);
-  } catch {
-    res.status(500).json("Erreur serveur, base de données inaccessible");
-  }
-};
-
-// Récupérer tous les Artistes
+// Récupérer tous les artistes //
 export const getAllArtists = async (req, res) => {
   try {
     const artists = await Artist.find();
@@ -111,20 +122,32 @@ export const getAllArtists = async (req, res) => {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
-// Modifier un artiste
-export const updateArtist = async (req, res, silent = false) => {
+
+// Récupérer un artiste //
+export const getOneArtist = async (req, res) => {
+  try {
+    const artist = await Artist.findById(req.params.id);
+    if (!artist) return res.status(404).json("Artiste non trouvé");
+    res.status(200).json(artist);
+  } catch {
+    res.status(500).json("Erreur serveur, base de données inaccessible");
+  }
+};
+
+// Modifier un Artiste //
+export const updateArtiste = async (req, res, silent = false) => {
   try {
     const artistId = req.params.artistId || req.params.id;
     const existing = await Artist.findById(artistId);
-
     if (!existing) {
-      if (!silent && res) return res.status(404).json("artiste non trouvé");
-      else throw new Error("artiste non trouvé");
+      if (!silent && res) return res.status(404).json("Artiste non trouvé");
+      else throw new Error("Artiste non trouvé");
     }
 
     const body = req.body.artist ? JSON.parse(req.body.artist) : req.body;
+    if (!body.media && req.body.media) body.media = req.body.media;
+    if (!body.mediaType && req.body.mediaType) body.mediaType = req.body.mediaType;
 
-    // --- 1) Champs textuels ---
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
@@ -135,7 +158,7 @@ export const updateArtist = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    const mediaType = (body.mediaType || "").toLowerCase(); // image | logo | video
+    const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
     const oldImageId = existing.mediaFileId || null;
@@ -144,7 +167,6 @@ export const updateArtist = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    // --- 2) Préparation de la mise à jour ---
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;
@@ -193,161 +215,85 @@ export const updateArtist = async (req, res, silent = false) => {
       filtered.mediaName = baseName;
     }
 
-    // --- 3) Mise à jour en base ---
-    const updated = await Artist.findByIdAndUpdate(req.params.id, filtered, {
+    const updated = await Artist.findByIdAndUpdate(artistId, filtered, {
       new: true,
       runValidators: false,
     });
 
-    // --- 4) Nettoyage post-update ---
     if (sentNewMedia) {
-      console.log("DEBUG MEDIA:", {
-        mediaType,
-        oldImageId,
-        newImageId,
-        oldLogoId,
-        newLogoId,
-        reqFile: !!req.file,
-      });
-
-      // --- Remplacement IMAGE → IMAGE (suppression directe) ---
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée :", oldImageId);
-        } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
-        }
+        } catch {}
       }
 
-      // --- Passage vers vidéo → suppression ancienne image + logo ---
       if (mediaType === "video") {
         if (oldImageId) {
           try {
             await imagekit.deleteFile(oldImageId);
-            console.log("Ancienne image supprimée (passage vidéo) :", oldImageId);
-          } catch (e) {
-            console.error("Suppression ancienne image échouée :", e?.message || e);
-          }
+          } catch {}
         }
-        if (oldLogoId) {
-          const inUse = await isFileInUse(oldLogoId);
-          if (inUse === false) {
-            try {
-              await imagekit.deleteFile(oldLogoId);
-              console.log("Ancien logo supprimé (passage vidéo) :", oldLogoId);
-            } catch (e) {
-              console.error("Suppression ancien logo échouée :", e?.message || e);
-            }
-          }
+        if (oldLogoId && (await isFileInUse(oldLogoId)) === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+          } catch {}
         }
       }
 
-      // --- Passage vers LOGO → supprimer ancienne IMAGE ---
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
+        if ((await isFileInUse(oldLogoId)) === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+          } catch {}
+        }
+      }
+
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée (passage logo) :", oldImageId);
-        } catch (e) {
-          console.error("Suppression ancienne image échouée :", e?.message || e);
-        }
+        } catch {}
       }
 
-      // --- Passage vers IMAGE → supprimer ancien LOGO s’il n’est plus utilisé ---
-      if (mediaType === "image" && oldLogoId) {
-        const inUse = await isFileInUse(oldLogoId);
-        if (inUse === false) {
-          try {
-            await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé (passage image) :", oldLogoId);
-          } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
-      }
-
-      // --- Remplacement LOGO → LOGO ---
-      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
-        const inUse = await isFileInUse(oldLogoId);
-        console.log("Vérif post-update LOGO :", { oldLogoId, newLogoId, inUse });
-        if (inUse === false) {
-          try {
-            await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé :", oldLogoId);
-          } catch (e) {
-            console.error("Suppression ancien logo échouée :", e?.message || e);
-          }
-        }
+      if (mediaType === "image" && oldLogoId && (await isFileInUse(oldLogoId)) === false) {
+        try {
+          await imagekit.deleteFile(oldLogoId);
+        } catch {}
       }
     }
 
-    // --- 5) Réponse finale ---
     if (silent) return updated;
-    res.status(200).json(updated);
+    if (res && !silent) return res.status(200).json(updated);
   } catch (error) {
-    console.error("updateArtist error:", error);
-    if (!silent && res) {
-      res.status(500).json({ error: error.message });
-    } else {
-      throw error;
-    }
+    if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// suprimer un artiste //
+// Supprimer un Artiste //
 export const deleteArtist = async (req, res) => {
   try {
-    const artist = await Artist.findById(req.params.id);
+    const artistId = req.params.artistId || req.params.id;
+    const artist = await Artist.findById(artistId);
     if (!artist) return res.status(404).json("Artiste non trouvé");
 
     const imgId = artist.mediaFileId || null;
     const logoId = artist.logoFileId || null;
 
-    // Supprime d’abord le document pour éviter les ré-lectures
-    await Artist.findByIdAndDelete(req.params.id);
+    await Artist.findByIdAndDelete(artistId);
 
-    // Images : suppression directe (jamais réutilisées)
     if (imgId) {
       try {
         await imagekit.deleteFile(imgId);
-      } catch (e) {
-        console.error("Suppression image échouée :", e?.message || e);
-      }
+      } catch {}
     }
 
-    // Logos : suppression conditionnelle (peuvent être réutilisés)
-    if (logoId) {
-      const inUse = await isFileInUse(logoId);
-      if (inUse === false) {
-        try {
-          await imagekit.deleteFile(logoId);
-        } catch (e) {
-          console.error("Suppression logo échouée :", e?.message || e);
-        }
-      }
-    }
-    // --- Remplacement IMAGE → IMAGE (suppression directe) ---
-    console.log(
-      "DEBUG IMAGE: oldImageId =",
-      oldImageId,
-      "| newImageId =",
-      newImageId,
-      "| req.file =",
-      !!req.file
-    );
-
-    if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+    if (logoId && (await isFileInUse(logoId)) === false) {
       try {
-        await imagekit.deleteFile(oldImageId);
-        console.log("Ancienne image supprimée :", oldImageId);
-      } catch (e) {
-        console.error("Suppression ancienne image échouée :", e?.message || e);
-      }
+        await imagekit.deleteFile(logoId);
+      } catch {}
     }
 
-    res.status(200).json("Artiste supprimé avec succès");
-  } catch (error) {
-    console.error("deleteArtist error:", error);
+    res.status(200).json("artiste supprimé avec succès");
+  } catch {
     res.status(500).json({ error: "Erreur serveur (deleteArtist)" });
   }
 };
