@@ -55,11 +55,12 @@ export const createGuest = async (req, res, silent = false) => {
     // === DÉTERMINATION DU DOSSIER ===
     const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
 
-    // === GESTION DU LOGO EXISTANT ===
+    // === GESTION DU LOGO EXISTANT (fileId uniquement) ===
     if (isLogo && isFileId(body.media)) {
-      console.log("📎 Logo existant détecté, liaison sans upload");
+      console.log("📎 Logo existant détecté (fileId) → liaison sans upload");
+
       const details = await imagekit.getFileDetails(body.media).catch(() => null);
-      if (!details) throw new Error("Logo existant introuvable");
+      if (!details) throw new Error("Logo existant introuvable sur ImageKit");
 
       const doc = new Guest({
         name: body.name,
@@ -75,9 +76,10 @@ export const createGuest = async (req, res, silent = false) => {
 
       if (silent) return doc;
       if (res)
-        return res
-          .status(201)
-          .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
+        return res.status(201).json({
+          message: "Invité (logo existant) ajouté avec succès",
+          guest: doc,
+        });
       return;
     }
 
