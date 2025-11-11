@@ -135,7 +135,7 @@ export const getOneArtist = async (req, res) => {
 };
 
 // Modifier un Artiste //
-export const updateArtiste = async (req, res, silent = false) => {
+export const updateArtist = async (req, res, silent = false) => {
   try {
     const artistId = req.params.artistId || req.params.id;
     const existing = await Artist.findById(artistId);
