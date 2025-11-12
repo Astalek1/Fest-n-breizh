@@ -171,6 +171,62 @@ export const updateGuest = async (req, res, silent = false) => {
 
     let newImageId = null;
     let newLogoId = null;
+    if (sentNewMedia) {
+      console.log("🧩 [DEBUG] => Nouveau média détecté, traitement..."); // à supprimer
+      if (mediaType === "video") {
+        console.log("🧩 [DEBUG] Type vidéo, aucun upload ImageKit effectué"); // à supprimer
+        filtered.media = body.media || existing.media;
+        filtered.mediaFileId = null;
+        filtered.logo = null;
+        filtered.logoFileId = null;
+        filtered.mediaName = baseName;
+      } else {
+        const isLogo = mediaType === "logo";
+        const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
+        console.log("🧩 [DEBUG] Type:", isLogo ? "logo" : "image", "| dossier:", folder); // à supprimer
+
+        let url = null;
+        let fileId = null;
+        let fileName = null;
+
+        if (isFileId(body.media)) {
+          console.log("🧩 [DEBUG] body.media est un fileId, récupération depuis ImageKit"); // à supprimer
+          const details = await imagekit.getFileDetails(body.media);
+          url = details.url;
+          fileId = details.fileId;
+          fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
+        } else {
+          console.log("🧩 [DEBUG] Upload ou buffer détecté, appel resolveMedia()"); // à supprimer
+          const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
+          console.log("✅ [DEBUG] Résultat resolveMedia:", up); // à supprimer
+
+          if (!up?.url) {
+            console.error("❌ [DEBUG] Erreur : resolveMedia n’a pas retourné d’URL"); // à supprimer
+            return res.status(400).json("Média invalide ou introuvable");
+          }
+
+          url = up.url;
+          fileId = up.fileId || null;
+          fileName = up.fileName || baseName;
+        }
+
+        if (isLogo) {
+          filtered.logo = url;
+          filtered.logoFileId = fileId;
+          filtered.media = null;
+          filtered.mediaFileId = null;
+          newLogoId = fileId;
+        } else {
+          filtered.media = url;
+          filtered.mediaFileId = fileId;
+          filtered.logo = null;
+          filtered.logoFileId = null;
+          newImageId = fileId;
+        }
+
+        filtered.mediaName = fileName;
+      }
+    }
 
     // --- nettoyage ancien média ---
     if (sentNewMedia) {
