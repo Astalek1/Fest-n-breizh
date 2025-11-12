@@ -94,8 +94,7 @@ export default async function resizeImage(req, res, next) {
   try {
     if (req.file?.buffer) {
       await processOne(req.file, inferType(req, req.file));
-      if (file.bufferLarge) file.buffer = file.bufferLarge; // test
-
+      if (file.bufferLarge) req.file.buffer = req.file.bufferLarge; // test
       return next();
     }
 
