@@ -244,9 +244,16 @@ export const updateGuest = async (req, res, silent = false) => {
     }
 
     // === RÉPONSE JSON ===
-    if (!silent && res) {
-      return res.status(200).json(updated);
+    console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
+    if (!silent && res && !res.headersSent) {
+      console.log("📤 [TRACE] Envoi du JSON à Postman");
+      return res.status(200).json({
+        message: "Invité mis à jour avec succès",
+        guest: updated,
+      });
     }
+
+    console.log("⚠️ [TRACE] Aucun retour envoyé (mode silent ou headers déjà envoyés)"); // test
     return updated;
   } catch (error) {
     console.error("[DEBUG] updateGuest error:", error);
