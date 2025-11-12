@@ -65,17 +65,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
-
-// TEMP : intercepte les réponses finales pour vérifier leur type
-app.use((req, res, next) => {
-  res.on("finish", () => {
-    console.log(
-      "🧭 [TRACE] Réponse terminée :",
-      req.method,
-      req.originalUrl,
-      "| status:",
-      res.statusCode
-    );
-  });
-  next();
-});
