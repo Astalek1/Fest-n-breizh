@@ -172,93 +172,64 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    if (sentNewMedia) {
-      console.log("🧩 [DEBUG] => Nouveau média détecté, traitement..."); // à supprimer
-      if (mediaType === "video") {
-        console.log("🧩 [DEBUG] Type vidéo, aucun upload ImageKit effectué"); // à supprimer
-        filtered.media = body.media || existing.media;
-        filtered.mediaFileId = null;
-        filtered.logo = null;
-        filtered.logoFileId = null;
-        filtered.mediaName = baseName;
-      } else {
-        const isLogo = mediaType === "logo";
-        const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
-        console.log("🧩 [DEBUG] Type:", isLogo ? "logo" : "image", "| dossier:", folder); // à supprimer
-
-        let url = null;
-        let fileId = null;
-        let fileName = null;
-
-        if (isFileId(body.media)) {
-          console.log("🧩 [DEBUG] body.media est un fileId, récupération depuis ImageKit"); // à supprimer
-          const details = await imagekit.getFileDetails(body.media);
-          url = details.url;
-          fileId = details.fileId;
-          fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
-        } else {
-          console.log("🧩 [DEBUG] Upload ou buffer détecté, appel resolveMedia()"); // à supprimer
-          const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
-          console.log("✅ [DEBUG] Résultat resolveMedia:", up); // à supprimer
-
-          if (!up?.url) {
-            console.error("❌ [DEBUG] Erreur : resolveMedia n’a pas retourné d’URL"); // à supprimer
-            return res.status(400).json("Média invalide ou introuvable");
-          }
-
-          url = up.url;
-          fileId = up.fileId || null;
-          fileName = up.fileName || baseName;
-        }
-
-        if (isLogo) {
-          console.log("🧩 [DEBUG] Mise à jour d’un logo"); // à supprimer
-          filtered.logo = url;
-          filtered.logoFileId = fileId;
-          filtered.media = null;
-          filtered.mediaFileId = null;
-          newLogoId = fileId;
-        } else {
-          console.log("🧩 [DEBUG] Mise à jour d’une image principale"); // à supprimer
-          filtered.media = url;
-          filtered.mediaFileId = fileId;
-          filtered.logo = null;
-          filtered.logoFileId = null;
-          newImageId = fileId;
-        }
-
-        filtered.mediaName = fileName;
-      }
-    } else {
-      console.log("🧩 [DEBUG] Aucun nouveau média détecté"); // à supprimer
-      if (req.body.fileName) filtered.mediaName = baseName;
-    }
-
-    console.log("📄 [DEBUG] filtered juste avant update:", filtered); // à supprimer
-    const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
-      new: true,
-      runValidators: false,
-    });
-
-    console.log("✅ [DEBUG] Invité mis à jour en base:", updated); // à supprimer
-
     // --- nettoyage ancien média ---
     if (sentNewMedia) {
       console.log("🧩 [DEBUG] Vérification des anciens médias à supprimer..."); // à supprimer
+
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
         console.log("🧩 [DEBUG] Suppression ancienne image", oldImageId); // à supprimer
-        try {
-          await imagekit.deleteFile(oldImageId);
-        } catch (err) {
-          console.error("❌ [DEBUG] Échec suppression ancienne image", err.message); // à supprimer
-        }
+        imagekit
+          .deleteFile(oldImageId)
+          .then(() => console.log("✅ [DEBUG] Ancienne image supprimée")) // à supprimer
+          .catch((err) => console.warn("⚠️ [DEBUG] Échec suppression ancienne image", err.message)); // à supprimer
+      }
+
+      if (mediaType === "video" && oldImageId) {
+        console.log("🧩 [DEBUG] Suppression ancienne image vidéo", oldImageId); // à supprimer
+        imagekit
+          .deleteFile(oldImageId)
+          .catch((err) =>
+            console.warn("⚠️ [DEBUG] Échec suppression ancienne image vidéo", err.message)
+          ); // à supprimer
+      }
+
+      if (mediaType === "logo" && oldImageId) {
+        console.log("🧩 [DEBUG] Suppression ancienne image liée au logo", oldImageId); // à supprimer
+        imagekit
+          .deleteFile(oldImageId)
+          .catch((err) =>
+            console.warn("⚠️ [DEBUG] Échec suppression image liée au logo", err.message)
+          ); // à supprimer
+      }
+
+      if (mediaType === "image" && oldLogoId) {
+        console.log("🧩 [DEBUG] Vérification ancien logo inutilisé", oldLogoId); // à supprimer
+        isFileInUse(oldLogoId)
+          .then((used) => {
+            if (!used) {
+              console.log("🧩 [DEBUG] Ancien logo inutilisé, suppression"); // à supprimer
+              return imagekit.deleteFile(oldLogoId);
+            }
+          })
+          .catch((err) => console.warn("⚠️ [DEBUG] Vérification ancien logo échouée", err.message)); // à supprimer
+      }
+
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
+        console.log("🧩 [DEBUG] Ancien logo différent du nouveau, suppression sécurisée"); // à supprimer
+        isFileInUse(oldLogoId)
+          .then((used) => {
+            if (!used) {
+              console.log("🧩 [DEBUG] Suppression ancien logo", oldLogoId); // à supprimer
+              return imagekit.deleteFile(oldLogoId);
+            }
+          })
+          .catch((err) => console.warn("⚠️ [DEBUG] Suppression ancien logo échouée", err.message)); // à supprimer
       }
     }
 
     if (silent) return updated;
     if (res && !silent) {
       console.log("✅ [DEBUG] Fin de updateGuest atteinte, envoi de la réponse..."); // à supprimer
-
       return res.status(200).json(updated);
     }
   } catch (error) {
