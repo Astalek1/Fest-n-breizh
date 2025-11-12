@@ -197,38 +197,32 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // === SUPPRESSION ANCIENS MÉDIAS (avec correction SDK) ===
+    // === SUPPRESSION ANCIENS MÉDIAS ===
     if (sentNewMedia) {
-      // --- Ancienne image ---
-      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+      console.log("🧩 Vérification suppression anciens médias…");
+
+      // Suppression image si remplacée
+      if (oldImageId && oldImageId !== newImageId) {
         try {
-          await new Promise((resolve) => {
-            imagekit.deleteFile(oldImageId, (err) => {
-              if (err) console.warn("⚠️ Échec suppression ancienne image:", err.message);
-              else console.log("✅ Ancienne image supprimée (callback)");
-              resolve();
-            });
-          });
+          await imagekit.deleteFile(oldImageId);
+          console.log("✅ Ancienne image supprimée");
         } catch (err) {
-          console.warn("Échec suppression ancienne image:", err.message);
+          console.warn("⚠️ Erreur suppression ancienne image:", err.message);
         }
       }
 
-      // --- Ancien logo ---
-      if (mediaType === "logo" && oldLogoId && oldLogoId !== newLogoId) {
+      // Suppression logo si remplacé
+      if (oldLogoId && oldLogoId !== newLogoId) {
         try {
-          const used = await isFileInUse(oldLogoId);
-          if (!used) {
-            await new Promise((resolve) => {
-              imagekit.deleteFile(oldLogoId, (err) => {
-                if (err) console.warn("⚠️ Échec suppression ancien logo:", err.message);
-                else console.log("✅ Ancien logo supprimé (callback)");
-                resolve();
-              });
-            });
+          const stillUsed = await isFileInUse(oldLogoId);
+          if (!stillUsed) {
+            await imagekit.deleteFile(oldLogoId);
+            console.log("✅ Ancien logo supprimé");
+          } else {
+            console.log("ℹ️ Ancien logo conservé (encore utilisé)");
           }
         } catch (err) {
-          console.warn("Erreur vérification ancien logo:", err.message);
+          console.warn("⚠️ Erreur vérification ancien logo:", err.message);
         }
       }
     }
