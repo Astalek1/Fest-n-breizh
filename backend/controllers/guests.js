@@ -118,6 +118,8 @@ export const getOneGuest = async (req, res) => {
 
 // === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
+  console.log("🧩 DEBUG multer field:", req.file?.fieldname || "aucun fichier reçu");
+
   try {
     const guestId = req.params.guestId || req.params.id;
     const existing = await Guest.findById(guestId);
