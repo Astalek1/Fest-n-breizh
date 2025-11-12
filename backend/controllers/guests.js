@@ -118,12 +118,14 @@ export const getOneGuest = async (req, res) => {
 
 // === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
+  // === LOGS DE DEBUG (temporaires) ===
   console.log("🧩 [DEBUG] Entrée dans updateGuest()");
   console.log("🧩 [DEBUG] req.params =", req.params);
   console.log("🧩 [DEBUG] req.body keys =", Object.keys(req.body));
   console.log("🧩 [DEBUG] req.file présent ?", !!req.file, "| field:", req.file?.fieldname);
 
   try {
+    // --- Récupération de l’invité ---
     const guestId = req.params.guestId || req.params.id;
     console.log("🧩 [DEBUG] guestId détecté:", guestId);
 
@@ -138,6 +140,7 @@ export const updateGuest = async (req, res, silent = false) => {
       throw new Error("Invité non trouvé");
     }
 
+    // --- Lecture du body ---
     console.log("🧩 [DEBUG] Corps brut reçu:", req.body);
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
     console.log("🧩 [DEBUG] Body parsé:", body);
@@ -147,24 +150,26 @@ export const updateGuest = async (req, res, silent = false) => {
 
     console.log("🧩 [DEBUG] body.mediaType =", body.mediaType, "| body.media =", !!body.media);
 
+    // --- Filtrage des champs texte ---
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
     }
-
     console.log("🧩 [DEBUG] Champs filtrés initiaux:", filtered);
 
+    // --- Préparation du nom de base ---
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
-
     console.log("🧩 [DEBUG] baseName calculé:", baseName);
 
+    // --- Détermination du type de média ---
     const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
     console.log("🧩 [DEBUG] sentNewMedia =", sentNewMedia, "| mediaType =", mediaType);
 
+    // --- Anciennes références ---
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
     console.log("🧩 [DEBUG] Ancien média:", { oldImageId, oldLogoId });
@@ -172,7 +177,7 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    // --- nouveau média ---
+    // === TRAITEMENT DU NOUVEAU MÉDIA ===
     if (sentNewMedia) {
       console.log("🧩 [DEBUG] => Nouveau média détecté, traitement...");
 
@@ -231,18 +236,19 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // --- nettoyage ancien média (attente sécurisée) ---
+    // === SUPPRESSION ANCIENS MÉDIAS (test temporaire) ===
     if (sentNewMedia) {
       console.log("🧩 [DEBUG] Vérification des anciens médias à supprimer...");
       const deleteTasks = [];
 
+      // TEST TEMPORAIRE : suppression sécurisée avec await pour éviter blocage Postman
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
-        deleteTasks.push(
-          imagekit
-            .deleteFile(oldImageId)
-            .then(() => console.log("✅ Ancienne image supprimée"))
-            .catch((err) => console.warn("⚠️ Échec suppression ancienne image:", err.message))
-        );
+        try {
+          await imagekit.deleteFile(oldImageId);
+          console.log("✅ Ancienne image supprimée");
+        } catch (err) {
+          console.warn("⚠️ Échec suppression ancienne image:", err.message);
+        }
       }
 
       if (mediaType === "logo" && oldLogoId && oldLogoId !== newLogoId) {
@@ -261,7 +267,7 @@ export const updateGuest = async (req, res, silent = false) => {
       await Promise.allSettled(deleteTasks);
     }
 
-    // --- mise à jour MongoDB ---
+    // === MISE À JOUR MONGODB ===
     console.log("📄 [DEBUG] filtered juste avant update:", filtered);
     const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
       new: true,
@@ -269,14 +275,16 @@ export const updateGuest = async (req, res, silent = false) => {
     });
     console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
 
-    // --- réponse finale ---
-    console.log("🚦 [TRACE] Avant envoi réponse, typeof res:", typeof res); // a suprimer
-    console.log("🚦 [TRACE] res.headersSent =", res.headersSent); // a suprimer
+    // === RÉPONSE (test Postman) ===
+    console.log("🚦 [TRACE] Avant envoi réponse, typeof res:", typeof res);
+    console.log("🚦 [TRACE] res.headersSent =", res.headersSent);
 
     if (!silent && res) {
       console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
       return res.status(200).json(updated);
     }
+
+    // TEMPORAIRE : traçage post-réponse
     console.log("✅ [TRACE] res.json() envoyé");
     setTimeout(() => console.log("⏱️ [TRACE] 2s après réponse (process toujours actif)"), 2000);
 
