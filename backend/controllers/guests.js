@@ -117,7 +117,7 @@ export const getOneGuest = async (req, res) => {
 };
 
 // === MODIFIER UN INVITÉ ===
-export const updateGuest = async (req, res, silent = false) => {
+export const updateGuest = async (req, res, next) => {
   try {
     // --- Récupération de l’invité ---
     const guestId = req.params.guestId || req.params.id;
