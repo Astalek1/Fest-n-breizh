@@ -230,7 +230,8 @@ export const updateGuest = async (req, res, silent = false) => {
 
     if (silent) return updated;
     if (res && !silent) {
-      console.log("✅ [DEBUG] Fin de updateGuest atteinte, envoi de la réponse..."); // à supprimer
+      console.log("🧩 [DEBUG] Taille JSON envoyée:", JSON.stringify(updated).length, "octets"); //a supprimer
+
       return res.status(200).json(updated);
     }
   } catch (error) {
