@@ -197,34 +197,43 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // === SUPPRESSION ANCIENS MÉDIAS ===
-    if (sentNewMedia) {
-      console.log("🧩 Vérification suppression anciens médias…");
+    // === SUPPRESSION ANCIENS MÉDIAS (tous cas) ===
+    console.log("🧩 Vérification suppression anciens médias...");
 
-      // Suppression image si remplacée
-      if (oldImageId && oldImageId !== newImageId) {
-        try {
+    try {
+      // Si on passe à une vidéo → suppression des anciens fichiers image/logo
+      if (mediaType === "video") {
+        if (oldImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("✅ Ancienne image supprimée");
-        } catch (err) {
-          console.warn("⚠️ Erreur suppression ancienne image:", err.message);
+          console.log("✅ Ancienne image supprimée (passage vidéo)");
+        }
+        if (oldLogoId) {
+          const used = await isFileInUse(oldLogoId);
+          if (!used) {
+            await imagekit.deleteFile(oldLogoId);
+            console.log("✅ Ancien logo supprimé (passage vidéo)");
+          }
         }
       }
 
-      // Suppression logo si remplacé
-      if (oldLogoId && oldLogoId !== newLogoId) {
-        try {
-          const stillUsed = await isFileInUse(oldLogoId);
-          if (!stillUsed) {
-            await imagekit.deleteFile(oldLogoId);
-            console.log("✅ Ancien logo supprimé");
-          } else {
-            console.log("ℹ️ Ancien logo conservé (encore utilisé)");
-          }
-        } catch (err) {
-          console.warn("⚠️ Erreur vérification ancien logo:", err.message);
+      // Si on a uploadé ou lié une nouvelle image
+      if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
+        await imagekit.deleteFile(oldImageId);
+        console.log("✅ Ancienne image supprimée (nouvelle image)");
+      }
+
+      // Si on a uploadé ou lié un nouveau logo
+      if (mediaType === "logo" && oldLogoId && oldLogoId !== newLogoId) {
+        const used = await isFileInUse(oldLogoId);
+        if (!used) {
+          await imagekit.deleteFile(oldLogoId);
+          console.log("✅ Ancien logo supprimé (nouveau logo)");
+        } else {
+          console.log("ℹ️ Ancien logo conservé (encore utilisé)");
         }
       }
+    } catch (err) {
+      console.warn("⚠️ Erreur pendant la suppression des anciens médias:", err.message);
     }
 
     // === MISE À JOUR MONGODB ===
