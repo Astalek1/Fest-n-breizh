@@ -106,10 +106,29 @@ export const createArtist = async (req, res, silent = false) => {
       mediaName: fileName,
     });
 
-    await doc.save();
+    try {
+      await doc.save();
+      console.log("=== DEBUG ARTIST SAVED ===", doc._id);
 
-    if (silent) return doc;
-    if (res) return res.status(201).json({ message: "Artiste ajouté avec succès !", artist: doc });
+      if (silent) return doc;
+      if (res)
+        return res.status(201).json({ message: "Artiste ajouté avec succès !", artist: doc });
+    } catch (error) {
+      console.error("❌ Erreur sauvegarde artiste :", error);
+
+      // ⚠️ rollback : suppression du média si la sauvegarde échoue
+      if (fileId) {
+        try {
+          await imagekit.deleteFile(fileId);
+          console.log("🧹 Image supprimée suite à échec de création artiste");
+        } catch (cleanupError) {
+          console.error("⚠️ Échec suppression image après erreur :", cleanupError);
+        }
+      }
+
+      if (!silent && res) return res.status(500).json({ error: "Erreur création artiste" });
+      return null;
+    }
   } catch (error) {
     if (!silent && res) res.status(500).json({ error: error.message });
   }
