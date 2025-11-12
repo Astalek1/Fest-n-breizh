@@ -122,6 +122,7 @@ export const updateGuest = async (req, res, silent = false) => {
   console.log("🧩 [DEBUG] req.params =", req.params); // à supprimer
   console.log("🧩 [DEBUG] req.body keys =", Object.keys(req.body)); // à supprimer
   console.log("🧩 [DEBUG] req.file présent ?", !!req.file, "| field:", req.file?.fieldname); // à supprimer
+  let updated = null;
 
   try {
     const guestId = req.params.guestId || req.params.id;
@@ -234,11 +235,11 @@ export const updateGuest = async (req, res, silent = false) => {
     }
   } catch (error) {
     console.error("❌ [DEBUG] updateGuest error:", error); // à supprimer
-    if (!silent && res) res.status(500).json({ error: error.message });
-    //ajout test//
-    if (res && !silent) {
-      console.log("✅ [DEBUG] Réponse JSON envoyée");
-      return res.status(200).json(updated);
+    if (!silent && res) {
+      const status = updated ? 200 : 500;
+      return res
+        .status(status)
+        .json(updated || { error: error.message || "Erreur inconnue dans updateGuest" });
     }
   }
 };
