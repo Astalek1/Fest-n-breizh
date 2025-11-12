@@ -104,10 +104,28 @@ export const createGuest = async (req, res, silent = false) => {
       mediaName: fileName,
     });
 
-    await doc.save();
+    try {
+      await doc.save();
+      console.log("=== DEBUG GUEST SAVED ===", doc._id);
 
-    if (silent) return doc;
-    if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
+      if (silent) return doc;
+      if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
+    } catch (error) {
+      console.error("❌ Erreur sauvegarde invité :", error);
+
+      // ⚠️ rollback : suppression du média uploadé si la sauvegarde échoue
+      if (fileId) {
+        try {
+          await imagekit.deleteFile(fileId);
+          console.log("🧹 Média supprimé suite à échec de création invité");
+        } catch (cleanupError) {
+          console.error("⚠️ Échec suppression média après erreur :", cleanupError);
+        }
+      }
+
+      if (!silent && res) return res.status(500).json({ error: "Erreur création invité" });
+      return null;
+    }
   } catch (error) {
     if (!silent && res) res.status(500).json({ error: error.message });
   }
