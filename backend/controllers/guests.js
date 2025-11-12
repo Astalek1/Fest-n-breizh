@@ -6,12 +6,13 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// Créér un invité //
+// === CRÉER UN INVITÉ ===
 export const createGuest = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
     const mediaType = (body.mediaType || "").toLowerCase();
     const isLogo = mediaType === "logo";
+
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
@@ -23,10 +24,8 @@ export const createGuest = async (req, res, silent = false) => {
         name: body.name,
         description: body.description,
         media: body.media,
-        mediaFileId: null,
-        logo: null,
-        logoFileId: null,
         mediaName: baseName,
+        mediaType,
       });
 
       await doc.save();
@@ -37,101 +36,66 @@ export const createGuest = async (req, res, silent = false) => {
       }
 
       if (silent) return doc;
-      if (res)
-        return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès", guest: doc });
-      return;
+      return res.status(201).json({ message: "Invité (vidéo) ajouté avec succès", guest: doc });
     }
 
     // === CAS LOGO EXISTANT ===
     if (isLogo && isFileId(body.media)) {
-      const details = await imagekit.getFileDetails(body.media).catch(() => null);
-      if (!details) throw new Error("Logo existant introuvable sur ImageKit");
-
+      const details = await imagekit.getFileDetails(body.media);
       const doc = new Guest({
         name: body.name,
         description: body.description,
         logo: details.url,
         logoFileId: details.fileId,
-        media: null,
-        mediaFileId: null,
         mediaName: baseName,
+        mediaType,
       });
 
       await doc.save();
 
-      if (silent) return doc;
-      if (res)
-        return res
-          .status(201)
-          .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
-      return;
-    }
-
-    // === CAS UPLOAD (image ou nouveau logo) ===
-    const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
-    let url = null,
-      fileId = null,
-      fileName = null;
-
-    const existingId = body.mediaFileId || body.media;
-    if (isFileId(existingId)) {
-      try {
-        const details = await imagekit.getFileDetails(existingId);
-        url = details.url;
-        fileId = details.fileId;
-        fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
-      } catch {}
-    }
-
-    if (!url) {
-      const up = await resolveMedia(body.media, req.file, folder, baseName);
-      if (!up?.url) {
-        if (silent) throw new Error("Média invalide");
-        return res.status(400).json("Média invalide");
+      if (req.body.editionId) {
+        const Edition = (await import("../models/Edition.js")).default;
+        await Edition.findByIdAndUpdate(req.body.editionId, { $push: { guests: doc._id } });
       }
-      url = up.url;
-      fileId = up.fileId || null;
-      fileName = up.fileName || baseName;
+
+      if (silent) return doc;
+      return res
+        .status(201)
+        .json({ message: "Invité (logo existant) ajouté avec succès", guest: doc });
     }
+
+    // === CAS IMAGE OU NOUVEAU LOGO ===
+    const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
+    const up = await resolveMedia(body.media, req.file, folder, baseName);
+    if (!up?.url) throw new Error("Échec de l’upload du média");
 
     const doc = new Guest({
       name: body.name,
       description: body.description,
-      media: isLogo ? null : url,
-      mediaFileId: isLogo ? null : fileId,
-      logo: isLogo ? url : null,
-      logoFileId: isLogo ? fileId : null,
-      mediaName: fileName,
+      media: !isLogo ? up.url : null,
+      mediaFileId: !isLogo ? up.fileId : null,
+      logo: isLogo ? up.url : null,
+      logoFileId: isLogo ? up.fileId : null,
+      mediaName: up.fileName || baseName,
+      mediaType,
     });
 
-    try {
-      await doc.save();
-      console.log("=== DEBUG GUEST SAVED ===", doc._id);
+    await doc.save();
 
-      if (silent) return doc;
-      if (res) return res.status(201).json({ message: "Invité ajouté avec succès !", guest: doc });
-    } catch (error) {
-      console.error("❌ Erreur sauvegarde invité :", error);
-
-      // ⚠️ rollback : suppression du média uploadé si la sauvegarde échoue
-      if (fileId) {
-        try {
-          await imagekit.deleteFile(fileId);
-          console.log("🧹 Média supprimé suite à échec de création invité");
-        } catch (cleanupError) {
-          console.error("⚠️ Échec suppression média après erreur :", cleanupError);
-        }
-      }
-
-      if (!silent && res) return res.status(500).json({ error: "Erreur création invité" });
-      return null;
+    if (req.body.editionId) {
+      const Edition = (await import("../models/Edition.js")).default;
+      await Edition.findByIdAndUpdate(req.body.editionId, { $push: { guests: doc._id } });
     }
+
+    if (silent) return doc;
+    return res.status(201).json({ message: "Invité ajouté avec succès", guest: doc });
   } catch (error) {
+    console.error("createGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// Récupérer tous les invités //
+// === RÉCUPÉRER TOUS LES INVITÉS ===
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -141,7 +105,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// Récupérer un invité //
+// === RÉCUPÉRER UN INVITÉ ===
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -152,18 +116,14 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// Modifier un invité //
+// === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
   try {
     const guestId = req.params.guestId || req.params.id;
-    console.log("🧩 updateGuest() called with guestId:", guestId);
-
     const existing = await Guest.findById(guestId);
-    console.log("🧩 existing guest found:", !!existing);
-
     if (!existing) {
       if (!silent && res) return res.status(404).json("Invité non trouvé");
-      else throw new Error("Invité non trouvé");
+      throw new Error("Invité non trouvé");
     }
 
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
@@ -179,22 +139,6 @@ export const updateGuest = async (req, res, silent = false) => {
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
-
-    // --- Vérification stricte avant tout upload ---
-    if (
-      !filtered.name ||
-      !filtered.description ||
-      typeof filtered.name !== "string" ||
-      /<!DOCTYPE/i.test(JSON.stringify(req.body))
-    ) {
-      console.error("⚠️ Requête invalide détectée, aucun upload ni update effectué.");
-      if (!silent && res) {
-        return res
-          .status(400)
-          .json({ error: "Requête invalide : champs manquants ou corps mal formé." });
-      }
-      return; // STOP avant toute tentative d'upload
-    }
 
     const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
@@ -278,14 +222,6 @@ export const updateGuest = async (req, res, silent = false) => {
         }
       }
 
-      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
-        if ((await isFileInUse(oldLogoId)) === false) {
-          try {
-            await imagekit.deleteFile(oldLogoId);
-          } catch {}
-        }
-      }
-
       if (mediaType === "logo" && oldImageId) {
         try {
           await imagekit.deleteFile(oldImageId);
@@ -297,16 +233,25 @@ export const updateGuest = async (req, res, silent = false) => {
           await imagekit.deleteFile(oldLogoId);
         } catch {}
       }
+
+      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
+        if ((await isFileInUse(oldLogoId)) === false) {
+          try {
+            await imagekit.deleteFile(oldLogoId);
+          } catch {}
+        }
+      }
     }
 
     if (silent) return updated;
     if (res && !silent) return res.status(200).json(updated);
   } catch (error) {
+    console.error("updateGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
 
-// Supprimer un invité //
+// === SUPPRIMER UN INVITÉ ===
 export const deleteGuest = async (req, res) => {
   try {
     const guestId = req.params.guestId || req.params.id;
@@ -331,7 +276,8 @@ export const deleteGuest = async (req, res) => {
     }
 
     res.status(200).json("Invité supprimé avec succès");
-  } catch {
+  } catch (error) {
+    console.error("deleteGuest error:", error);
     res.status(500).json({ error: "Erreur serveur (deleteGuest)" });
   }
 };
