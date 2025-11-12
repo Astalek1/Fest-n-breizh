@@ -165,8 +165,7 @@ export const addArtistToEdition = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur (addArtistToEdition)" });
   }
 };
-
-// === AJOUTER UN INVITÉ À UNE ÉDITION ===
+// === AJOUTER DES INVITÉS À UNE ÉDITION ===
 export const addGuestToEdition = async (req, res) => {
   try {
     console.log("🧩 Entrée dans addGuestToEdition()");
@@ -175,40 +174,52 @@ export const addGuestToEdition = async (req, res) => {
     const edition = await Edition.findById(editionId);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    // ✅ Récupération et parsing du body (gestion Postman)
-    const guestData =
-      typeof req.body.guest === "string" ? JSON.parse(req.body.guest) : req.body.guest || req.body;
+    // ✅ Parsing du tableau d’invités depuis le champ unique "guest"
+    const guests = Array.isArray(req.body.guest)
+      ? req.body.guest
+      : JSON.parse(req.body.guest || "[]");
 
-    console.log("DEBUG guest body:", guestData);
+    console.log("DEBUG guest body:", guests);
 
-    // ✅ Récupération du fichier média
-    const file = req.file || (req.files?.media ? req.files.media[0] : null);
-
-    // ✅ Construction d'une requête factice pour createGuest()
-    const fakeReq = {
-      params: {},
-      body: { guest: JSON.stringify(guestData) }, // 🔥 c’est ce qui manquait
-      file,
-    };
-
-    // ✅ Création de l’invité
-    const createdGuest = await guestsCtrl.createGuest(fakeReq, null, true);
-    if (!createdGuest?._id) {
-      return res.status(400).json({ message: "Échec de la création de l’invité" });
+    if (!Array.isArray(guests) || !guests.length) {
+      return res.status(400).json({ message: "Aucun invité valide fourni" });
     }
 
-    // ✅ Ajout à l’édition
-    edition.guests.push(createdGuest._id);
+    // ✅ Gestion des fichiers (si plusieurs fichiers dans req.files)
+    const files = req.files?.media || (req.file ? [req.file] : []);
+    const createdGuests = [];
+
+    // ✅ Boucle sur chaque invité du tableau
+    for (let i = 0; i < guests.length; i++) {
+      const guestData = guests[i];
+      const file = files[i] || null;
+
+      const fakeReq = {
+        params: {},
+        body: { guest: JSON.stringify(guestData) },
+        file,
+      };
+
+      const createdGuest = await guestsCtrl.createGuest(fakeReq, null, true);
+      if (createdGuest?._id) {
+        edition.guests.push(createdGuest._id);
+        createdGuests.push(createdGuest);
+      } else {
+        console.warn(`⚠️ Échec création invité index ${i}`);
+      }
+    }
+
+    // ✅ Sauvegarde finale de l’édition
     await edition.save();
 
-    console.log(`✅ Invité ajouté à l’édition ${editionId}`);
+    console.log(`✅ ${createdGuests.length} invité(s) ajouté(s) à l’édition ${editionId}`);
     res.status(201).json({
-      message: "Invité ajouté avec succès",
-      guest: createdGuest,
+      message: "Invités ajoutés avec succès",
+      guests: createdGuests,
     });
   } catch (error) {
     console.error("addGuestToEdition error:", error);
-    res.status(500).json({ error: "Erreur serveur (addGuestToEdition)" });
+    res.status(500).json({ error: error.message || "Erreur serveur (addGuestToEdition)" });
   }
 };
 
