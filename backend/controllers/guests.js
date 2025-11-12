@@ -122,7 +122,6 @@ export const updateGuest = async (req, res, silent = false) => {
   console.log("🧩 [DEBUG] req.params =", req.params); // à supprimer
   console.log("🧩 [DEBUG] req.body keys =", Object.keys(req.body)); // à supprimer
   console.log("🧩 [DEBUG] req.file présent ?", !!req.file, "| field:", req.file?.fieldname); // à supprimer
-  let updated = null;
 
   try {
     const guestId = req.params.guestId || req.params.id;
@@ -228,19 +227,24 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    if (silent) return updated;
-    if (res && !silent) {
-      console.log("🧩 [DEBUG] Taille JSON envoyée:", JSON.stringify(updated).length, "octets"); //a supprimer
-
-      return res.status(200).json(updated);
-    }
-  } catch (error) {
-    console.log("📄 [DEBUG] filtered juste avant update:", filtered);
+    // --- mise à jour réelle dans MongoDB ---
+    console.log("📄 [DEBUG] filtered juste avant update:", filtered); // à supprimer
     const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
       new: true,
       runValidators: false,
     });
-    console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
+    console.log("✅ [DEBUG] Invité mis à jour en base:", updated); // à supprimer
+
+    if (silent) return updated;
+    if (res && !silent) {
+      console.log("🧩 [DEBUG] Taille JSON envoyée:", JSON.stringify(updated).length, "octets"); // à supprimer
+      return res.status(200).json(updated);
+    }
+  } catch (error) {
+    console.error("❌ [DEBUG] updateGuest error:", error); // à supprimer
+    if (!silent && res) {
+      return res.status(500).json({ error: error.message || "Erreur inconnue dans updateGuest" });
+    }
   }
 };
 
