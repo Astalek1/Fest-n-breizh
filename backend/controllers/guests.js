@@ -235,13 +235,12 @@ export const updateGuest = async (req, res, silent = false) => {
       return res.status(200).json(updated);
     }
   } catch (error) {
-    console.error("❌ [DEBUG] updateGuest error:", error); // à supprimer
-    if (!silent && res) {
-      const status = updated ? 200 : 500;
-      return res
-        .status(status)
-        .json(updated || { error: error.message || "Erreur inconnue dans updateGuest" });
-    }
+    console.log("📄 [DEBUG] filtered juste avant update:", filtered);
+    const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
+      new: true,
+      runValidators: false,
+    });
+    console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
   }
 };
 
