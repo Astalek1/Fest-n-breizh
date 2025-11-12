@@ -238,6 +238,11 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
+    // === LIBÉRATION DU FLUX MULTER ===
+    if (req.file?.stream && !req.file.stream.destroyed) {
+      req.file.stream.destroy();
+    }
+
     // === RÉPONSE JSON ===
     console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
     if (!silent && res && !res.headersSent) {
