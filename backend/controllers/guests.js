@@ -126,6 +126,7 @@ export const updateGuest = async (req, res, silent = false) => {
       if (!silent && res) return res.status(404).json("Invité non trouvé");
       throw new Error("Invité non trouvé");
     }
+
     // --- Lecture du body ---
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
     if (!body.media && req.body.media) body.media = req.body.media;
@@ -195,23 +196,35 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // === SUPPRESSION ANCIENS MÉDIAS (temporaire) ===
+    // === SUPPRESSION ANCIENS MÉDIAS (avec correction SDK) ===
     if (sentNewMedia) {
+      // --- Ancienne image ---
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
         try {
-          await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée");
+          await new Promise((resolve) => {
+            imagekit.deleteFile(oldImageId, (err) => {
+              if (err) console.warn("⚠️ Échec suppression ancienne image:", err.message);
+              else console.log("✅ Ancienne image supprimée (callback)");
+              resolve();
+            });
+          });
         } catch (err) {
           console.warn("Échec suppression ancienne image:", err.message);
         }
       }
 
+      // --- Ancien logo ---
       if (mediaType === "logo" && oldLogoId && oldLogoId !== newLogoId) {
         try {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
-            await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé");
+            await new Promise((resolve) => {
+              imagekit.deleteFile(oldLogoId, (err) => {
+                if (err) console.warn("⚠️ Échec suppression ancien logo:", err.message);
+                else console.log("✅ Ancien logo supprimé (callback)");
+                resolve();
+              });
+            });
           }
         } catch (err) {
           console.warn("Erreur vérification ancien logo:", err.message);
@@ -225,7 +238,7 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
-    // === LIBÉRATION DU FLUX MULTER (temporaire) ===
+    // === LIBÉRATION DU FLUX MULTER ===
     if (req.file?.stream && !req.file.stream.destroyed) {
       req.file.stream.destroy();
     }
@@ -236,7 +249,7 @@ export const updateGuest = async (req, res, silent = false) => {
     }
     return updated;
   } catch (error) {
-    console.error(" [DEBUG] updateGuest error:", error);
+    console.error("[DEBUG] updateGuest error:", error);
     if (!silent && res) {
       return res.status(500).json({ error: error.message || "Erreur inconnue dans updateGuest" });
     }
