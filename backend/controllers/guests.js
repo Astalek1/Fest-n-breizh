@@ -206,7 +206,7 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
-    console.log("✅ Invité mis à jour :", updated ? updated._id : "aucun résultat"); // a suprimer
+    console.log("✅ Invité mis à jour :", updated); // a suprimer
 
     if (sentNewMedia) {
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
