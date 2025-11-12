@@ -277,6 +277,8 @@ export const updateGuest = async (req, res, silent = false) => {
       console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
       return res.status(200).json(updated);
     }
+    console.log("✅ [TRACE] res.json() envoyé");
+    setTimeout(() => console.log("⏱️ [TRACE] 2s après réponse (process toujours actif)"), 2000);
 
     return updated;
   } catch (error) {
