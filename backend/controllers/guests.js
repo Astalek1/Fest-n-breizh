@@ -257,12 +257,18 @@ export const updateGuest = async (req, res, silent = false) => {
 
     if (silent) return updated;
     if (res && !silent) {
-      console.log("🧩 [DEBUG] Réponse envoyée au client"); // à supprimer
+      console.log("✅ [DEBUG] Fin de updateGuest atteinte, envoi de la réponse..."); // à supprimer
+
       return res.status(200).json(updated);
     }
   } catch (error) {
     console.error("❌ [DEBUG] updateGuest error:", error); // à supprimer
     if (!silent && res) res.status(500).json({ error: error.message });
+    //ajout test//
+    if (res && !silent) {
+      console.log("✅ [DEBUG] Réponse JSON envoyée");
+      return res.status(200).json(updated);
+    }
   }
 };
 
