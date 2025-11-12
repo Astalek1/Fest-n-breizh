@@ -11,13 +11,7 @@ router.get("/:id", guestsCtrl.getOneGuest);
 
 router.post("/", auth, multer.single("media"), resizeImage, guestsCtrl.createGuest);
 
-router.put(
-  "/:id",
-  auth,
-  multer.fields({ name: "media", maxCount: 1 }),
-  resizeImage,
-  guestsCtrl.updateGuest
-);
+router.put("/:id", auth, multer.single("media"), resizeImage, guestsCtrl.updateGuest);
 
 router.delete("/:id", auth, guestsCtrl.deleteGuest);
 
