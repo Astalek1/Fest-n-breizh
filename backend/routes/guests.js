@@ -14,7 +14,7 @@ router.post("/", auth, multer.single("media"), resizeImage, guestsCtrl.createGue
 router.put(
   "/:id",
   auth,
-  multer.single({ name: "media", maxCount: 1 }),
+  multer.fields({ name: "media", maxCount: 1 }),
   resizeImage,
   guestsCtrl.updateGuest
 );
