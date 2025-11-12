@@ -63,7 +63,7 @@ router.post(
   auth,
   upload.fields([{ name: "media", maxCount: 10 }]),
   resizeImage,
-  artistsCtrl.createArtist
+  editionsCtrl.addArtistToEdition
 );
 
 router.put(
