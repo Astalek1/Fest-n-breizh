@@ -185,6 +185,13 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
+    // Validation minimale avant tout upload
+    if (!filtered.name || !filtered.description) {
+      if (!silent && res)
+        return res.status(400).json({ error: "Champs requis manquants : name ou description" });
+      throw new Error("Champs requis manquants");
+    }
+
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;

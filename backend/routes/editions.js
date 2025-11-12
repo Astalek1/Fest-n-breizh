@@ -47,14 +47,6 @@ router.post(
   editionsCtrl.addGuestToEdition
 );
 
-router.put(
-  "/:editionId/guests/:guestId",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.updateEdition
-);
-
 router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
 
 // === GESTION DES ARTISTES D'UNE ÉDITION ===
