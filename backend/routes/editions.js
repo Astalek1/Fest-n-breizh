@@ -47,14 +47,6 @@ router.post(
   editionsCtrl.addGuestToEdition
 );
 
-router.put(
-  "/:editionId/guests/:guestId",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.updateEdition
-);
-
 router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
 
 // === GESTION DES ARTISTES D'UNE ÉDITION ===
@@ -64,14 +56,6 @@ router.post(
   upload.fields([{ name: "media", maxCount: 10 }]),
   resizeImage,
   editionsCtrl.addArtistToEdition
-);
-
-router.put(
-  "/:editionId/artists/:artistId",
-  auth,
-  upload.single("media"),
-  resizeImage,
-  editionsCtrl.updateEdition
 );
 
 router.delete("/:editionId/artists/:artistId", auth, artistsCtrl.deleteArtist);
