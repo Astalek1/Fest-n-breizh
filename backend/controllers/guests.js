@@ -244,6 +244,9 @@ export const updateGuest = async (req, res, silent = false) => {
     }
 
     // === RÉPONSE JSON ===
+    console.log("🧩 [TRACE] res.headersSent juste avant res.json:", res.headersSent); //test
+    console.log("🧩 [TRACE] req.file?.stream.destroyed:", req.file?.stream?.destroyed); //test
+
     console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
     if (!silent && res && !res.headersSent) {
       console.log("📤 [TRACE] Envoi du JSON à Postman");
