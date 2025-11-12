@@ -119,6 +119,9 @@ export const getOneEdition = async (req, res) => {
 export const addArtistToEdition = async (req, res) => {
   try {
     console.log("🧩 Entrée dans addArtistToEdition()");
+    console.log("🧩 req.file:", !!req.file);
+    console.log("🧩 req.files:", req.files ? Object.keys(req.files) : "Aucun fichier reçu");
+
     const { editionId } = req.params;
 
     const edition = await Edition.findById(editionId);
