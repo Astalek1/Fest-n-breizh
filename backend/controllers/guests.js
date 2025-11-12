@@ -274,18 +274,19 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
     console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
-
     // === RÉPONSE (test Postman) ===
     console.log("🚦 [TRACE] Avant envoi réponse, typeof res:", typeof res);
     console.log("🚦 [TRACE] res.headersSent =", res.headersSent);
 
-    if (!silent && res) {
-      console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
-      return res.status(200).json(updated);
-    }
+    // ⚙️ Libération du flux Multer AVANT l’envoi de la réponse
     if (req.file && req.file.stream && !req.file.stream.destroyed) {
       console.log("⚙️ [DEBUG] Destruction du flux Multer avant réponse");
       req.file.stream.destroy(); // TEMPORAIRE : libère le flux
+    }
+
+    if (!silent && res) {
+      console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
+      return res.status(200).json(updated);
     }
 
     // TEMPORAIRE : traçage post-réponse
