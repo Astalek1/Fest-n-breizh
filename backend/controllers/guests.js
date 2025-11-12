@@ -180,13 +180,20 @@ export const updateGuest = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    // Vérification stricte des données avant tout upload
-    if (!filtered.name || !filtered.description || /<!DOCTYPE/i.test(JSON.stringify(req.body))) {
-      console.error("⚠️ Requête invalide détectée, upload annulé.");
+    // --- Vérification stricte avant tout upload ---
+    if (
+      !filtered.name ||
+      !filtered.description ||
+      typeof filtered.name !== "string" ||
+      /<!DOCTYPE/i.test(JSON.stringify(req.body))
+    ) {
+      console.error("⚠️ Requête invalide détectée, aucun upload ni update effectué.");
       if (!silent && res) {
-        return res.status(400).json({ error: "Requête invalide ou corps mal formé" });
+        return res
+          .status(400)
+          .json({ error: "Requête invalide : champs manquants ou corps mal formé." });
       }
-      return; // stoppe net la fonction avant tout upload
+      return; // STOP avant toute tentative d'upload
     }
 
     const mediaType = (body.mediaType || "").toLowerCase();
