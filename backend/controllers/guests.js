@@ -270,6 +270,9 @@ export const updateGuest = async (req, res, silent = false) => {
     console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
 
     // --- réponse finale ---
+    console.log("🚦 [TRACE] Avant envoi réponse, typeof res:", typeof res); // a suprimer
+    console.log("🚦 [TRACE] res.headersSent =", res.headersSent); // a suprimer
+
     if (!silent && res) {
       console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
       return res.status(200).json(updated);
