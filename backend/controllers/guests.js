@@ -185,11 +185,15 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    // Validation minimale avant tout upload
-    if (!filtered.name || !filtered.description) {
+    // --- Sécurité avant tout upload ---
+    if (!body.name || !body.description || body.name.startsWith("<!DOCTYPE")) {
+      console.error("⚠️ Requête invalide, aucun upload effectué");
+      if (req.file && req.file.buffer) req.file.buffer = null; // neutralise le buffer
       if (!silent && res)
-        return res.status(400).json({ error: "Champs requis manquants : name ou description" });
-      throw new Error("Champs requis manquants");
+        return res
+          .status(400)
+          .json({ error: "Requête invalide : données manquantes ou corrompues" });
+      throw new Error("Requête invalide : name/description absents ou DOCTYPE détecté");
     }
 
     if (sentNewMedia) {
