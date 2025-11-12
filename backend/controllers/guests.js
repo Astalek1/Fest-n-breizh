@@ -118,63 +118,66 @@ export const getOneGuest = async (req, res) => {
 
 // === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
-  console.log("🧩 [DEBUG] Entrée dans updateGuest()"); // à supprimer
-  console.log("🧩 [DEBUG] req.params =", req.params); // à supprimer
-  console.log("🧩 [DEBUG] req.body keys =", Object.keys(req.body)); // à supprimer
-  console.log("🧩 [DEBUG] req.file présent ?", !!req.file, "| field:", req.file?.fieldname); // à supprimer
+  console.log("🧩 [DEBUG] Entrée dans updateGuest()");
+  console.log("🧩 [DEBUG] req.params =", req.params);
+  console.log("🧩 [DEBUG] req.body keys =", Object.keys(req.body));
+  console.log("🧩 [DEBUG] req.file présent ?", !!req.file, "| field:", req.file?.fieldname);
 
   try {
     const guestId = req.params.guestId || req.params.id;
-    console.log("🧩 [DEBUG] guestId détecté:", guestId); // à supprimer
+    console.log("🧩 [DEBUG] guestId détecté:", guestId);
 
     const existing = await Guest.findById(guestId);
     console.log(
       "🧩 [DEBUG] Invité trouvé ?",
       !!existing,
       existing ? existing.name : "❌ non trouvé"
-    ); // à supprimer
+    );
     if (!existing) {
       if (!silent && res) return res.status(404).json("Invité non trouvé");
       throw new Error("Invité non trouvé");
     }
 
-    console.log("🧩 [DEBUG] Corps brut reçu:", req.body); // à supprimer
+    console.log("🧩 [DEBUG] Corps brut reçu:", req.body);
     const body = req.body.guest ? JSON.parse(req.body.guest) : req.body;
-    console.log("🧩 [DEBUG] Body parsé:", body); // à supprimer
+    console.log("🧩 [DEBUG] Body parsé:", body);
 
     if (!body.media && req.body.media) body.media = req.body.media;
     if (!body.mediaType && req.body.mediaType) body.mediaType = req.body.mediaType;
 
-    console.log("🧩 [DEBUG] body.mediaType =", body.mediaType, "| body.media =", !!body.media); // à supprimer
+    console.log("🧩 [DEBUG] body.mediaType =", body.mediaType, "| body.media =", !!body.media);
 
     const filtered = {};
     for (const k of ["name", "description"]) {
       if (body[k] !== undefined && body[k] !== "") filtered[k] = body[k];
     }
 
-    console.log("🧩 [DEBUG] Champs filtrés initiaux:", filtered); // à supprimer
+    console.log("🧩 [DEBUG] Champs filtrés initiaux:", filtered);
 
     const baseName =
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
-    console.log("🧩 [DEBUG] baseName calculé:", baseName); // à supprimer
+    console.log("🧩 [DEBUG] baseName calculé:", baseName);
 
     const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
-    console.log("🧩 [DEBUG] sentNewMedia =", sentNewMedia, "| mediaType =", mediaType); // à supprimer
+    console.log("🧩 [DEBUG] sentNewMedia =", sentNewMedia, "| mediaType =", mediaType);
 
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
-    console.log("🧩 [DEBUG] Ancien média:", { oldImageId, oldLogoId }); // à supprimer
+    console.log("🧩 [DEBUG] Ancien média:", { oldImageId, oldLogoId });
 
     let newImageId = null;
     let newLogoId = null;
+
+    // --- nouveau média ---
     if (sentNewMedia) {
-      console.log("🧩 [DEBUG] => Nouveau média détecté, traitement..."); // à supprimer
+      console.log("🧩 [DEBUG] => Nouveau média détecté, traitement...");
+
       if (mediaType === "video") {
-        console.log("🧩 [DEBUG] Type vidéo, aucun upload ImageKit effectué"); // à supprimer
+        console.log("🧩 [DEBUG] Type vidéo, aucun upload ImageKit effectué");
         filtered.media = body.media || existing.media;
         filtered.mediaFileId = null;
         filtered.logo = null;
@@ -183,25 +186,25 @@ export const updateGuest = async (req, res, silent = false) => {
       } else {
         const isLogo = mediaType === "logo";
         const folder = isLogo ? "/festn_breizh/logos" : "/festn_breizh/invités";
-        console.log("🧩 [DEBUG] Type:", isLogo ? "logo" : "image", "| dossier:", folder); // à supprimer
+        console.log("🧩 [DEBUG] Type:", isLogo ? "logo" : "image", "| dossier:", folder);
 
         let url = null;
         let fileId = null;
         let fileName = null;
 
         if (isFileId(body.media)) {
-          console.log("🧩 [DEBUG] body.media est un fileId, récupération depuis ImageKit"); // à supprimer
+          console.log("🧩 [DEBUG] body.media est un fileId, récupération depuis ImageKit");
           const details = await imagekit.getFileDetails(body.media);
           url = details.url;
           fileId = details.fileId;
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
-          console.log("🧩 [DEBUG] Upload ou buffer détecté, appel resolveMedia()"); // à supprimer
+          console.log("🧩 [DEBUG] Upload ou buffer détecté, appel resolveMedia()");
           const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
-          console.log("✅ [DEBUG] Résultat resolveMedia:", up); // à supprimer
+          console.log("✅ [DEBUG] Résultat resolveMedia:", up);
 
           if (!up?.url) {
-            console.error("❌ [DEBUG] Erreur : resolveMedia n’a pas retourné d’URL"); // à supprimer
+            console.error("❌ [DEBUG] Erreur : resolveMedia n’a pas retourné d’URL");
             return res.status(400).json("Média invalide ou introuvable");
           }
 
@@ -228,76 +231,53 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // --- nettoyage ancien média ---
+    // --- nettoyage ancien média (attente sécurisée) ---
     if (sentNewMedia) {
-      console.log("🧩 [DEBUG] Vérification des anciens médias à supprimer..."); // à supprimer
+      console.log("🧩 [DEBUG] Vérification des anciens médias à supprimer...");
+      const deleteTasks = [];
 
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
-        console.log("🧩 [DEBUG] Suppression ancienne image", oldImageId); // à supprimer
-        imagekit
-          .deleteFile(oldImageId)
-          .then(() => console.log("✅ [DEBUG] Ancienne image supprimée")) // à supprimer
-          .catch((err) => console.warn("⚠️ [DEBUG] Échec suppression ancienne image", err.message)); // à supprimer
+        deleteTasks.push(
+          imagekit
+            .deleteFile(oldImageId)
+            .then(() => console.log("✅ Ancienne image supprimée"))
+            .catch((err) => console.warn("⚠️ Échec suppression ancienne image:", err.message))
+        );
       }
 
-      if (mediaType === "video" && oldImageId) {
-        console.log("🧩 [DEBUG] Suppression ancienne image vidéo", oldImageId); // à supprimer
-        imagekit
-          .deleteFile(oldImageId)
-          .catch((err) =>
-            console.warn("⚠️ [DEBUG] Échec suppression ancienne image vidéo", err.message)
-          ); // à supprimer
+      if (mediaType === "logo" && oldLogoId && oldLogoId !== newLogoId) {
+        deleteTasks.push(
+          isFileInUse(oldLogoId)
+            .then((used) => {
+              if (!used) {
+                console.log("🧩 Ancien logo inutilisé, suppression...");
+                return imagekit.deleteFile(oldLogoId);
+              }
+            })
+            .catch((err) => console.warn("⚠️ Vérification ancien logo échouée:", err.message))
+        );
       }
 
-      if (mediaType === "logo" && oldImageId) {
-        console.log("🧩 [DEBUG] Suppression ancienne image liée au logo", oldImageId); // à supprimer
-        imagekit
-          .deleteFile(oldImageId)
-          .catch((err) =>
-            console.warn("⚠️ [DEBUG] Échec suppression image liée au logo", err.message)
-          ); // à supprimer
-      }
-
-      if (mediaType === "image" && oldLogoId) {
-        console.log("🧩 [DEBUG] Vérification ancien logo inutilisé", oldLogoId); // à supprimer
-        isFileInUse(oldLogoId)
-          .then((used) => {
-            if (!used) {
-              console.log("🧩 [DEBUG] Ancien logo inutilisé, suppression"); // à supprimer
-              return imagekit.deleteFile(oldLogoId);
-            }
-          })
-          .catch((err) => console.warn("⚠️ [DEBUG] Vérification ancien logo échouée", err.message)); // à supprimer
-      }
-
-      if (mediaType === "logo" && oldLogoId && newLogoId && oldLogoId !== newLogoId) {
-        console.log("🧩 [DEBUG] Ancien logo différent du nouveau, suppression sécurisée"); // à supprimer
-        isFileInUse(oldLogoId)
-          .then((used) => {
-            if (!used) {
-              console.log("🧩 [DEBUG] Suppression ancien logo", oldLogoId); // à supprimer
-              return imagekit.deleteFile(oldLogoId);
-            }
-          })
-          .catch((err) => console.warn("⚠️ [DEBUG] Suppression ancien logo échouée", err.message)); // à supprimer
-      }
+      await Promise.allSettled(deleteTasks);
     }
 
-    // --- mise à jour réelle dans MongoDB ---
-    console.log("📄 [DEBUG] filtered juste avant update:", filtered); // à supprimer
+    // --- mise à jour MongoDB ---
+    console.log("📄 [DEBUG] filtered juste avant update:", filtered);
     const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
       new: true,
       runValidators: false,
     });
-    console.log("✅ [DEBUG] Invité mis à jour en base:", updated); // à supprimer
+    console.log("✅ [DEBUG] Invité mis à jour en base:", updated);
 
-    if (silent) return updated;
-    if (res && !silent) {
-      console.log("🧩 [DEBUG] Taille JSON envoyée:", JSON.stringify(updated).length, "octets"); // à supprimer
+    // --- réponse finale ---
+    if (!silent && res) {
+      console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
       return res.status(200).json(updated);
     }
+
+    return updated;
   } catch (error) {
-    console.error("❌ [DEBUG] updateGuest error:", error); // à supprimer
+    console.error("❌ [DEBUG] updateGuest error:", error);
     if (!silent && res) {
       return res.status(500).json({ error: error.message || "Erreur inconnue dans updateGuest" });
     }
