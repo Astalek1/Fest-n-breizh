@@ -197,6 +197,12 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
+    // === MISE À JOUR MONGODB ===
+    const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
+      new: true,
+      runValidators: false,
+    });
+
     // === SUPPRESSION ANCIENS MÉDIAS (tous cas) ===
     console.log("🧩 Vérification suppression anciens médias...");
 
@@ -235,12 +241,6 @@ export const updateGuest = async (req, res, silent = false) => {
     } catch (err) {
       console.warn("⚠️ Erreur pendant la suppression des anciens médias:", err.message);
     }
-
-    // === MISE À JOUR MONGODB ===
-    const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
-      new: true,
-      runValidators: false,
-    });
 
     // === LIBÉRATION DU FLUX MULTER ===
     if (req.file?.stream && !req.file.stream.destroyed) {
