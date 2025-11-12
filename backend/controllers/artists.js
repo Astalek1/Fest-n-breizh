@@ -28,8 +28,10 @@ export const createArtist = async (req, res, silent = false) => {
         logoFileId: null,
         mediaName: baseName,
       });
+      console.log("=== DEBUG ARTIST READY TO SAVE ===", doc);
 
       await doc.save();
+      console.log("=== DEBUG ARTIST SAVED ===", doc._id);
 
       if (req.body.editionId) {
         const Edition = (await import("../models/Edition.js")).default;
