@@ -248,6 +248,8 @@ export const updateGuest = async (req, res, silent = false) => {
     console.log("🧩 [TRACE] req.file?.stream.destroyed:", req.file?.stream?.destroyed); //test
 
     console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
+    console.log("🧠 [TRACE] silent =", silent, "| res existe =", !!res);
+
     if (!silent && res && !res.headersSent) {
       console.log("📤 [TRACE] Envoi du JSON à Postman");
       return res.status(200).json({
