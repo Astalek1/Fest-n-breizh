@@ -118,7 +118,7 @@ export const getOneGuest = async (req, res) => {
 
 // === MODIFIER UN INVITÉ ===
 export const updateGuest = async (req, res, silent = false) => {
-  console.log("🧩 DEBUG multer field:", req.file?.fieldname || "aucun fichier reçu");
+  console.log("🧩 DEBUG multer field:", req.file?.fieldname || "aucun fichier reçu"); // a suprimer
 
   try {
     const guestId = req.params.guestId || req.params.id;
@@ -173,6 +173,7 @@ export const updateGuest = async (req, res, silent = false) => {
           fileName = details.name?.replace(/\.[^/.]+$/, "") || baseName;
         } else {
           const up = await resolveMedia(body.media, req.file, folder, `${baseName}-${Date.now()}`);
+          console.log("✅ resolveMedia terminé, résultat:", up); // a suprimer
           if (!up?.url) return res.status(400).json("Média invalide ou introuvable");
           url = up.url;
           fileId = up.fileId || null;
@@ -199,10 +200,13 @@ export const updateGuest = async (req, res, silent = false) => {
       filtered.mediaName = baseName;
     }
 
+    console.log("📄 filtered juste avant update:", filtered); // a suprimer
     const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
       new: true,
       runValidators: false,
     });
+
+    console.log("✅ Invité mis à jour :", updated ? updated._id : "aucun résultat"); // a suprimer
 
     if (sentNewMedia) {
       if (mediaType === "image" && oldImageId && oldImageId !== newImageId) {
