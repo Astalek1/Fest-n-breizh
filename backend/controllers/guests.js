@@ -156,7 +156,11 @@ export const getOneGuest = async (req, res) => {
 export const updateGuest = async (req, res, silent = false) => {
   try {
     const guestId = req.params.guestId || req.params.id;
+    console.log("🧩 updateGuest() called with guestId:", guestId);
+
     const existing = await Guest.findById(guestId);
+    console.log("🧩 existing guest found:", !!existing);
+
     if (!existing) {
       if (!silent && res) return res.status(404).json("Invité non trouvé");
       else throw new Error("Invité non trouvé");
@@ -176,6 +180,15 @@ export const updateGuest = async (req, res, silent = false) => {
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
 
+    // Vérification stricte des données avant tout upload
+    if (!filtered.name || !filtered.description || /<!DOCTYPE/i.test(JSON.stringify(req.body))) {
+      console.error("⚠️ Requête invalide détectée, upload annulé.");
+      if (!silent && res) {
+        return res.status(400).json({ error: "Requête invalide ou corps mal formé" });
+      }
+      return; // stoppe net la fonction avant tout upload
+    }
+
     const mediaType = (body.mediaType || "").toLowerCase();
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
 
@@ -184,17 +197,6 @@ export const updateGuest = async (req, res, silent = false) => {
 
     let newImageId = null;
     let newLogoId = null;
-
-    // --- Sécurité avant tout upload ---
-    if (!body.name || !body.description || body.name.startsWith("<!DOCTYPE")) {
-      console.error("⚠️ Requête invalide, aucun upload effectué");
-      if (req.file && req.file.buffer) req.file.buffer = null; // neutralise le buffer
-      if (!silent && res)
-        return res
-          .status(400)
-          .json({ error: "Requête invalide : données manquantes ou corrompues" });
-      throw new Error("Requête invalide : name/description absents ou DOCTYPE détecté");
-    }
 
     if (sentNewMedia) {
       if (mediaType === "video") {
