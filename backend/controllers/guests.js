@@ -117,8 +117,9 @@ export const getOneGuest = async (req, res) => {
 };
 
 // === MODIFIER UN INVITÉ ===
-export const updateGuest = async (req, res, next) => {
+export const updateGuest = async (req, res, silent = false) => {
   try {
+    const isSilent = typeof silent === "boolean" ? silent : false;
     // --- Récupération de l’invité ---
     const guestId = req.params.guestId || req.params.id;
     const existing = await Guest.findById(guestId);
@@ -250,19 +251,13 @@ export const updateGuest = async (req, res, next) => {
     console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
     console.log("🧠 [TRACE] silent =", silent, "| res existe =", !!res);
 
-    if (!silent && res && !res.headersSent) {
-      console.log("📤 [TRACE] Envoi du JSON à Postman");
-      return res.status(200).json({
-        message: "Invité mis à jour avec succès",
-        guest: updated,
-      });
+    if (!isSilent && res) {
+      return res.status(200).json(updated);
     }
-
-    console.log("⚠️ [TRACE] Aucun retour envoyé (mode silent ou headers déjà envoyés)"); // test
     return updated;
   } catch (error) {
     console.error("[DEBUG] updateGuest error:", error);
-    if (!silent && res) {
+    if (!isSilent && res) {
       return res.status(500).json({ error: error.message || "Erreur inconnue dans updateGuest" });
     }
   }
