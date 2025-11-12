@@ -71,7 +71,7 @@ router.put(
   auth,
   upload.single("media"),
   resizeImage,
-  artistsCtrl.updateArtist
+  editionsCtrl.updateEdition
 );
 
 router.delete("/:editionId/artists/:artistId", auth, artistsCtrl.deleteArtist);
