@@ -9,7 +9,7 @@ const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${
 // Créér un artiste //
 export const createArtist = async (req, res, silent = false) => {
   try {
-    const body = JSON.parse(req.body.guest || "{}");
+    const body = JSON.parse(req.body.artist || "{}");
     const mediaType = (body.mediaType || "").toLowerCase();
     const isLogo = mediaType === "logo";
     const baseName =
