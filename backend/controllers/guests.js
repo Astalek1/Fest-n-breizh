@@ -185,13 +185,6 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    // Validation minimale avant tout upload
-    if (!filtered.name || !filtered.description) {
-      if (!silent && res)
-        return res.status(400).json({ error: "Champs requis manquants : name ou description" });
-      throw new Error("Champs requis manquants");
-    }
-
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;
@@ -290,26 +283,6 @@ export const updateGuest = async (req, res, silent = false) => {
     if (res && !silent) return res.status(200).json(updated);
   } catch (error) {
     if (!silent && res) res.status(500).json({ error: error.message });
-    if (req.file) {
-      const folder =
-        (req.body.mediaType || "").toLowerCase() === "logo"
-          ? "/festn_breizh/logos"
-          : "/festn_breizh/invités";
-
-      // On tente de supprimer le nouveau fichier si l’upload a eu lieu
-      if (req.file.filename && req.file.filename.endsWith(".webp")) {
-        try {
-          const fileName = req.file.originalname.replace(/\.[^/.]+$/, "");
-          const search = await imagekit.listFiles({
-            searchQuery: `name="${fileName}" AND folder="${folder}"`,
-          });
-          if (search && search.length > 0) {
-            await imagekit.deleteFile(search[0].fileId);
-            console.log("Image supprimée suite à échec de mise à jour invité");
-          }
-        } catch {}
-      }
-    }
   }
 };
 
