@@ -283,6 +283,10 @@ export const updateGuest = async (req, res, silent = false) => {
       console.log("📤 [DEBUG] Envoi réponse JSON à Postman...");
       return res.status(200).json(updated);
     }
+    if (req.file && req.file.stream && !req.file.stream.destroyed) {
+      console.log("⚙️ [DEBUG] Destruction du flux Multer avant réponse");
+      req.file.stream.destroy(); // TEMPORAIRE : libère le flux
+    }
 
     // TEMPORAIRE : traçage post-réponse
     console.log("✅ [TRACE] res.json() envoyé");
