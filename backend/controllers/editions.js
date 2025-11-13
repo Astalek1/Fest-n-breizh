@@ -49,19 +49,11 @@ export const createEdition = async (req, res) => {
     const uploadedGuestFiles = req.files?.guestFiles || [];
     fileCursor = 0;
 
-    console.log("DEBUG req.files.guestFiles length:", uploadedGuestFiles.length);
     uploadedGuestFiles.forEach((f, i) => console.log(`guestFiles[${i}] →`, f.originalname));
 
     for (const [index, guestData] of (editionData.guests || []).entries()) {
       const needsFile = guestData.mediaType !== "video" && !guestData.mediaFileId;
       const mediaFile = needsFile ? uploadedGuestFiles[fileCursor++] || null : null;
-
-      console.log("DEBUG guest index:", index, {
-        hasFile: !!mediaFile,
-        mediaType: guestData.mediaType,
-        guestFilesCount: uploadedGuestFiles.length,
-        fileCursor,
-      });
 
       const newGuest = await guestsCtrl.createGuest(
         { body: { guest: JSON.stringify(guestData) }, file: mediaFile },
@@ -127,7 +119,7 @@ export const addArtistToEdition = async (req, res) => {
     const edition = await Edition.findById(editionId);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    // ✅ Récupération et parsing du body (gestion Postman)
+    // Récupération et parsing du body (gestion Postman)
     const artistData =
       typeof req.body.artist === "string"
         ? JSON.parse(req.body.artist)
@@ -135,27 +127,27 @@ export const addArtistToEdition = async (req, res) => {
 
     console.log("DEBUG artist body:", artistData);
 
-    // ✅ Récupération du fichier média
+    // Récupération du fichier média
     const file = req.file || (req.files?.media ? req.files.media[0] : null);
 
-    // ✅ Construction d'une requête factice pour createGuest()
+    // Construction d'une requête factice pour createGuest()
     const fakeReq = {
       params: {},
       body: { artist: JSON.stringify(artistData) }, // 🔥 c’est ce qui manquait
       file,
     };
 
-    // ✅ Création de l'artiste
+    // Création de l'artiste
     const createdArtist = await artistsCtrl.createArtist(fakeReq, null, true);
     if (!createdArtist?._id) {
       return res.status(400).json({ message: "Échec de la création de l’artiste" });
     }
 
-    // ✅ Ajout à l’édition
+    // Ajout à l’édition
     edition.artists.push(createdArtist._id);
     await edition.save();
 
-    console.log(`✅ Artiste ajouté à l’édition ${editionId}`);
+    console.log(`Artiste ajouté à l’édition ${editionId}`);
     res.status(201).json({
       message: "Artiste ajouté avec succès",
       artist: createdArtist,
@@ -168,28 +160,25 @@ export const addArtistToEdition = async (req, res) => {
 // === AJOUTER DES INVITÉS À UNE ÉDITION ===
 export const addGuestToEdition = async (req, res) => {
   try {
-    console.log("🧩 Entrée dans addGuestToEdition()");
     const { editionId } = req.params;
 
     const edition = await Edition.findById(editionId);
     if (!edition) return res.status(404).json("Édition non trouvée");
 
-    // ✅ Parsing du tableau d’invités depuis le champ unique "guest"
+    // Parsing du tableau d’invités depuis le champ unique "guest"
     const guests = Array.isArray(req.body.guest)
       ? req.body.guest
       : JSON.parse(req.body.guest || "[]");
-
-    console.log("DEBUG guest body:", guests);
 
     if (!Array.isArray(guests) || !guests.length) {
       return res.status(400).json({ message: "Aucun invité valide fourni" });
     }
 
-    // ✅ Gestion des fichiers (si plusieurs fichiers dans req.files)
+    // Gestion des fichiers (si plusieurs fichiers dans req.files)
     const files = req.files?.media || (req.file ? [req.file] : []);
     const createdGuests = [];
 
-    // ✅ Boucle sur chaque invité du tableau
+    // Boucle sur chaque invité du tableau
     for (let i = 0; i < guests.length; i++) {
       const guestData = guests[i];
       const file = files[i] || null;
@@ -205,14 +194,13 @@ export const addGuestToEdition = async (req, res) => {
         edition.guests.push(createdGuest._id);
         createdGuests.push(createdGuest);
       } else {
-        console.warn(`⚠️ Échec création invité index ${i}`);
+        console.warn(`Échec création invité index ${i}`);
       }
     }
 
-    // ✅ Sauvegarde finale de l’édition
+    // Sauvegarde finale de l’édition
     await edition.save();
-
-    console.log(`✅ ${createdGuests.length} invité(s) ajouté(s) à l’édition ${editionId}`);
+    console.log(` ${createdGuests.length} invité(s) ajouté(s) à l’édition ${editionId}`);
     res.status(201).json({
       message: "Invités ajoutés avec succès",
       guests: createdGuests,
@@ -228,44 +216,32 @@ export const updateEdition = async (req, res) => {
   const { editionId, guestId } = req.params;
 
   if (guestId) {
-    console.log("🔁 Mode édition invité spécifique");
     const fakeReq = {
       params: { id: guestId },
       body: req.body,
       file: req.file,
     };
 
-    console.log("🎯 DEBUG updateEdition -> guest update:");
-    console.log("req.file:", !!req.file);
-    console.log("req.body keys:", Object.keys(req.body));
-    console.log("guestId:", guestId);
-
     return await guestsCtrl.updateGuest(fakeReq, res, false);
   }
 
-  console.log("\n🧩 CHECKPOINT 0 – Entrée dans updateEdition()");
   try {
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
-    console.log("CHECKPOINT 1 – editionData keys:", Object.keys(editionData));
 
     const existingEdition = await Edition.findById(req.params.editionId || req.params.id);
-    console.log("CHECKPOINT 2 – Edition trouvée:", !!existingEdition);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
 
     const updatedArtists = [];
     const updatedGuests = [];
 
     // === ARTISTES ===
-    console.log("CHECKPOINT 3 – Début boucle ARTISTES");
     for (const [index, artist] of (editionData.artists || []).entries()) {
-      console.log(`CHECKPOINT 3.${index} – Traitement artiste ${artist._id || "sans ID"}`);
       if (!artist._id) continue;
 
       const file =
         req.files?.artistFiles?.[index] ||
         (req.files?.artistFiles || []).find((f) => f.originalname.includes(artist.fileName)) ||
         null;
-      console.log(`CHECKPOINT 3.${index}.1 – Fichier trouvé:`, !!file);
 
       const fakeReq = {
         params: { id: artist._id },
@@ -273,24 +249,19 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      console.log(`CHECKPOINT 3.${index}.2 – Appel updateArtist()`);
       const updated = await artistsCtrl.updateArtist(fakeReq, null, true);
-      console.log(`CHECKPOINT 3.${index}.3 – Résultat updateArtist:`, !!updated);
 
       if (updated?._id) updatedArtists.push(updated._id);
     }
 
     // === INVITÉS ===
-    console.log("CHECKPOINT 4 – Début boucle INVITÉS");
     for (const [index, guest] of (editionData.guests || []).entries()) {
-      console.log(`CHECKPOINT 4.${index} – Traitement invité ${guest._id || "sans ID"}`);
       if (!guest._id) continue;
 
       const file =
         req.files?.guestFiles?.[index] ||
         (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
         null;
-      console.log(`CHECKPOINT 4.${index}.1 – Fichier trouvé:`, !!file);
 
       const fakeReq = {
         params: { id: guest._id },
@@ -298,14 +269,10 @@ export const updateEdition = async (req, res) => {
         file,
       };
 
-      console.log(`CHECKPOINT 4.${index}.2 – Appel updateGuest()`);
       const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
-      console.log(`CHECKPOINT 4.${index}.3 – Résultat updateGuest:`, !!updated);
 
       if (updated?._id) updatedGuests.push(updated._id);
     }
-
-    console.log("CHECKPOINT 5 – Fin des boucles, maj Edition");
 
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.poster = editionData.poster || existingEdition.poster;
@@ -313,22 +280,15 @@ export const updateEdition = async (req, res) => {
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
     if (updatedGuests.length) existingEdition.guests = updatedGuests;
 
-    console.log("CHECKPOINT 6 – Sauvegarde de l’édition en base");
     await existingEdition.save();
-
-    console.log(`✅ CHECKPOINT 7 – Édition mise à jour (${existingEdition._id})`);
 
     res.status(200).json({
       message: "Édition mise à jour avec succès",
       edition: existingEdition,
     });
-
-    console.log("CHECKPOINT 8 – Réponse envoyée");
   } catch (error) {
-    console.error("❌ updateEdition error:", error);
+    console.error("updateEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
-  } finally {
-    console.log("🧩 CHECKPOINT 9 – FIN FONCTION REELLE updateEdition()");
   }
 };
 
