@@ -204,22 +204,20 @@ export const updateGuest = async (req, res, silent = false) => {
     });
 
     // === SUPPRESSION ANCIENS MÉDIAS (tous cas) ===
-    console.log("🧩 Vérification suppression anciens médias...");
-
     try {
       // === Cas 1 : passage à une vidéo ===
       if (mediaType === "video") {
         if (oldImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("✅ Ancienne image supprimée (passage vidéo)");
+          console.log("Ancienne image supprimée (passage vidéo)");
         }
         if (oldLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("✅ Ancien logo supprimé (passage vidéo)");
+            console.log("Ancien logo supprimé (passage vidéo)");
           } else {
-            console.log("ℹ️ Ancien logo conservé (encore utilisé)");
+            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
@@ -229,16 +227,16 @@ export const updateGuest = async (req, res, silent = false) => {
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("✅ Ancienne image supprimée (nouvelle image)");
+          console.log("Ancienne image supprimée (nouvelle image)");
         }
         // Supprimer ancien logo si présent et plus utilisé
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("✅ Ancien logo supprimé (passage image)");
+            console.log("Ancien logo supprimé (passage image)");
           } else {
-            console.log("ℹ️ Ancien logo conservé (encore utilisé)");
+            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
@@ -248,21 +246,21 @@ export const updateGuest = async (req, res, silent = false) => {
         // Supprimer ancienne image si existante
         if (oldImageId && oldImageId !== newImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("✅ Ancienne image supprimée (passage logo)");
+          console.log("Ancienne image supprimée (passage logo)");
         }
         // Supprimer ancien logo si différent et non utilisé ailleurs
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("✅ Ancien logo supprimé (nouveau logo)");
+            console.log("Ancien logo supprimé (nouveau logo)");
           } else {
-            console.log("ℹ️ Ancien logo conservé (encore utilisé)");
+            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
     } catch (error) {
-      console.warn("⚠️ Erreur pendant la suppression des anciens médias:", err.message);
+      console.warn("Erreur pendant la suppression des anciens médias:", err.message);
     }
 
     // === LIBÉRATION DU FLUX MULTER ===
@@ -271,12 +269,6 @@ export const updateGuest = async (req, res, silent = false) => {
     }
 
     // === RÉPONSE JSON ===
-    console.log("🧩 [TRACE] res.headersSent juste avant res.json:", res.headersSent); //test
-    console.log("🧩 [TRACE] req.file?.stream.destroyed:", req.file?.stream?.destroyed); //test
-
-    console.log("✅ [TRACE] Fin logique updateGuest, préparation du retour…"); //test
-    console.log("🧠 [TRACE] silent =", silent, "| res existe =", !!res);
-
     if (!isSilent && res) {
       return res.status(200).json(updated);
     }
