@@ -6,7 +6,7 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 const isFileId = (v) => typeof v === "string" && /^[a-zA-Z0-9_-]{8,}$/.test(v);
 const toSlug = (s) => (s || "").trim().replace(/\s+/g, "-").toLowerCase() || `${Date.now()}`;
 
-// === CRÉER UN INVITÉ ===
+// Création d'un invité //
 export const createGuest = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.guest || "{}");
@@ -95,7 +95,7 @@ export const createGuest = async (req, res, silent = false) => {
   }
 };
 
-// === RÉCUPÉRER TOUS LES INVITÉS ===
+// Récupérer tous les invités //
 export const getAllGuests = async (req, res) => {
   try {
     const guests = await Guest.find();
@@ -105,7 +105,7 @@ export const getAllGuests = async (req, res) => {
   }
 };
 
-// === RÉCUPÉRER UN INVITÉ ===
+// Récupérer un invité //
 export const getOneGuest = async (req, res) => {
   try {
     const guest = await Guest.findById(req.params.id);
@@ -116,7 +116,7 @@ export const getOneGuest = async (req, res) => {
   }
 };
 
-// === MODIFIER UN INVITÉ ===
+// Modifier un invité //
 export const updateGuest = async (req, res, silent = false) => {
   try {
     const isSilent = typeof silent === "boolean" ? silent : false;
@@ -154,7 +154,7 @@ export const updateGuest = async (req, res, silent = false) => {
     let newImageId = null;
     let newLogoId = null;
 
-    // === TRAITEMENT DU NOUVEAU MÉDIA ===
+    // --- TRAITEMENT DU NOUVEAU MÉDIA ---
     if (sentNewMedia) {
       if (mediaType === "video") {
         filtered.media = body.media || existing.media;
@@ -197,15 +197,16 @@ export const updateGuest = async (req, res, silent = false) => {
       }
     }
 
-    // === MISE À JOUR MONGODB ===
+    // --- MISE À JOUR MONGODB ---
     const updated = await Guest.findByIdAndUpdate(guestId, filtered, {
       new: true,
       runValidators: false,
     });
 
-    // === SUPPRESSION ANCIENS MÉDIAS (tous cas) ===
+    // ---SUPPRESSION ANCIENS MÉDIAS (tous cas) ---
+
+    // === Cas 1 : passage à une vidéo ===
     try {
-      // === Cas 1 : passage à une vidéo ===
       if (mediaType === "video") {
         if (oldImageId) {
           await imagekit.deleteFile(oldImageId);
@@ -263,12 +264,10 @@ export const updateGuest = async (req, res, silent = false) => {
       console.warn("Erreur pendant la suppression des anciens médias:", err.message);
     }
 
-    // === LIBÉRATION DU FLUX MULTER ===
     if (req.file?.stream && !req.file.stream.destroyed) {
       req.file.stream.destroy();
     }
 
-    // === RÉPONSE JSON ===
     if (!isSilent && res) {
       return res.status(200).json(updated);
     }
@@ -281,7 +280,7 @@ export const updateGuest = async (req, res, silent = false) => {
   }
 };
 
-// === SUPPRIMER UN INVITÉ ===
+// Supprimer un invité //
 export const deleteGuest = async (req, res) => {
   try {
     const guestId = req.params.guestId || req.params.id;
