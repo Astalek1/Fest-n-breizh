@@ -90,7 +90,6 @@ export const createGuest = async (req, res, silent = false) => {
     if (silent) return doc;
     return res.status(201).json({ message: "Invité ajouté avec succès", guest: doc });
   } catch (error) {
-    console.error("createGuest error:", error);
     if (!silent && res) res.status(500).json({ error: error.message });
   }
 };
@@ -210,15 +209,11 @@ export const updateGuest = async (req, res, silent = false) => {
       if (mediaType === "video") {
         if (oldImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée (passage vidéo)");
         }
         if (oldLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé (passage vidéo)");
-          } else {
-            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
@@ -228,16 +223,12 @@ export const updateGuest = async (req, res, silent = false) => {
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée (nouvelle image)");
         }
         // Supprimer ancien logo si présent et plus utilisé
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé (passage image)");
-          } else {
-            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
@@ -247,21 +238,17 @@ export const updateGuest = async (req, res, silent = false) => {
         // Supprimer ancienne image si existante
         if (oldImageId && oldImageId !== newImageId) {
           await imagekit.deleteFile(oldImageId);
-          console.log("Ancienne image supprimée (passage logo)");
         }
         // Supprimer ancien logo si différent et non utilisé ailleurs
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
             await imagekit.deleteFile(oldLogoId);
-            console.log("Ancien logo supprimé (nouveau logo)");
-          } else {
-            console.log("Ancien logo conservé (encore utilisé)");
           }
         }
       }
     } catch (error) {
-      console.warn("Erreur pendant la suppression des anciens médias:", err.message);
+      console.warn("Erreur pendant la suppression des anciens médias:", error.message);
     }
 
     if (req.file?.stream && !req.file.stream.destroyed) {
@@ -273,7 +260,6 @@ export const updateGuest = async (req, res, silent = false) => {
     }
     return updated;
   } catch (error) {
-    console.error("[DEBUG] updateGuest error:", error);
     if (!isSilent && res) {
       return res.status(500).json({ error: error.message || "Erreur inconnue dans updateGuest" });
     }
@@ -306,7 +292,6 @@ export const deleteGuest = async (req, res) => {
 
     res.status(200).json("Invité supprimé avec succès");
   } catch (error) {
-    console.error("deleteGuest error:", error);
     res.status(500).json({ error: "Erreur serveur (deleteGuest)" });
   }
 };
