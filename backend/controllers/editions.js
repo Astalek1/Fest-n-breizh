@@ -21,19 +21,11 @@ export const createEdition = async (req, res) => {
     const uploadedArtistFiles = req.files?.artistFiles || [];
     let fileCursor = 0;
 
-    console.log("DEBUG req.files.artistFiles length:", uploadedArtistFiles.length);
     uploadedArtistFiles.forEach((f, i) => console.log(`artistFiles[${i}] →`, f.originalname));
 
     for (const [index, artistData] of (editionData.artists || []).entries()) {
       const needsFile = artistData.mediaType !== "video" && !artistData.mediaFileId;
       const mediaFile = needsFile ? uploadedArtistFiles[fileCursor++] || null : null;
-
-      console.log("DEBUG guest index:", index, {
-        hasFile: !!mediaFile,
-        mediaType: artistData.mediaType,
-        artistFilesCount: uploadedArtistFiles.length,
-        fileCursor,
-      });
 
       const newArtist = await artistsCtrl.createArtist(
         { body: { artist: JSON.stringify(artistData) }, file: mediaFile },
@@ -78,7 +70,6 @@ export const createEdition = async (req, res) => {
       edition: newEdition,
     });
   } catch (error) {
-    console.error("createEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (createEdition)" });
   }
 };
@@ -86,12 +77,9 @@ export const createEdition = async (req, res) => {
 // === LIRE TOUTES LES ÉDITIONS ===
 export const getAllEditions = async (req, res) => {
   try {
-    console.log("DEBUG getAllEditions start");
     const editions = await Edition.find().populate("artists").populate("guests");
-    console.log("DEBUG editions found:", editions.length);
     res.status(200).json(editions);
-  } catch (err) {
-    console.error("getAllEditions error:", err);
+  } catch (error) {
     res.status(500).json("Erreur serveur, base de données inaccessible");
   }
 };
@@ -110,10 +98,6 @@ export const getOneEdition = async (req, res) => {
 // === AJOUTER UN ARTISTE À UNE ÉDITION ===
 export const addArtistToEdition = async (req, res) => {
   try {
-    console.log("🧩 Entrée dans addArtistToEdition()");
-    console.log("🧩 req.file:", !!req.file);
-    console.log("🧩 req.files:", req.files ? Object.keys(req.files) : "Aucun fichier reçu");
-
     const { editionId } = req.params;
 
     const edition = await Edition.findById(editionId);
@@ -125,15 +109,13 @@ export const addArtistToEdition = async (req, res) => {
         ? JSON.parse(req.body.artist)
         : req.body.artist || req.body;
 
-    console.log("DEBUG artist body:", artistData);
-
     // Récupération du fichier média
     const file = req.file || (req.files?.media ? req.files.media[0] : null);
 
     // Construction d'une requête factice pour createGuest()
     const fakeReq = {
       params: {},
-      body: { artist: JSON.stringify(artistData) }, // 🔥 c’est ce qui manquait
+      body: { artist: JSON.stringify(artistData) },
       file,
     };
 
@@ -147,13 +129,11 @@ export const addArtistToEdition = async (req, res) => {
     edition.artists.push(createdArtist._id);
     await edition.save();
 
-    console.log(`Artiste ajouté à l’édition ${editionId}`);
     res.status(201).json({
       message: "Artiste ajouté avec succès",
       artist: createdArtist,
     });
   } catch (error) {
-    console.error("addArtistToEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (addArtistToEdition)" });
   }
 };
@@ -200,13 +180,11 @@ export const addGuestToEdition = async (req, res) => {
 
     // Sauvegarde finale de l’édition
     await edition.save();
-    console.log(` ${createdGuests.length} invité(s) ajouté(s) à l’édition ${editionId}`);
     res.status(201).json({
       message: "Invités ajoutés avec succès",
       guests: createdGuests,
     });
   } catch (error) {
-    console.error("addGuestToEdition error:", error);
     res.status(500).json({ error: error.message || "Erreur serveur (addGuestToEdition)" });
   }
 };
@@ -287,7 +265,6 @@ export const updateEdition = async (req, res) => {
       edition: existingEdition,
     });
   } catch (error) {
-    console.error("updateEdition error:", error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
   }
 };
@@ -313,7 +290,6 @@ export const deleteEdition = async (req, res) => {
     await Edition.findByIdAndDelete(req.params.id);
     res.status(200).json("Édition supprimée avec succès");
   } catch (error) {
-    console.error("deleteEdition error:", error);
     res.status(500).json({ error: error.message || "Erreur serveur (deleteEdition)" });
   }
 };
