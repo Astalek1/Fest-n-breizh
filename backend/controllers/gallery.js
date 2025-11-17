@@ -147,7 +147,7 @@ export const deletePoster = async (req, res) => {
 
 export const newPhoto = async (req, res) => {
   try {
-    const photoData = JSON.parse(req.body.photoData);
+    const photoData = JSON.parse(req.body.photo);
     if (!photoData.alt) return res.status(400).json("Le champ alt est obligatoire");
 
     const existing = await Gallery.findOne({
@@ -215,7 +215,7 @@ export const updatePhoto = async (req, res) => {
     });
     if (!existingPhoto) return res.status(404).json("Photo non trouvée");
 
-    const body = req.body.photoData ? JSON.parse(req.body.photoData) : req.body;
+    const body = req.body.photoData ? JSON.parse(req.body.photo) : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
