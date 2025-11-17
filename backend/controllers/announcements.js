@@ -95,6 +95,8 @@ export const updateAnnouncement = async (req, res) => {
       filtered.media = body.media || existing.media;
       filtered.mediaFileId = null;
       filtered.mediaName = baseName;
+      filtered.mediaType = nextType;
+
       didChangeFile = !!oldFileId; // suppression du fichier précédent si existait
     }
 
@@ -103,21 +105,27 @@ export const updateAnnouncement = async (req, res) => {
       if (!req.file && body.media && /^[a-zA-Z0-9]{8,}$/.test(body.media)) {
         // Réutilisation d’un logo existant
         const details = await imagekit.getFileDetails(body.media);
+
         filtered.media = details.url;
         filtered.mediaFileId = details.fileId;
         filtered.mediaName = baseName;
+        filtered.mediaType = nextType;
+
         newFileId = details.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
       } else if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
         // Nouveau logo
         const uploaded = await resolveMedia(body.media, req.file, "/festn_breizh/logos", baseName);
+
         if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
         filtered.media = uploaded.url;
         filtered.mediaFileId = uploaded.fileId;
         filtered.mediaName = uploaded.fileName || baseName;
+        filtered.mediaType = nextType;
+
         newFileId = uploaded.fileId;
-        didChangeFile = true;
+        didChangeFile = oldFileId && oldFileId !== newFileId;
       }
     }
 
@@ -139,6 +147,7 @@ export const updateAnnouncement = async (req, res) => {
         filtered.media = uploaded.url;
         filtered.mediaFileId = uploaded.fileId;
         filtered.mediaName = uploaded.fileName || baseName;
+        filtered.mediaType = nextType;
 
         newFileId = uploaded.fileId;
         didChangeFile = oldFileId && oldFileId !== newFileId;
@@ -156,6 +165,7 @@ export const updateAnnouncement = async (req, res) => {
         filtered.media = existing.media;
         filtered.mediaFileId = existing.mediaFileId;
         filtered.mediaName = existing.mediaName;
+        filtered.mediaType = nextType;
       }
     }
 
