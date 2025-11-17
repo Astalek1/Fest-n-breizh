@@ -117,7 +117,7 @@ export const updateAnnouncement = async (req, res) => {
         filtered.mediaFileId = uploaded.fileId;
         filtered.mediaName = uploaded.fileName || baseName;
         newFileId = uploaded.fileId;
-        didChangeFile = oldFileId && oldFileId !== newFileId;
+        didChangeFile = true;
       }
     }
 
