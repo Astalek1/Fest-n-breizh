@@ -41,6 +41,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
         "festn_breizh/accueil",
         "festn_breizh/affiches",
         "festn_breizh/gallery",
+        "festn_breizh/photos",
       ];
 
       // Si Sharp a généré deux versions ET que le dossier le demande
