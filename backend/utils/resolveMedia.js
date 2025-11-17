@@ -37,12 +37,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
       const timestamp = Date.now();
 
       // Dossiers avec double version (small + large)
-      const dualVersionFolders = [
-        "festn_breizh/accueil",
-        "festn_breizh/affiches",
-        "festn_breizh/gallery",
-        "festn_breizh/photos",
-      ];
+      const dualVersionFolders = ["festn_breizh/affiches", "festn_breizh/photos"];
 
       // Si Sharp a généré deux versions ET que le dossier le demande
       if (file.bufferSmall && file.bufferLarge && dualVersionFolders.includes(folder)) {

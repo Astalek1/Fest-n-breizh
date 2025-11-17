@@ -215,7 +215,7 @@ export const updatePhoto = async (req, res) => {
     });
     if (!existingPhoto) return res.status(404).json("Photo non trouvée");
 
-    const body = req.body.photoData ? JSON.parse(req.body.photo) : req.body;
+    const body = req.body.photo ? JSON.parse(req.body.photo) : req.body;
     const allowedFields = ["title", "alt", "caption"];
     const filteredData = {};
 
