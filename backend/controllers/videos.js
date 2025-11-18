@@ -3,7 +3,7 @@ import Video from "../models/Videos.js";
 // créée une nouvelle vidéo //
 export const newVideo = async (req, res) => {
   try {
-    const videoData = JSON.parse(req.body.video);
+    const videoData = req.body.video ? JSON.parse(req.body.video) : req.body;
 
     const newVideo = new Video({
       title: videoData.title,
@@ -46,19 +46,19 @@ export const getOneVideo = async (req, res) => {
 //modifier une vidéo//
 export const updateVideo = async (req, res) => {
   try {
-    const existingVideo = await Video.findOne({
-      _id: req.params.id,
-    });
+    const existingVideo = await Video.findOne({ _id: req.params.id });
     if (!existingVideo) {
       return res.status(404).json("video non trouvée");
     }
+
+    const body = req.body.video ? JSON.parse(req.body.video) : req.body;
 
     const allowedFields = ["title", "url", "description"];
 
     const filteredData = {};
     for (const field of allowedFields) {
-      if (req.body[field] !== undefined) {
-        filteredData[field] = req.body[field];
+      if (body[field] !== undefined) {
+        filteredData[field] = body[field];
       }
     }
 
