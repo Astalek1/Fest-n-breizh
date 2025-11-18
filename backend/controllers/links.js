@@ -3,32 +3,55 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// Créer un nouveau lien
+// Créer un nouveau lien //
 export const newLink = async (req, res) => {
   try {
-    const linkData = JSON.parse(req.body.link || "{}");
+    const body = JSON.parse(req.body.link || "{}");
 
-    const cleanName = (req.body.fileName || linkData.fileName || "logo-link")
+    const cleanName = (req.body.fileName || body.fileName || "logo-link")
       .trim()
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    const mediaResult = await resolveMedia(
-      linkData.media,
-      req.file,
-      "/festn_breizh/logos",
-      cleanName
-    );
+    let logoUrl = null;
+    let logoFileId = null;
+    let logoName = cleanName;
 
-    if (!mediaResult?.url) return res.status(400).json("Logo invalide");
+    // a) Réutilisation d’un logo existant (fileId)
+    if (body.file && /^[a-zA-Z0-9]{8,}$/.test(body.file)) {
+      const details = await imagekit.getFileDetails(body.file);
+      logoUrl = details.url;
+      logoFileId = details.fileId;
+      logoName = details.name.replace(/\.[^/.]+$/, "");
+    }
+
+    // b) Nouveau logo (upload)
+    else if (req.file) {
+      const uploaded = await resolveMedia(body.media, req.file, "/festn_breizh/logos", cleanName);
+      if (!uploaded?.url) return res.status(400).json("Logo invalide");
+      logoUrl = uploaded.url;
+      logoFileId = uploaded.fileId;
+      logoName = uploaded.fileName || cleanName;
+    }
+
+    // c) URL externe
+    else if (body.media && /^https?:\/\//i.test(body.media)) {
+      const uploaded = await resolveMedia(body.media, null, "/festn_breizh/logos", cleanName);
+      if (!uploaded?.url) return res.status(400).json("Logo invalide");
+      logoUrl = uploaded.url;
+      logoFileId = uploaded.fileId;
+      logoName = uploaded.fileName || cleanName;
+    }
+
+    if (!logoUrl) return res.status(400).json("Aucun logo fourni");
 
     const newLink = new Link({
-      title: linkData.title,
-      description: linkData.description,
-      url: linkData.url || null,
-      logo: mediaResult.url,
-      logoFileId: mediaResult.fileId,
-      logoName: mediaResult.fileName || cleanName,
+      title: body.title,
+      description: body.description,
+      url: body.url || null,
+      logo: logoUrl,
+      logoFileId,
+      logoName,
     });
 
     await newLink.save();
@@ -39,7 +62,7 @@ export const newLink = async (req, res) => {
   }
 };
 
-// Récupérer tous les liens
+// Récupérer tous les liens //
 export const getAllLinks = async (req, res) => {
   try {
     const links = await Link.find();
@@ -49,7 +72,7 @@ export const getAllLinks = async (req, res) => {
   }
 };
 
-// Récupérer un lien par ID
+// Récupérer un lien //
 export const getOneLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
@@ -60,7 +83,7 @@ export const getOneLink = async (req, res) => {
   }
 };
 
-// Mettre à jour un lien
+// Mettre à jour un lien //
 export const updateLink = async (req, res) => {
   try {
     const existing = await Link.findById(req.params.id);
@@ -88,32 +111,36 @@ export const updateLink = async (req, res) => {
     let didChangeFile = false;
 
     // a) Renommage du logo existant
-    if (!req.file && !body.logo && existing.logoFileId) {
+    if (!req.file && !body.file && !body.media && existing.logoFileId) {
       const ext = (existing.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
       await imagekit.updateFileDetails(existing.logoFileId, { name: newName });
+
       filtered.logo = existing.logo.replace(/[^/]+$/, newName);
       filtered.logoName = baseName;
     }
 
-    // b) Réutilisation d’un logo existant (fileId)
-    else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
-      const details = await imagekit.getFileDetails(body.logo);
+    // b) Réutilisation d’un logo existant via fileId
+    else if (!req.file && body.file && /^[a-zA-Z0-9]{8,}$/.test(body.file)) {
+      const details = await imagekit.getFileDetails(body.file);
+
       filtered.logo = details.url;
       filtered.logoFileId = details.fileId;
       filtered.logoName = details.name.replace(/\.[^/.]+$/, "");
+
       newFileId = details.fileId;
       didChangeFile = oldFileId && oldFileId !== newFileId;
     }
 
-    // c) Nouveau logo (upload ou URL)
-    else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
-      const uploaded = await resolveMedia(body.logo, req.file, "/festn_breizh/logos", baseName);
+    // c) Nouveau logo
+    else if (req.file || (body.media && /^https?:\/\//i.test(body.media))) {
+      const uploaded = await resolveMedia(body.media, req.file, "/festn_breizh/logos", baseName);
       if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
       filtered.logo = uploaded.url;
       filtered.logoFileId = uploaded.fileId;
       filtered.logoName = uploaded.fileName || baseName;
+
       newFileId = uploaded.fileId;
       didChangeFile = oldFileId && oldFileId !== newFileId;
     }
@@ -123,6 +150,7 @@ export const updateLink = async (req, res) => {
       runValidators: true,
     });
 
+    // Suppression sécurisée
     if (didChangeFile && oldFileId) {
       const inUse = await isFileInUse(oldFileId);
       if (!inUse) {
@@ -141,7 +169,7 @@ export const updateLink = async (req, res) => {
   }
 };
 
-// Supprimer un lien
+// Supprimer un lien //
 export const deleteLink = async (req, res) => {
   try {
     const link = await Link.findById(req.params.id);
