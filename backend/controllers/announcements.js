@@ -102,7 +102,10 @@ export const updateAnnouncement = async (req, res) => {
 
     // === Cas 2 : Logo ===
     else if (nextType === "logo") {
-      if (!req.file && body.media && /^[a-zA-Z0-9]{8,}$/.test(body.media)) {
+      const isFileId =
+        typeof body.media === "string" && body.media.length > 0 && !body.media.includes("/");
+
+      if (!req.file && isFileId) {
         // Réutilisation d’un logo existant
         const details = await imagekit.getFileDetails(body.media);
 
