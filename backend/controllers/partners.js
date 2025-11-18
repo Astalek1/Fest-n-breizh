@@ -13,12 +13,9 @@ export const newPartner = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    const mediaResult = await resolveMedia(
-      partnerData.media,
-      req.file,
-      "/festn_breizh/logos",
-      cleanName
-    );
+    const fileValue = partnerData.file || null;
+
+    const mediaResult = await resolveMedia(fileValue, req.file, "/festn_breizh/logos", cleanName);
 
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
@@ -83,12 +80,14 @@ export const updatePartner = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
+    const fileValue = body.file || null;
+
     const oldFileId = existing.logoFileId;
     let newFileId = oldFileId;
     let didChangeFile = false;
 
-    // a) Renommage du logo existant (pas d’upload)
-    if (!req.file && !body.logo && existing.logoFileId) {
+    // a) Renommage du logo existant (pas d’upload, pas de fileId, pas d’URL)
+    if (!req.file && !fileValue && existing.logoFileId) {
       const ext = (existing.logo.split(".").pop() || "webp").toLowerCase();
       const newName = `${baseName}.${ext}`;
 
@@ -98,8 +97,8 @@ export const updatePartner = async (req, res) => {
     }
 
     // b) Réutilisation d’un logo existant (fileId)
-    else if (!req.file && body.logo && /^[a-zA-Z0-9]{8,}$/.test(body.logo)) {
-      const details = await imagekit.getFileDetails(body.logo);
+    else if (!req.file && fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
+      const details = await imagekit.getFileDetails(fileValue);
       filtered.logo = details.url;
       filtered.logoFileId = details.fileId;
       filtered.logoName = details.name.replace(/\.[^/.]+$/, "");
@@ -107,9 +106,9 @@ export const updatePartner = async (req, res) => {
       didChangeFile = oldFileId && oldFileId !== newFileId;
     }
 
-    // c) Nouveau logo (upload ou URL http)
-    else if (req.file || (body.logo && /^https?:\/\//i.test(body.logo))) {
-      const uploaded = await resolveMedia(body.logo, req.file, "/festn_breizh/logos", baseName);
+    // c) Nouveau logo (upload ou URL)
+    else if (req.file || (fileValue && /^https?:\/\//i.test(fileValue))) {
+      const uploaded = await resolveMedia(fileValue, req.file, "/festn_breizh/logos", baseName);
       if (!uploaded?.url) return res.status(400).json("Logo invalide");
 
       filtered.logo = uploaded.url;
@@ -124,15 +123,8 @@ export const updatePartner = async (req, res) => {
       runValidators: true,
     });
 
-    // Suppression conditionnelle du logo inutilisé
+    // Suppression conditionnelle du logo inutilisé //
     if (didChangeFile && oldFileId) {
-      console.log("DEBUG DELETE PARTNER LOGO :", {
-        oldFileId,
-        newFileId,
-        didChangeFile,
-        inUseBeforeDelete: await isFileInUse(oldFileId),
-      });
-
       const inUse = await isFileInUse(oldFileId);
       if (!inUse) {
         try {
