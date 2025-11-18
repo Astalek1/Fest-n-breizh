@@ -3,7 +3,7 @@ name: Ping MongoDB Weekly
 on:
   schedule:
     - cron: "0 1 * * 1" # Lundi à 1h du matin (UTC)
-  workflow_dispatch: # Permet de tester manuellement
+  workflow_dispatch: # Permet de tester manuellement si besoin
 
 jobs:
   ping:
