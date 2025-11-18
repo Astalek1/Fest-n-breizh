@@ -102,16 +102,6 @@ export const updateAnnouncement = async (req, res) => {
 
     // === Cas 2 : Logo ===
     else if (nextType === "logo") {
-      // a suprimer apres tests
-      console.log("DEBUG LOGO UPDATE :", {
-        mediaTypeReceived: nextType,
-        bodyMedia: body.media,
-        reqFileExists: !!req.file,
-        isFileId:
-          typeof body.media === "string" && body.media.length > 0 && !body.media.includes("/"),
-        oldFileId,
-      });
-      // fin a suprimer apres tests
       const isFileId =
         typeof body.media === "string" && body.media.length > 0 && !body.media.includes("/");
 
