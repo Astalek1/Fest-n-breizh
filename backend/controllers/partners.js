@@ -3,7 +3,7 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
-// Créer un nouveau partenaire
+// Créer un nouveau partenaire //
 export const newPartner = async (req, res) => {
   try {
     const partnerData = JSON.parse(req.body.partner || "{}");
@@ -39,7 +39,7 @@ export const newPartner = async (req, res) => {
   }
 };
 
-// Récupérer tous les partenaires
+// Récupérer tous les partenaires //
 export const getAllPartners = async (req, res) => {
   try {
     const partners = await Partner.find();
@@ -49,7 +49,7 @@ export const getAllPartners = async (req, res) => {
   }
 };
 
-// Récupérer un partenaire par ID
+// Récupérer un partenaire //
 export const getOnePartner = async (req, res) => {
   try {
     const partner = await Partner.findById(req.params.id);
@@ -60,7 +60,7 @@ export const getOnePartner = async (req, res) => {
   }
 };
 
-// Modifier un partenaire
+// Modifier un partenaire //
 export const updatePartner = async (req, res) => {
   try {
     const existing = await Partner.findById(req.params.id);
@@ -126,6 +126,13 @@ export const updatePartner = async (req, res) => {
 
     // Suppression conditionnelle du logo inutilisé
     if (didChangeFile && oldFileId) {
+      console.log("DEBUG DELETE PARTNER LOGO :", {
+        oldFileId,
+        newFileId,
+        didChangeFile,
+        inUseBeforeDelete: await isFileInUse(oldFileId),
+      });
+
       const inUse = await isFileInUse(oldFileId);
       if (!inUse) {
         try {
@@ -143,7 +150,7 @@ export const updatePartner = async (req, res) => {
   }
 };
 
-// Supprimer un partenaire
+// Supprimer un partenaire //
 export const deletePartner = async (req, res) => {
   try {
     const partner = await Partner.findById(req.params.id);
