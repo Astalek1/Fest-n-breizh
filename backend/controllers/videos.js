@@ -3,6 +3,9 @@ import Video from "../models/Videos.js";
 // créée une nouvelle vidéo //
 export const newVideo = async (req, res) => {
   try {
+    console.log("REQ BODY :", req.body);
+    console.log("VIDEO RAW :", req.body.video);
+
     const videoData = req.body.video ? JSON.parse(req.body.video) : req.body;
 
     const newVideo = new Video({
