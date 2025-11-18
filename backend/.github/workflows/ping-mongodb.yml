@@ -1,0 +1,14 @@
+name: Ping MongoDB Weekly
+
+on:
+  schedule:
+    - cron: "0 1 * * 1" # Lundi à 1h du matin (UTC)
+  workflow_dispatch: # Permet de tester manuellement
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send ping to backend
+        run: |
+          curl -s https://fnb-backend.dokku.festnbreizh.bzh/health
