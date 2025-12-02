@@ -11,7 +11,7 @@ function App() {
         <Route path="/Editions/:editionId" element={<Editions />} />
         <Route path="/Gallery/photos" element={<GalleryPhoto />} />
         <Route path="/Gallery/affiches" element={<GalleryPoster />} />
-        <Route path="/Video" element={<Video />} />
+        <Route path="/Videos" element={<Videos />} />
         <Route path="/Links" element={<Links />} />
         <Route path="/Partners" element={<Partners />} />
         <Route path="/Contact" element={<Contact />} />
