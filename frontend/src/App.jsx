@@ -6,7 +6,7 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<Home />} />
         <Route path="/About" element={<About />} />
         <Route path="/Editions/:editionId" element={<Editions />} />
         <Route path="/Gallery/photos" element={<GalleryPhoto />} />
