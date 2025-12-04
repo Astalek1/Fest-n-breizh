@@ -4,8 +4,8 @@ const linkSchema = mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   url: { type: String, required: true },
-  logo: { type: String, required: true },
-  logoFileId: { type: String, required: true },
+  logo: { type: String},
+  logoFileId: { type: String},
   logoName: { type: String },
 });
 
