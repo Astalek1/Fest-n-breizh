@@ -13,8 +13,15 @@ export const newPartner = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    const fileValue = partnerData.file || null;
+    let fileValue = partnerData.file || null;
 
+    // Si on reçoit un fileId → on le transforme en URL avant resolveMedia
+    if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
+      const details = await imagekit.getFileDetails(fileValue);
+      fileValue = details.url;  // ✔️ resolveMedia sait gérer l'URL
+    }
+
+    // Un seul flux : resolveMedia traite upload + URL
     const mediaResult = await resolveMedia(fileValue, req.file, "/festn_breizh/logos", cleanName);
 
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
@@ -30,11 +37,13 @@ export const newPartner = async (req, res) => {
 
     await newPartner.save();
     res.status(201).json({ message: "Partenaire ajouté avec succès !" });
+
   } catch (error) {
     console.error("Erreur newPartner :", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Récupérer tous les partenaires //
 export const getAllPartners = async (req, res) => {
