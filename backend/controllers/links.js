@@ -31,7 +31,7 @@ export const newLink = async (req, res) => {
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
     const newLink = new Link({
-      name: linkData.title,
+      name: linkData.name,
       description: linkData.description,
       url: linkData.url || null,
       logo: mediaResult.url,
