@@ -13,16 +13,26 @@ export const newPartner = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    let fileValue = partnerData.file || null;
+    const fileValue = partnerData.file || null;
+    let mediaResult;
 
-    // Si on reçoit un fileId → on le transforme en URL avant resolveMedia
+    // 👉 Cas fileId existant → on génère un mediaResult complet
     if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
       const details = await imagekit.getFileDetails(fileValue);
-      fileValue = details.url;  // ✔️ resolveMedia sait gérer l'URL
+      mediaResult = {
+        url: details.url,
+        fileId: details.fileId,
+        fileName: details.name.replace(/\.[^/.]+$/, ""),
+      };
+    } else {
+      // 👉 Cas normal (upload ou URL)
+      mediaResult = await resolveMedia(
+        fileValue,
+        req.file,
+        "/festn_breizh/logos",
+        cleanName
+      );
     }
-
-    // Un seul flux : resolveMedia traite upload + URL
-    const mediaResult = await resolveMedia(fileValue, req.file, "/festn_breizh/logos", cleanName);
 
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
@@ -43,6 +53,7 @@ export const newPartner = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 // Récupérer tous les partenaires //
