@@ -13,20 +13,26 @@ export const newLink = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
-    let fileValue = linkData.file || null;
+    const fileValue = linkData.file || null;
+    let mediaResult;
 
-    // FileId → URL (résolution automatique)
+    // file = fileId existant
     if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
       const details = await imagekit.getFileDetails(fileValue);
-      fileValue = details.url;
+      mediaResult = {
+        url: details.url,
+        fileId: details.fileId,
+        fileName: details.name.replace(/\.[^/.]+$/, ""),
+      };
+    } else {
+      // upload ou URL → resolveMedia comme avant
+      mediaResult = await resolveMedia(
+        fileValue,
+        req.file,
+        "/festn_breizh/logos",
+        cleanName
+      );
     }
-
-    const mediaResult = await resolveMedia(
-      fileValue,
-      req.file,
-      "/festn_breizh/logos",
-      cleanName
-    );
 
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
@@ -41,12 +47,12 @@ export const newLink = async (req, res) => {
 
     await newLink.save();
     res.status(201).json({ message: "Lien ajouté avec succès !" });
-
   } catch (error) {
     console.error("Erreur newLink :", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 // Récupérer tous les liens //
