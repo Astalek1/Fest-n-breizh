@@ -31,7 +31,7 @@ export const newLink = async (req, res) => {
     if (!mediaResult?.url) return res.status(400).json("Logo invalide");
 
     const newLink = new Link({
-      title: linkData.title,
+      name: linkData.title,
       description: linkData.description,
       url: linkData.url || null,
       logo: mediaResult.url,
@@ -86,7 +86,7 @@ export const updateLink = async (req, res) => {
 
     // Champs simples
     const filtered = {};
-    for (const k of ["title", "description", "url"]) {
+    for (const k of ["name", "description", "url"]) {
       if (body[k] !== undefined) filtered[k] = body[k];
     }
 
