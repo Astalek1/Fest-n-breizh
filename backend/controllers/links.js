@@ -13,8 +13,16 @@ export const newLink = async (req, res) => {
       .replace(/\s+/g, "-")
       .toLowerCase();
 
+    let fileValue = linkData.file || null;
+
+    // FileId → URL (résolution automatique)
+    if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
+      const details = await imagekit.getFileDetails(fileValue);
+      fileValue = details.url;
+    }
+
     const mediaResult = await resolveMedia(
-      linkData.file,
+      fileValue,
       req.file,
       "/festn_breizh/logos",
       cleanName
@@ -33,11 +41,13 @@ export const newLink = async (req, res) => {
 
     await newLink.save();
     res.status(201).json({ message: "Lien ajouté avec succès !" });
+
   } catch (error) {
     console.error("Erreur newLink :", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Récupérer tous les liens //
 export const getAllLinks = async (req, res) => {
