@@ -1,13 +1,60 @@
 @use '../../styles/variables' as *;
 
 .Header {
+  position: relative;
   display: flex;
   justify-content: space-between;
-  width: 72%;
-  height: 68px;
-  margin: auto;
-  margin-top: 30px;
-  margin-bottom: 50px;
-  gap: 50px;
+  width: 100%;
+  height: auto;
   background-color: $main-color;
+
+  &__img {
+    width: 10%;
+    height: auto;
+  }
+
+  &__nav {
+    width: 55%;
+    height: auto;
+    border: red solid 1px;
+    display: flex;
+    text-align: center;
+    align-items: flex-start;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  &__link {
+    color: $secondary-color;
+    text-decoration: none;
+    font-size: 25px;
+    border: 1px solid red;
+    margin: 10px;
+    overflow: visible;
+  }
+
+  &__dropdown {
+    display: flex;
+    align-items: center; // Aligne Photos et Affiches parfaitement sous Galerie
+    position: relative;
+    line-height: 1;
+    height: auto;
+    overflow: visible; // Évite le scroll interne
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  &__dropdown-content {
+    border: 1px solid red;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center; // centre le texte
+    width: max-content; // le dropdown prend la largeur du plus long mot
+    white-space: nowrap; // évite tout retour à la ligne
+  }
 }

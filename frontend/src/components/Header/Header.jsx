@@ -7,7 +7,7 @@ function Header() {
       <div className="Header">
         <img
           className="Header__img"
-          src="https://imagekit.io/dashboard/media-library/detail/692ec2715c7cd75eb832f0c5"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.png?updatedAt=1764672114013"
           alt="Logo Kasa"
         />
 
@@ -18,9 +18,7 @@ function Header() {
           <Link className="Header__link" to="/About">
             A-propos
           </Link>
-          <Link className="Header__link" to="/Editions">
-            Les Editions
-          </Link>
+
           <div className="Header__dropdown">
             <span className="Header__link">Galerie</span>
             <div className="Header__dropdown-content">
@@ -32,6 +30,9 @@ function Header() {
               </Link>
             </div>
           </div>
+          <Link className="Header__link" to="/Editions">
+            Les Editions
+          </Link>
           <Link className="Header__link" to="/Videos">
             Nos Vidéos
           </Link>
@@ -42,7 +43,7 @@ function Header() {
             Nos Partenaires
           </Link>
           <Link className="Header__link" to="/Contact">
-            Contacter nous
+            Nous Contacter
           </Link>
         </nav>
       </div>

@@ -1,7 +1,7 @@
 import './Home.scss'
 
 function Home() {
-  return <></>
+  return <>accueil</>
 }
 
 export default Home
