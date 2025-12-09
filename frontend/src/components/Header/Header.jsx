@@ -1,7 +1,28 @@
 import './Header.scss'
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 function Header() {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.Header__dropdown')) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
+
+  const toggleDropdown = () => {
+    setOpen(!open)
+  }
+
   return (
     <header>
       <div className="Header">
@@ -20,12 +41,22 @@ function Header() {
           </Link>
 
           <div className="Header__dropdown">
-            <span className="Header__link">Galerie</span>
-            <div className="Header__dropdown-content">
-              <Link className="Header__link" to="/Gallery/photos">
+            <span className="Header__span" onClick={toggleDropdown}>
+              Galerie
+            </span>
+            <div className={`Header__dropdown-content ${open ? 'show' : ''}`}>
+              <Link
+                className="Header__link"
+                to="/Gallery/photos"
+                onClick={() => setOpen(false)}
+              >
                 Photos
               </Link>
-              <Link className="Header__link" to="/Gallery/affiches">
+              <Link
+                className="Header__link"
+                to="/Gallery/affiches"
+                onClick={() => setOpen(false)}
+              >
                 Affiches
               </Link>
             </div>
