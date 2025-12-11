@@ -1,7 +1,7 @@
 //import './Editions.scss'
 
 function Editions() {
-  return <>Editions</>
+  return <> Les Editions</>
 }
 
 export default Editions

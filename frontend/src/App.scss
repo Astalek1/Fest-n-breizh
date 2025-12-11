@@ -8,10 +8,9 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
-  overflow-x: hidden;
 }
 
-// === Mise en page globale ===
-main {
-  margin: 0 $side-margin;
+.page-container {
+  min-height: 74vh; // prend tout l’écran
+  font-size: 80px;
 }

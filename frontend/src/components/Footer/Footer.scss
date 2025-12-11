@@ -1,0 +1,15 @@
+@use '../../styles/variables' as *;
+
+.Footer {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100x;
+  background-color: $main-color;
+
+  &__img {
+    width: 8%;
+    height: auto;
+  }
+}
