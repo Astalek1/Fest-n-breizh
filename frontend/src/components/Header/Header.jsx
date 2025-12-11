@@ -47,14 +47,14 @@ function Header() {
             <div className={`Header__dropdown-content ${open ? 'show' : ''}`}>
               <Link
                 className="Header__link"
-                to="/Gallery/photos"
+                to="/photos"
                 onClick={() => setOpen(false)}
               >
                 Photos
               </Link>
               <Link
                 className="Header__link"
-                to="/Gallery/affiches"
+                to="/Posters"
                 onClick={() => setOpen(false)}
               >
                 Affiches
