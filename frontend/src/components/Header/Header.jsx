@@ -28,8 +28,8 @@ function Header() {
       <div className="Header">
         <img
           className="Header__img"
-          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.png?updatedAt=1764672114013"
-          alt="Logo Kasa"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp"
+          alt="Logo Fest'n Breizh"
         />
 
         <nav className="Header__nav">
@@ -44,7 +44,7 @@ function Header() {
             <span className="Header__span" onClick={toggleDropdown}>
               Galerie
             </span>
-            <div className={`Header__dropdown-content ${open ? 'show' : ''}`}>
+            <div className={`Header__dropdown--content ${open ? 'show' : ''}`}>
               <Link
                 className="Header__link"
                 to="/photos"

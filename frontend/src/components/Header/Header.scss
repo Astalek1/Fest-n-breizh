@@ -66,7 +66,7 @@
     padding: 5px;
   }
 
-  &__dropdown-content {
+  &__dropdown--content {
     position: absolute;
     top: 90%;
     left: 50%;
@@ -78,12 +78,12 @@
     white-space: nowrap; // évite tout retour à la ligne
   }
 
-  &__dropdown-content .Header__link {
+  &__dropdown--content .Header__link {
     padding: 5px;
     margin: 5px;
   }
 
-  .Header__dropdown-content.show {
+  .Header__dropdown--content.show {
     display: flex;
   }
 }

@@ -5,11 +5,72 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: 100x;
+  height: auto;
+  max-height: 5%;
   background-color: $main-color;
 
   &__img {
-    width: 8%;
+    width: 9%;
     height: auto;
+  }
+
+  &__txt {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__copyright {
+    color: $secondary-color;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    margin-bottom: 1%;
+    width: 100%;
+    height: 80%;
+    font-size: 22px;
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+  }
+  &__portfolio {
+    color: $secondary-color;
+  }
+
+  &__login {
+    color: $secondary-color;
+  }
+  &__login,
+  &__portfolio {
+    margin: 0 12px;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+
+  &__login:hover,
+  &__portfolio:hover {
+    text-decoration: underline;
+  }
+
+  &__logo {
+    width: 13%;
+    height: auto;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+  }
+  &__lien--logo {
+    width: 80%;
+    height: auto;
+    margin: 10px;
+    transition: transform 0.3s ease;
+  }
+
+  &__lien--logo:hover {
+    transform: translateY(-10px);
   }
 }
