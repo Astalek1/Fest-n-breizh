@@ -254,6 +254,7 @@ export const updateEdition = async (req, res) => {
     }
 
     existingEdition.title = editionData.title || existingEdition.title;
+    existingEdition.description = editionData.description || existingEdition.description;
     existingEdition.poster = editionData.poster || existingEdition.poster;
 
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
