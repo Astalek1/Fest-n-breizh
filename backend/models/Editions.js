@@ -4,6 +4,7 @@ import "../models/Guests.js";
 
 const editionsSchema = mongoose.Schema({
   title: { type: String, required: true },
+  description: {type: String},
   poster: { type: String, required: true },
   artists: [{ type: mongoose.Schema.Types.ObjectId, ref: "Artist" }], // références
   guests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Guest" }], // références

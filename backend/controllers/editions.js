@@ -59,6 +59,7 @@ export const createEdition = async (req, res) => {
     // --- CRÉATION DE L'ÉDITION ---
     const newEdition = new Edition({
       title: editionData.title,
+      description: editionData.description,
       poster: editionData.poster,
       artists: artistDocs,
       guests: guestDocs,
