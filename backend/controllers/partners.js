@@ -8,14 +8,21 @@ export const newPartner = async (req, res) => {
   try {
     const partnerData = JSON.parse(req.body.partner || "{}");
 
- let cleanName =
-  (req.body.fileName || partnerData.fileName) ??
-  (req.file ? req.file.originalname.replace(/\.[^/.]+$/, "") : "logo");
+let cleanName = req.body.fileName || partnerData.fileName || null;
+
+if (!cleanName && req.file) {
+  cleanName = req.file.originalname.replace(/\.[^/.]+$/, "");
+}
+
+if (!cleanName) {
+  return res.status(400).json("Nom de fichier introuvable — fileName ou upload requis.");
+}
 
 cleanName = cleanName
   .trim()
   .replace(/\s+/g, "-")
   .toLowerCase();
+
 
 
     const fileValue = partnerData.file || null;
