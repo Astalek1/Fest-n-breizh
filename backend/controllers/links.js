@@ -9,7 +9,7 @@ export const newLink = async (req, res) => {
     const linkData = JSON.parse(req.body.link || "{}");
 
  let cleanName =
-  (req.body.fileName || partnerData.fileName) ??
+  (req.body.fileName || linksData.fileName) ??
   (req.file ? req.file.originalname.replace(/\.[^/.]+$/, "") : "logo");
 
 cleanName = cleanName
