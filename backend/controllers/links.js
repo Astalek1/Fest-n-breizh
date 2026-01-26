@@ -8,10 +8,15 @@ export const newLink = async (req, res) => {
   try {
     const linkData = JSON.parse(req.body.link || "{}");
 
-    const cleanName = (req.body.fileName || linkData.fileName || "logo-link")
-      .trim()
-      .replace(/\s+/g, "-")
-      .toLowerCase();
+ let cleanName =
+  (req.body.fileName || partnerData.fileName) ??
+  (req.file ? req.file.originalname.replace(/\.[^/.]+$/, "") : "logo");
+
+cleanName = cleanName
+  .trim()
+  .replace(/\s+/g, "-")
+  .toLowerCase();
+
 
     const fileValue = linkData.file || null;
     let mediaResult;
