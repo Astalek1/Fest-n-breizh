@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const linkSchema = mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  url: { type: String, required: true },
+  url: { type: String},
   logo: { type: String},
   logoFileId: { type: String},
   logoName: { type: String },

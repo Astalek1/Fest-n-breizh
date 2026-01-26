@@ -16,7 +16,7 @@ export const newPartner = async (req, res) => {
     const fileValue = partnerData.file || null;
     let mediaResult;
 
-    // 👉 Cas fileId existant → on génère un mediaResult complet
+    // Cas fileId existant → on génère un mediaResult complet
     if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
       const details = await imagekit.getFileDetails(fileValue);
       mediaResult = {
@@ -25,7 +25,7 @@ export const newPartner = async (req, res) => {
         fileName: details.name.replace(/\.[^/.]+$/, ""),
       };
     } else {
-      // 👉 Cas normal (upload ou URL)
+      // Cas normal (upload ou URL)
       mediaResult = await resolveMedia(
         fileValue,
         req.file,
