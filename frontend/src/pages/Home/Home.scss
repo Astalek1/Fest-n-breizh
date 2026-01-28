@@ -1,1 +1,67 @@
 @use '../../styles/variables' as *;
+
+.home {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.slidshow {
+  position: relative;
+  &__img {
+    width: 100%;
+    height: 1000px;
+    background-size: 100%; // dézoom (moins zoomé que cover)
+    background-position: center; // décale l’image vers le bas
+    background-repeat: no-repeat;
+
+    transition:
+      background-image 1.5s ease-in-out,
+      background-size 1.5s ease-in-out,
+      background-position 1.5s ease-in-out;
+  }
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.15); // très léger filtre sombre
+    pointer-events: none; // ne bloque pas les clics
+  }
+
+  &__text {
+    width: 1000px;
+    height: auto; // important !
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex; // permet d'utiliser justify + align
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    color: $secondary-color;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  // Le span doit être au-dessus et avec une autre police
+  & .slidshow__title {
+    display: block; // le place au-dessus
+    font-size: 60px; // plus grand
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.announcements {
+  width: 100%;
+  margin-top: 40px;
+  // tu styliseras ici
+}
