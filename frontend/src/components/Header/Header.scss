@@ -9,8 +9,8 @@
   background-color: $main-color;
 
   &__img {
-    width: 10%;
-    height: auto;
+    width: 230px;
+    height: 180px;
   }
 
   &__nav {
@@ -31,7 +31,10 @@
     font-size: 20px;
     margin: 10px;
     overflow: visible;
-    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
   }
 
   &__span {
@@ -41,7 +44,10 @@
     overflow: visible;
     padding: 4px;
     cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
   }
   &__link:hover {
     color: $main-color;

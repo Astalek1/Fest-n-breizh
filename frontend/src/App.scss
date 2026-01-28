@@ -14,3 +14,13 @@
   min-height: 74vh; // prend tout l’écran
   font-size: 80px;
 }
+body,
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page__container {
+  flex: 1; // zone qui pousse le footer en bas
+}
