@@ -19,26 +19,69 @@ function Home() {
     return () => clearInterval(timer)
   }, [carouselImages.length])
 
+  const [announcements, setAnnouncements] = useState([])
+
+  useEffect(() => {
+    setAnnouncements([])
+  }, [])
+
   return (
-    <div className="home">
-      <div className="slidshow">
+    <>
+      <div className="slideshow">
         <div
-          className="slidshow__img"
+          className="slideshow__img"
           style={{ backgroundImage: `url(${carouselImages[index]})` }}
         ></div>
 
-        <div className="slidshow__overlay"></div>
+        <div className="slideshow__overlay"></div>
 
-        <div className="slidshow__text">
-          <div className="slidshow__text">
-            <span className="slidshow__title">Fest’n Breizh </span>
-            vous souhaite la bienvenue !
-          </div>
+        <div className="slideshow__text">
+          <span className="slideshow__span">Fest’n Breizh </span>
+          vous souhaite la bienvenue !
         </div>
       </div>
 
-      <div className="announcements"></div>
-    </div>
+      <div className="home">
+        <div className="announcements">
+          {announcements.length === 0 ? (
+            <>
+              <h1 className="announcements__title">
+                Les dernières annonces de Fest’n Breizh
+              </h1>
+
+              <p className="announcements__subtitle">
+                Retrouvez ici toutes les actualités du festival : nouveautés,
+                événements, invités, informations importantes et moments forts à
+                venir.
+              </p>
+            </>
+          ) : (
+            announcements.map((item) => (
+              <article className="announcement" key={item._id}>
+                <h2>{item.title}</h2>
+                <p>{item.text}</p>
+
+                {item.mediaType === 'image' && (
+                  <img src={item.media} alt={item.title} />
+                )}
+
+                {item.mediaType === 'logo' && (
+                  <img src={item.logo} alt={item.title} />
+                )}
+
+                {item.mediaType === 'video' && (
+                  <iframe
+                    src={item.url.replace('watch?v=', 'embed/')}
+                    title={item.title}
+                    allowFullScreen
+                  />
+                )}
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </>
   )
 }
 

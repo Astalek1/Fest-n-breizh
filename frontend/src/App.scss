@@ -13,14 +13,22 @@
 .page__container {
   min-height: 74vh; // prend tout l’écran
   font-size: 80px;
+  flex: 1; // zone qui pousse le footer en bas
+  margin: 0 100px;
 }
+
 body,
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
-.page__container {
-  flex: 1; // zone qui pousse le footer en bas
+h1 {
+  font-size: 50px;
+}
+
+p {
+  font-size: 30px;
 }
