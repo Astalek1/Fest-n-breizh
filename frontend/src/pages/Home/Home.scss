@@ -10,9 +10,9 @@
   position: relative;
   &__img {
     width: 100%;
-    height: 1000px;
-    background-size: 100%; // dézoom (moins zoomé que cover)
-    background-position: center; // décale l’image vers le bas
+    height: 80vh;
+    background-size: 100%;
+    background-position: center;
     background-repeat: no-repeat;
 
     transition:
@@ -26,20 +26,19 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.15); // très léger filtre sombre
-    pointer-events: none; // ne bloque pas les clics
+    background: rgba(0, 0, 0, 0.15);
   }
 
   &__text {
     width: 1000px;
-    height: auto; // important !
+    height: auto;
 
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    display: flex; // permet d'utiliser justify + align
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -50,10 +49,10 @@
     font-weight: 400;
     line-height: 1.4;
   }
-  // Le span doit être au-dessus et avec une autre police
+
   & .slidshow__title {
-    display: block; // le place au-dessus
-    font-size: 60px; // plus grand
+    display: block;
+    font-size: 50px;
     font-weight: 700;
     margin-bottom: 10px;
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
