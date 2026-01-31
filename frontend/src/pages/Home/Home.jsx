@@ -22,7 +22,10 @@ function Home() {
   const [announcements, setAnnouncements] = useState([])
 
   useEffect(() => {
-    setAnnouncements([])
+    fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/announcements')
+      .then((res) => res.json())
+      .then((data) => setAnnouncements(data))
+      .catch((err) => console.error(err))
   }, [])
 
   return (
@@ -42,17 +45,24 @@ function Home() {
       </div>
 
       <div className="home">
+        <h1 className="homme__title">
+          Les petites annonces de Fest’n Breizh!!!
+        </h1>
+
+        <p className="home__text">
+          Retrouvez ici toutes les actualités du festival : nouveautés,
+          événements, invités, informations importantes et moments forts à
+          venir.
+        </p>
         <div className="announcements">
           {announcements.length === 0 ? (
             <>
-              <h1 className="announcements__title">
-                Les dernières annonces de Fest’n Breizh
-              </h1>
+              <h2 className="announcements__message">
+                Aucune annonce pour le moment.
+              </h2>
 
-              <p className="announcements__subtitle">
-                Retrouvez ici toutes les actualités du festival : nouveautés,
-                événements, invités, informations importantes et moments forts à
-                venir.
+              <p className="announcements__message--txt">
+                Restez à l'affût des prochaines informations à venir!
               </p>
             </>
           ) : (
@@ -61,16 +71,25 @@ function Home() {
                 <h2>{item.title}</h2>
                 <p>{item.text}</p>
 
-                {item.mediaType === 'image' && (
-                  <img src={item.media} alt={item.title} />
+                {item.mediaType === 'photo' && (
+                  <img
+                    className="announcement__photo"
+                    src={item.media}
+                    alt={item.title}
+                  />
                 )}
 
                 {item.mediaType === 'logo' && (
-                  <img src={item.logo} alt={item.title} />
+                  <img
+                    className="announcement__logo"
+                    src={item.logo || item.media}
+                    alt={item.title}
+                  />
                 )}
 
                 {item.mediaType === 'video' && (
                   <iframe
+                    className="announcement__video"
                     src={item.url.replace('watch?v=', 'embed/')}
                     title={item.title}
                     allowFullScreen

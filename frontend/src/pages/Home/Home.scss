@@ -4,6 +4,11 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 40px;
+
+  &__text {
+    margin-bottom: 50px;
+  }
 }
 
 .slideshow {
@@ -72,5 +77,37 @@
 .announcements {
   width: 100%;
   margin-top: 40px;
-  // tu styliseras ici
+  margin-bottom: 40px;
+  padding: 0 25px;
+}
+
+.announcement {
+  margin-top: 25px;
+  &::before {
+    content: '';
+    display: block;
+    width: 80%; // longueur du trait (modifiable)
+    height: 2px; // épaisseur du trait
+    background-color: black; // couleur
+    margin: 20px auto; // centre la ligne
+    margin-bottom: 50px;
+  }
+  &__logo {
+    width: 200px;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 25px;
+  }
+  &__video {
+    width: 500px;
+    height: 300px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+  }
+  &__photo {
+    border-radius: 10px;
+    width: 600px;
+    height: auto;
+    margin-bottom: 25px;
+  }
 }

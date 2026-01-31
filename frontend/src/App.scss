@@ -14,7 +14,7 @@
   min-height: 74vh; // prend tout l’écran
   font-size: 80px;
   flex: 1; // zone qui pousse le footer en bas
-  margin: 0 100px;
+  margin: 0 10%;
 }
 
 body,
@@ -26,9 +26,16 @@ body,
 }
 
 h1 {
-  font-size: 50px;
+  font-size: 40px;
+}
+h2 {
+  font-size: 28px;
 }
 
 p {
-  font-size: 30px;
+  font-size: 24px;
+}
+
+img {
+  font-size: 14px;
 }
