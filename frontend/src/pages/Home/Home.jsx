@@ -26,6 +26,7 @@ function Home() {
       .then((res) => res.json())
       .then((data) => setAnnouncements(data))
       .catch((err) => console.error(err))
+    //setAnnouncements([])
   }, [])
 
   return (

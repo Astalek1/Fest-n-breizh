@@ -1,0 +1,14 @@
+.about {
+  &__title {
+    margin: 30px 50px;
+  }
+  &__text {
+    margin: 50px 100px;
+  }
+  &__img {
+    width: 1000px;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+  }
+}
