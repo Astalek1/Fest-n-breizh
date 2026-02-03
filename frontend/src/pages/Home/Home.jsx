@@ -39,22 +39,24 @@ function Home() {
 
         <div className="slideshow__overlay"></div>
 
-        <div className="slideshow__text">
+        <div className="slideshow__txt">
           <span className="slideshow__span">Fest’n Breizh </span>
           vous souhaite la bienvenue !
         </div>
       </div>
 
       <div className="home">
-        <h1 className="homme__title">
-          Les petites annonces de Fest’n Breizh!!!
-        </h1>
+        <div className="home__intro">
+          <h1 className="homme__title">
+            Les petites annonces de Fest’n Breizh!!!
+          </h1>
 
-        <p className="home__text">
-          Retrouvez ici toutes les actualités du festival : nouveautés,
-          événements, invités, informations importantes et moments forts à
-          venir.
-        </p>
+          <p className="home__txt">
+            Retrouvez ici toutes les actualités du festival : nouveautés,
+            événements, invités, informations importantes et moments forts à
+            venir.
+          </p>
+        </div>
         <div className="announcements">
           {announcements.length === 0 ? (
             <>

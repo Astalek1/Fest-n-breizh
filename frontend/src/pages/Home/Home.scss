@@ -6,7 +6,11 @@
   width: 100%;
   margin-top: 40px;
 
-  &__text {
+  &__intro {
+    margin-left: 20px;
+  }
+
+  &__txt {
     margin-bottom: 50px;
   }
 }
@@ -43,7 +47,7 @@
     background: rgba(0, 0, 0, 0.15);
   }
 
-  &__text,
+  &__txt,
   p {
     width: 1000px;
     height: auto;

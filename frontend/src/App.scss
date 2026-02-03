@@ -13,8 +13,10 @@
 .page__container {
   min-height: 74vh; // prend tout l’écran
   font-size: 80px;
-  flex: 1; // zone qui pousse le footer en bas
-  margin: 0 10%;
+  margin: 0 8%;
+  background-color: $secondary-color;
+  border-radius: 10px;
+  flex: 1;
 }
 
 body,
@@ -23,6 +25,7 @@ body,
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  background-color: $main-color;
 }
 
 h1 {
