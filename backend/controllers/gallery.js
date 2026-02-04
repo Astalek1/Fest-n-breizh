@@ -53,7 +53,8 @@ export const newPoster = async (req, res) => {
 
 export const getAllPosters = async (req, res) => {
   try {
-    const posters = await Gallery.find({ type: "poster" });
+    const posters = await Gallery.find({ type: "poster" })
+    .sort({ year: 1 });
     res.status(200).json(posters);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -114,6 +115,7 @@ export const updatePoster = async (req, res) => {
     const updatedPoster = await Gallery.findByIdAndUpdate(req.params.id, filteredData, {
       new: true,
       runValidators: true,
+      context:'query'
     });
 
     res.status(200).json(updatedPoster);

@@ -7,7 +7,11 @@ function Posters() {
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters')
       .then((res) => res.json())
-      .then((data) => setPosters(Array.isArray(data) ? data : []))
+      .then((data) =>
+        setPosters(
+          Array.isArray(data) ? data.sort((a, b) => a.year - b.year) : [],
+        ),
+      )
 
       .catch((err) => console.error(err))
   }, [])
@@ -27,7 +31,9 @@ function Posters() {
           <figure key={item._id} className="poster__item">
             <img src={item.urlSmall} alt={item.alt} className="poster__img" />
             <figcaption>
-              <h2 className="poster__title">{item.title}</h2>
+              <h2 className="poster__title">
+                {item.title} {item.year}
+              </h2>
               {item.caption && (
                 <p className="poster__caption">&copy; {item.caption}</p>
               )}
