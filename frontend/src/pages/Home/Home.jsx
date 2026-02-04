@@ -82,7 +82,7 @@ function Home() {
                   />
                 )}
 
-                {item.mediaType === 'logo' && (
+                {item.mediaType === 'logo' && item.media && (
                   <img
                     className="announcement__logo"
                     src={item.logo || item.media}

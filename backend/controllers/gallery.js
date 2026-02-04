@@ -34,6 +34,7 @@ export const newPoster = async (req, res) => {
 
     const newPoster = new Gallery({
       title: posterData.title,
+      year: posterData.year,
       url: newMedia.url,
       urlSmall: newMedia.urlSmall || null,
       mediaFileId: newMedia.fileId || null,
@@ -81,7 +82,7 @@ export const updatePoster = async (req, res) => {
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
     const body = req.body.poster ? JSON.parse(req.body.poster) : req.body;
-    const allowedFields = ["title", "alt", "caption"];
+    const allowedFields = ["title","year", "alt", "caption"];
     const filteredData = {};
 
     for (const field of allowedFields) {
@@ -171,7 +172,7 @@ export const newPhoto = async (req, res) => {
     if (!newMedia?.url) return res.status(400).json("Média invalide");
 
     const newPhoto = new Gallery({
-      title: photoData.title,
+      title:photoData.title,
       url: newMedia.url,
       urlSmall: newMedia.urlSmall || null,
       mediaFileId: newMedia.fileId || null,

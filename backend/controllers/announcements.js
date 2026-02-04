@@ -3,6 +3,7 @@ import imagekit from "../config/imageKit.js";
 import { resolveMedia } from "../utils/resolveMedia.js";
 import { isFileInUse } from "../utils/isFileInUse.js";
 
+
 // Créer une nouvelle annonce
 export const newAnnouncement = async (req, res) => {
   try {
@@ -224,3 +225,4 @@ export const deleteAnnouncement = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur (deleteAnnouncement)" });
   }
 };
+
