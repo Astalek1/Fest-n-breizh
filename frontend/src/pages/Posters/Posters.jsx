@@ -28,14 +28,14 @@ function Posters() {
 
       <div className="poster__container">
         {posters.map((item) => (
-          <figure key={item._id} className="poster__item">
+          <figure key={item._id} className="poster">
+            <h2 className="poster__title">
+              {item.title} {item.year}
+            </h2>
             <img src={item.urlSmall} alt={item.alt} className="poster__img" />
             <figcaption>
-              <h2 className="poster__title">
-                {item.title} {item.year}
-              </h2>
               {item.caption && (
-                <p className="poster__caption">&copy; {item.caption}</p>
+                <p className="poster__figcaption">&copy; {item.caption}</p>
               )}
             </figcaption>
           </figure>

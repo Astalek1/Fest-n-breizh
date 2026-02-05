@@ -20,11 +20,11 @@ function Photos() {
         <p>voicis quelques photos des differents événements.</p>
       </div>
 
-      <div className="photo__container">
+      <div className="photo">
         {photos.map((item) => (
-          <figure key={item._id} className="photo__item">
+          <figure key={item._id} className="photo__container">
             <img src={item.urlSmall} alt={item.alt} className="photo__img" />
-            <figcaption>
+            <figcaption classname="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
               {item.caption && (
                 <p className="photo__caption">&copy; {item.caption}</p>

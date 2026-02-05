@@ -1,0 +1,37 @@
+.page__title {
+  margin: 15px;
+}
+
+.poster__container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  padding: 50px;
+}
+.poster {
+  padding: 15px;
+  display: block;
+  &__img {
+    width: 300px;
+    height: 450px;
+    object-fit: cover; /* Assure que l'image couvre l'espace sans distorsion */
+    border: 2px solid #00000065;
+    margin: 0 15px;
+  }
+  &__figcaption {
+    width: 300px;
+    height: auto;
+    font-size: 15px;
+    display: flex;
+    position: relative;
+    bottom: 15px;
+    left: 20px;
+  }
+  &__title {
+    text-decoration: none;
+    font-size: 24px;
+    display: flex;
+    position: relative;
+    left: 20px;
+  }
+}

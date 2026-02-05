@@ -12,7 +12,7 @@ function Footer() {
         />
 
         <div className="Footer__txt">
-          <p className="Footer__copyright">Copyright Fest'n Breizh 2026</p>
+          <h2 className="Footer__copyright">Copyright Fest'n Breizh 2026</h2>
           <div className="Footer__bottom">
             <a
               className="Footer__portfolio"
