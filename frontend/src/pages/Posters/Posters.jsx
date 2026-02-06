@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 
 function Posters() {
   const [posters, setPosters] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPoster, setSelectedPoster] = useState(null)
 
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters')
@@ -28,7 +30,14 @@ function Posters() {
 
       <div className="poster__container">
         {posters.map((item) => (
-          <figure key={item._id} className="poster">
+          <figure
+            key={item._id}
+            className="poster"
+            onClick={() => {
+              setSelectedPoster(item)
+              setIsModalOpen(true)
+            }}
+          >
             <h2 className="poster__title">
               {item.title} {item.year}
             </h2>
@@ -41,6 +50,24 @@ function Posters() {
           </figure>
         ))}
       </div>
+
+      {isModalOpen && selectedPoster && (
+        <div className="modal" onClick={() => setIsModalOpen(false)}>
+          <div className="modal__content">
+            <span
+              className="modal__close"
+              onClick={() => setIsModalOpen(false)}
+            >
+              &#9746;
+            </span>
+            <img
+              className="modal__content--img"
+              src={selectedPoster.url}
+              alt={selectedPoster.alt}
+            />
+          </div>
+        </div>
+      )}
     </>
   )
 }

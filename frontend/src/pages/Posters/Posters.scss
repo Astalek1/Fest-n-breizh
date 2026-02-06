@@ -1,3 +1,5 @@
+@use '../../styles/variables' as *;
+
 .page__title {
   margin: 15px;
 }
@@ -6,15 +8,17 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
-  padding: 50px;
+  padding: 60px;
 }
 .poster {
-  padding: 15px;
+  margin: 0 10px;
+  padding: 0 10px;
   display: block;
+  transition: transform 230ms ease-in-out;
   &__img {
     width: 300px;
     height: 450px;
-    object-fit: cover; /* Assure que l'image couvre l'espace sans distorsion */
+    object-fit: cover;
     border: 2px solid #00000065;
     margin: 0 15px;
   }
@@ -26,6 +30,7 @@
     position: relative;
     bottom: 15px;
     left: 20px;
+    margin: 0;
   }
   &__title {
     text-decoration: none;
@@ -35,3 +40,59 @@
     left: 20px;
   }
 }
+
+.poster:hover {
+  background-color: rgba(0, 0, 0, 0.158);
+  border-radius: 8px;
+  cursor: pointer;
+  transform: scale(1.05);
+  transition: transform 300ms ease-in-out;
+}
+
+/* Styles pour le modal */
+.modal {
+  display: flex; /* Masquer le modal par défaut */
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.767);
+  overflow: auto; /* Permet le défilement si nécessaire */
+  justify-content: center;
+  align-items: center;
+
+  &__content {
+    width: 50vh;
+    height: 80vh;
+    position: relative;
+
+    overflow: cover; /* Masquer les débordements mais permet de scoll si necessaire */
+
+    &__content--img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__close {
+    margin-left: 94%;
+    color: grey;
+    width: 6%;
+    font-size: 42px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: none;
+  }
+  &__close:hover {
+    color: $secondary-color;
+  }
+}
+
+/* Classe pour bloquer le défilement */
+.no-scroll {
+  overflow: hidden;
+}
+/**/
