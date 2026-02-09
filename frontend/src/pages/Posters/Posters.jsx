@@ -52,16 +52,19 @@ function Posters() {
       </div>
 
       {isModalOpen && selectedPoster && (
-        <div className="modal" onClick={() => setIsModalOpen(false)}>
-          <div className="modal__content">
+        <div className="modal__poster" onClick={() => setIsModalOpen(false)}>
+          <div
+            className="modal__poster--content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <span
-              className="modal__close"
+              className="modal__poster--close"
               onClick={() => setIsModalOpen(false)}
             >
               &#9746;
             </span>
             <img
-              className="modal__content--img"
+              className="modal__poster--img"
               src={selectedPoster.url}
               alt={selectedPoster.alt}
             />

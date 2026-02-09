@@ -4,18 +4,17 @@
   margin: 15px;
 }
 
-.poster__container {
+.photo__container {
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
   padding: 60px;
 }
-.poster {
+.photo {
   margin: 0 10px;
   padding: 0 10px;
   display: block;
   transition: transform 230ms ease-in-out;
-
   &__img {
     width: 300px;
     height: 450px;
@@ -24,7 +23,7 @@
     margin: 0 15px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
   }
-  &__figcaption {
+  &__caption {
     width: 300px;
     height: auto;
     font-size: 15px;
@@ -43,8 +42,8 @@
   }
 }
 
-.poster:hover {
-  //background-color: rgba(0, 0, 0, 0.158);
+.photo:hover {
+  background-color: rgba(0, 0, 0, 0.158);
   //background-color: rgba(0, 0, 0, 0.849);
   //color: white;
   border-radius: 8px;
@@ -54,7 +53,7 @@
 }
 
 /* Styles pour le modal */
-.modal__poster {
+.modal__photo {
   display: flex; /* Masquer le modal par défaut */
   position: fixed;
   z-index: 1000;
@@ -92,12 +91,9 @@
   }
   &--close:hover {
     color: $secondary-color;
-    //background-color: rgba(0, 0, 0, 0.219);
   }
 }
 
-/* Classe pour bloquer le défilement */
 .no-scroll {
   overflow: hidden;
 }
-/**/

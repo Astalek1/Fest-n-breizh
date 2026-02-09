@@ -1,9 +1,10 @@
-//import './Photos.scss'
-
+import './Photos.scss'
 import { useState, useEffect } from 'react'
 
 function Photos() {
   const [photos, setPhotos] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
 
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/photos')
@@ -20,9 +21,16 @@ function Photos() {
         <p>voicis quelques photos des differents événements.</p>
       </div>
 
-      <div className="photo">
+      <div className="photo__container">
         {photos.map((item) => (
-          <figure key={item._id} className="photo__container">
+          <figure
+            key={item._id}
+            className="photo"
+            onClick={() => {
+              setSelectedPhoto(item)
+              setIsModalOpen(true)
+            }}
+          >
             <img src={item.urlSmall} alt={item.alt} className="photo__img" />
             <figcaption classname="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
@@ -33,6 +41,26 @@ function Photos() {
           </figure>
         ))}
       </div>
+      {isModalOpen && selectedPhoto && (
+        <div className="modal__photo" onClick={() => setIsModalOpen(false)}>
+          <div
+            className="modal__photo--content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span
+              className="modal__photo--close"
+              onClick={() => setIsModalOpen(false)}
+            >
+              &#9746;
+            </span>
+            <img
+              className="modal__photo--img"
+              src={selectedPhoto.url}
+              alt={selectedPhoto.alt}
+            />
+          </div>
+        </div>
+      )}
     </>
   )
 }
