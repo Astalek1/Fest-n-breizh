@@ -1,0 +1,45 @@
+.video__intro {
+  width: 100%;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 0 50px;
+
+  &--title {
+    margin: 25px 0px;
+  }
+  &--txt {
+    margin: 25px;
+    padding: 25px;
+  }
+}
+
+.videos {
+  margin: 50px;
+
+  &__content:before {
+    content: '';
+    display: block;
+    width: 100%; // longueur du trait (modifiable)
+    height: 2px; // épaisseur du trait
+    background-color: black; // couleur
+    margin: 20px auto; // centre la ligne
+    margin-bottom: 50px;
+    margin-top: 25px;
+  }
+  &__title {
+    margin: 25px;
+  }
+  &__txt {
+    margin: 25px;
+    padding: 25px;
+  }
+  &__windows {
+    width: 800px;
+    height: 500px;
+    border-radius: 20px;
+    margin: 50px;
+    margin-top: 0;
+    border: 1px solid black;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
+  }
+}

@@ -12,7 +12,8 @@
 }
 .poster {
   margin: 0 10px;
-  padding: 0 10px;
+  padding: 10px;
+  padding-bottom: 0;
   display: block;
   transition: transform 230ms ease-in-out;
 
@@ -27,7 +28,7 @@
   &__figcaption {
     width: 300px;
     height: auto;
-    font-size: 15px;
+    font-size: 18px;
     display: flex;
     position: relative;
     bottom: 15px;
@@ -44,7 +45,7 @@
 }
 
 .poster:hover {
-  //background-color: rgba(0, 0, 0, 0.158);
+  background-color: rgba(0, 0, 0, 0.082);
   //background-color: rgba(0, 0, 0, 0.849);
   //color: white;
   border-radius: 8px;

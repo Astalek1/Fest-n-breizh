@@ -10,23 +10,27 @@
   justify-content: start;
   padding: 60px;
 }
+
 .photo {
   margin: 0 10px;
-  padding: 0 10px;
+  padding: 10px;
+  padding-bottom: 0;
   display: block;
   transition: transform 230ms ease-in-out;
+
   &__img {
-    width: 300px;
-    height: 450px;
+    width: auto;
+    height: 400px;
     object-fit: cover;
     border: 2px solid #00000065;
     margin: 0 15px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    display: flex;
   }
   &__caption {
     width: 300px;
     height: auto;
-    font-size: 15px;
+    font-size: 17px;
     display: flex;
     position: relative;
     bottom: 15px;
@@ -39,11 +43,12 @@
     display: flex;
     position: relative;
     left: 20px;
+    padding-bottom: 5px;
   }
 }
 
 .photo:hover {
-  background-color: rgba(0, 0, 0, 0.158);
+  background-color: rgba(0, 0, 0, 0.082);
   //background-color: rgba(0, 0, 0, 0.849);
   //color: white;
   border-radius: 8px;
