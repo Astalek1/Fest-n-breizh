@@ -18,11 +18,12 @@
   &__img {
     width: auto;
     height: 300px;
-    border: 2px solid #00000065;
+    border: 1px solid #00000065;
     margin: 15px;
     padding: 0;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
     display: block;
+    border-radius: 5px;
   }
   &__caption {
     width: 100%;
