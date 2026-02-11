@@ -23,8 +23,9 @@ function Posters() {
       <div className="page__title">
         <h1>les Affiches</h1>
         <p>
-          voicis les affiches de toutes les édition de fest'n breizh depuis son
-          commencement en 2009.
+          voici les affiches de toutes les éditions de Fest'n Brezh depuis son
+          Commencement en 2009. Cliquez sur l'affiche pour la voir en plus
+          grand.
         </p>
       </div>
 
@@ -43,7 +44,7 @@ function Posters() {
             </h2>
             <img
               src={item.urlSmall}
-              alt={`affiche ${item.title}`}
+              alt={`affiche ${item.title} ${item.year}`}
               className="poster__img"
             />
             <figcaption>

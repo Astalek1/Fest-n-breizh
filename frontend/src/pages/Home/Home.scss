@@ -92,7 +92,7 @@
     display: block;
     width: 100%; // longueur du trait (modifiable)
     height: 2px; // épaisseur du trait
-    background-color: black; // couleur
+    background-color: $main-color; // couleur
     margin: 20px auto; // centre la ligne
     margin-bottom: 50px;
     margin-top: 25px;

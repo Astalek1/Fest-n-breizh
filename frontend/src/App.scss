@@ -13,7 +13,7 @@
 .page__container {
   min-height: 74vh; // prend tout l’écran
   font-size: 80px;
-  margin: 0 8%;
+  margin: $side-margin;
   background-color: $secondary-color;
   border-radius: 10px;
   flex: 1;
@@ -25,7 +25,7 @@ body,
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background-color: $main-color;
+  background-color: $margin-color;
 }
 
 h1 {

@@ -12,25 +12,22 @@
 }
 
 .photo {
-  margin: 0 10px;
-  padding: 10px;
-  padding-bottom: 0;
-  display: block;
+  margin: 10px;
   transition: transform 230ms ease-in-out;
 
   &__img {
     width: auto;
-    height: 400px;
-    object-fit: cover;
+    height: 300px;
     border: 2px solid #00000065;
-    margin: 0 15px;
+    margin: 15px;
+    padding: 0;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-    display: flex;
+    display: block;
   }
   &__caption {
-    width: 300px;
+    width: 100%;
     height: auto;
-    font-size: 17px;
+    font-size: 14px;
     display: flex;
     position: relative;
     bottom: 15px;
@@ -38,8 +35,9 @@
     margin: 0;
   }
   &__title {
+    width: 100%;
     text-decoration: none;
-    font-size: 24px;
+    font-size: 18px;
     display: flex;
     position: relative;
     left: 20px;
