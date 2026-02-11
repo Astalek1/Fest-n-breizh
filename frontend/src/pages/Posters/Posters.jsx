@@ -41,7 +41,11 @@ function Posters() {
             <h2 className="poster__title">
               {item.title} {item.year}
             </h2>
-            <img src={item.urlSmall} alt={item.alt} className="poster__img" />
+            <img
+              src={item.urlSmall}
+              alt={`affiche ${item.title}`}
+              className="poster__img"
+            />
             <figcaption>
               {item.caption && (
                 <p className="poster__figcaption">&copy; {item.caption}</p>
@@ -66,7 +70,7 @@ function Posters() {
             <img
               className="modal__poster--img"
               src={selectedPoster.url}
-              alt={selectedPoster.alt}
+              alt={`affiche ${selectedPoster.title}`}
             />
           </div>
         </div>

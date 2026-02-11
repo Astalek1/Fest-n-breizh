@@ -6,7 +6,6 @@ const gallerySchema = mongoose.Schema({
   urlSmall: { type: String, required: true}, // version petite
   mediaFileId: { type: String }, // fileId de la version large
   mediaFileIdSmall: { type: String }, // fileId de la version petite
-  alt: { type: String, required: true },
   caption: { type: String },
   type: { type: String, enum: ["photo", "poster"], required: true },
 year: {

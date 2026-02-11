@@ -18,6 +18,7 @@ function Footer() {
               className="Footer__portfolio"
               target="_blank"
               href="https://astalek1.github.io/portfolio/"
+              rel="noopener noreferrer"
             >
               <span>By Kévin Goujon</span>
             </a>
@@ -30,6 +31,7 @@ function Footer() {
           <a
             target="_blank"
             href="https://www.facebook.com/people/Festn-Bzh/100067739030441/?locale=fr_FR"
+            rel="noopener noreferrer"
           >
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/facebook-blanc.webp"
@@ -38,7 +40,11 @@ function Footer() {
             ></img>
           </a>
 
-          <a target="_blank" href="https://www.instagram.com/festnbreizh/">
+          <a
+            target="_blank"
+            href="https://www.instagram.com/festnbreizh/"
+            rel="noopener noreferrer"
+          >
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/instagrame-blanc.webp"
               alt="Logo Instagram"
@@ -49,6 +55,7 @@ function Footer() {
           <a
             target="_blank"
             href="https://www.youtube.com/@festnbreizh2300/featured"
+            rel="noopener noreferrer"
           >
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/youtube-rond-blanc%201.webp"

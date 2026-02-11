@@ -10,8 +10,6 @@ import { isFileInUse } from "../utils/isFileInUse.js";
 export const newPoster = async (req, res) => {
   try {
     const posterData = JSON.parse(req.body.poster);
-    if (!posterData.alt) return res.status(400).json("Le champ alt est obligatoire");
-
     const existing = await Gallery.findOne({
       title: posterData.title,
       type: "poster",
@@ -39,7 +37,6 @@ export const newPoster = async (req, res) => {
       urlSmall: newMedia.urlSmall || null,
       mediaFileId: newMedia.fileId || null,
       mediaFileIdSmall: newMedia.fileIdSmall || null,
-      alt: posterData.alt,
       caption: posterData.caption,
       type: "poster",
     });
@@ -83,7 +80,7 @@ export const updatePoster = async (req, res) => {
     if (!existingPoster) return res.status(404).json("Affiche non trouvée");
 
     const body = req.body.poster ? JSON.parse(req.body.poster) : req.body;
-    const allowedFields = ["title","year", "alt", "caption"];
+    const allowedFields = ["title","year",  "caption"];
     const filteredData = {};
 
     for (const field of allowedFields) {
@@ -151,7 +148,6 @@ export const deletePoster = async (req, res) => {
 export const newPhoto = async (req, res) => {
   try {
     const photoData = JSON.parse(req.body.photo);
-    if (!photoData.alt) return res.status(400).json("Le champ alt est obligatoire");
 
     const existing = await Gallery.findOne({
       title: photoData.title,
@@ -179,7 +175,6 @@ export const newPhoto = async (req, res) => {
       urlSmall: newMedia.urlSmall || null,
       mediaFileId: newMedia.fileId || null,
       mediaFileIdSmall: newMedia.fileIdSmall || null,
-      alt: photoData.alt,
       caption: photoData.caption,
       type: "photo",
     });
@@ -219,7 +214,7 @@ export const updatePhoto = async (req, res) => {
     if (!existingPhoto) return res.status(404).json("Photo non trouvée");
 
     const body = req.body.photo ? JSON.parse(req.body.photo) : req.body;
-    const allowedFields = ["title", "alt", "caption"];
+    const allowedFields = ["title",  "caption"];
     const filteredData = {};
 
     for (const field of allowedFields) {

@@ -86,7 +86,7 @@ function Home() {
                   <img
                     className="announcement__logo"
                     src={item.logo || item.media}
-                    alt={item.title}
+                    alt={`logo ${item.name}`}
                   />
                 )}
 

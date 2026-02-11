@@ -31,7 +31,11 @@ function Photos() {
               setIsModalOpen(true)
             }}
           >
-            <img src={item.urlSmall} alt={item.alt} className="photo__img" />
+            <img
+              src={item.urlSmall}
+              alt={`photo ${item.title}`}
+              className="photo__img"
+            />
             <figcaption classname="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
               {item.caption && (
@@ -54,9 +58,9 @@ function Photos() {
               &#9746;
             </span>
             <img
-              className="modal__photo--img"
+              className="modal__poster--img"
               src={selectedPhoto.url}
-              alt={selectedPhoto.alt}
+              alt={`affiche ${selectedPhoto.title}`}
             />
           </div>
         </div>

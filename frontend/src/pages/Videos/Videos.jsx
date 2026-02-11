@@ -16,11 +16,7 @@ function Videos() {
       <div className="video__intro">
         <h1 className="video__intro--title">Nos vidéo sur Youtube</h1>
 
-        <p className="video__intro--txt">
-          Retrouvez ici toutes les actualités du festival : nouveautés,
-          événements, invités, informations importantes et moments forts à
-          venir.
-        </p>
+        <p className="video__intro--txt">texte a venir.</p>
       </div>
       <div className="videos">
         {videos.map((item) => (

@@ -1,0 +1,29 @@
+.link__intro {
+  border: 1px solid red;
+  &--title {
+    color: red;
+  }
+
+  &--txt {
+    color: rgb(36, 69, 175);
+  }
+}
+
+.links {
+  &__content {
+  }
+
+  &__title {
+  }
+
+  &__txt {
+  }
+
+  &__logo {
+    border: 1px solid red;
+    max-height: 200px;
+    width: 500px;
+    height: auto;
+    object-fit: cover;
+  }
+}

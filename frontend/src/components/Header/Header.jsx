@@ -68,7 +68,7 @@ function Header() {
             Nos Vidéos
           </Link>
           <Link className="Header__link" to="/Links">
-            Nos Liens
+            Nos Réseaux
           </Link>
           <Link className="Header__link" to="/Partners">
             Nos Partenaires
