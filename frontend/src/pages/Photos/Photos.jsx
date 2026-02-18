@@ -39,7 +39,7 @@ function Photos() {
               alt={`photo ${item.title}`}
               className="photo__img"
             />
-            <figcaption classname="photo__figcaption">
+            <figcaption className="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
               {item.caption && (
                 <p className="photo__caption">&copy; {item.caption}</p>

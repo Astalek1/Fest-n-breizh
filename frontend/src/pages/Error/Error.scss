@@ -1,0 +1,32 @@
+@use '../../styles/variables' as *;
+
+.error {
+  min-height: 74vh;
+  background-color: white;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__title {
+    font-size: 400px;
+    text-decoration: none;
+    margin: none;
+  }
+
+  &__txt {
+    font-size: 40px;
+    margin-top: -80px;
+  }
+  &__link {
+    margin-top: 80px;
+    font-size: 28px;
+    text-decoration: none;
+    color: black;
+  }
+  &__link:hover {
+    color: red;
+  }
+}

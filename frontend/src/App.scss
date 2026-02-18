@@ -8,6 +8,10 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
+  /*background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/2024.webp');
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;*/
 }
 
 .page__container {
@@ -15,6 +19,7 @@
   font-size: 80px;
   margin: $side-margin;
   background-color: $secondary-color;
+  background-image: none;
   border-radius: 10px;
   flex: 1;
 }
@@ -26,24 +31,37 @@ body,
   flex-direction: column;
   overflow-x: hidden;
   background-color: $margin-color;
+  background-image: none;
 }
 
 h1 {
   font-size: 50px;
   margin-bottom: 10px;
   text-decoration: underline;
+  background-image: none;
 }
 h2 {
   font-size: 42px;
   margin-bottom: 10px;
   text-decoration: underline;
+  background-image: none;
 }
 
 p {
   font-size: 24px;
   margin-bottom: 15px;
+  background-image: none;
 }
 
 img {
   font-size: 14px;
+  background-image: none;
+}
+
+a {
+  background-image: none;
+}
+
+span {
+  background-image: none;
 }

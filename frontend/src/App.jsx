@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from 'react-router-dom'
 import './App.scss'
 import Header from './components/Header/Header.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -15,10 +20,25 @@ import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
 
 function App() {
+  const location = useLocation()
+  const knownPaths = [
+    '/',
+    '/About',
+    '/Editions',
+    '/photos',
+    '/Posters',
+    '/Videos',
+    '/Links',
+    '/Partners',
+    '/Contact',
+    '/Login',
+  ]
+  const isError = !knownPaths.includes(location.pathname)
+
   return (
     <>
       <Header />
-      <div className="page__container">
+      <div className={isError ? '' : 'page__container'}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
