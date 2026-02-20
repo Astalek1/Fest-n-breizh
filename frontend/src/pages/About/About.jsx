@@ -2,7 +2,7 @@ import './About.scss'
 
 function About() {
   return (
-    <article>
+    <article className="about">
       <h1 className="about__title">À propos de Fest'n Breizh.</h1>
       <p className="about__text">
         Fondé en 2009, Fest'n Breizh est un fest-noz annuel rennais. Cet

@@ -47,7 +47,7 @@ function Posters() {
               alt={`affiche ${item.title} ${item.year}`}
               className="poster__img"
             />
-            <figcaption>
+            <figcaption className="poster__caption">
               {item.caption && (
                 <p className="poster__figcaption">&copy; {item.caption}</p>
               )}

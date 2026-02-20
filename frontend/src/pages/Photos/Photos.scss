@@ -9,12 +9,16 @@
   flex-wrap: wrap;
   justify-content: start;
   padding: 60px;
+  background-image: none;
 }
 
 .photo {
   margin: 10px;
   transition: transform 230ms ease-in-out;
-
+  background-image: none;
+  &__figcaption {
+    background-image: none;
+  }
   &__img {
     width: auto;
     height: 300px;
@@ -69,10 +73,12 @@
   overflow: auto; /* Permet le défilement si nécessaire */
   justify-content: center;
   align-items: center;
+  background-image: none;
 
   &--content {
     position: relative;
     display: inline-block;
+    background-image: none;
   }
 
   &--img {
