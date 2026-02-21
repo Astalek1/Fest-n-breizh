@@ -11,7 +11,10 @@ function Editions() {
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
       .then((res) => res.json())
-      .then((data) => setEditions(data))
+      .then((data) => {
+        const sorted = [...data].sort((a, b) => a.year - b.year)
+        setEditions(sorted)
+      })
       .catch((err) => console.error(err))
   }, [])
 
@@ -20,6 +23,7 @@ function Editions() {
   return (
     <div className="editions">
       {/* MENU DYNAMIQUE */}
+
       <div className="editions__menu">
         {editions.map((edition) => (
           <button
@@ -38,7 +42,9 @@ function Editions() {
 
         {selectedEdition && (
           <div className="edition">
-            <h2 className="edition__title">{selectedEdition.title}</h2>
+            <h2 className="edition__title">
+              {`${selectedEdition.title} ${selectedEdition.year}`}
+            </h2>
             <p className="edition__txt">{selectedEdition.description}</p>
           </div>
         )}

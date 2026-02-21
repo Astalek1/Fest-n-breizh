@@ -6,6 +6,7 @@
   }
   &__button {
     background-image: none;
+    cursor: pointer;
   }
   &__content {
     background-image: none;
@@ -14,11 +15,10 @@
 
 .edition {
   background-image: none;
-
   &__title {
-    background-image: none;
+    color: red;
   }
   &__txt {
-    background-image: none;
+    color: green;
   }
 }
