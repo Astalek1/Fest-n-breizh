@@ -69,7 +69,7 @@ if (duplicate) {
     // --- CRÉATION DE L'ÉDITION ---
     const newEdition = new Edition({
       title: editionData.title,
-        year: editionData.year,
+      year: editionData.year,
       description: editionData.description,
       poster: editionData.poster,
       artists: artistDocs,
@@ -286,6 +286,7 @@ if (
     existingEdition.title = editionData.title || existingEdition.title;
     existingEdition.description = editionData.description || existingEdition.description;
     existingEdition.poster = editionData.poster || existingEdition.poster;
+    existingEdition.year = editionData.year || existingEdition.year;
 
     if (updatedArtists.length) existingEdition.artists = updatedArtists;
     if (updatedGuests.length) existingEdition.guests = updatedGuests;
