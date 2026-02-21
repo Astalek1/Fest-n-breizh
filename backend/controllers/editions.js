@@ -16,6 +16,16 @@ export const createEdition = async (req, res) => {
     if (!editionData.title || !editionData.poster)
       return res.status(400).json({ error: "Titre et affiche requis." });
 
+    const duplicate = await Edition.findOne({
+  title: editionData.title
+});
+
+if (duplicate) {
+  return res.status(400).json({
+    error: "Une édition avec ce titre existe déjà"
+  });
+}
+
     // --- ARTISTES ---
     const artistDocs = [];
     const uploadedArtistFiles = req.files?.artistFiles || [];
@@ -59,6 +69,7 @@ export const createEdition = async (req, res) => {
     // --- CRÉATION DE L'ÉDITION ---
     const newEdition = new Edition({
       title: editionData.title,
+        year: editionData.year,
       description: editionData.description,
       poster: editionData.poster,
       artists: artistDocs,
@@ -194,6 +205,7 @@ export const addGuestToEdition = async (req, res) => {
 export const updateEdition = async (req, res) => {
   const { editionId, guestId } = req.params;
 
+
   if (guestId) {
     const fakeReq = {
       params: { id: guestId },
@@ -209,6 +221,24 @@ export const updateEdition = async (req, res) => {
 
     const existingEdition = await Edition.findById(req.params.editionId || req.params.id);
     if (!existingEdition) return res.status(404).json({ error: "Édition non trouvée" });
+
+    // Vérifier doublon seulement si le titre est modifié
+if (
+  editionData.title &&
+  editionData.title !== existingEdition.title
+) {
+  const duplicate = await Edition.findOne({
+    title: editionData.title,
+    _id: { $ne: existingEdition._id }
+  });
+
+  if (duplicate) {
+    return res.status(400).json({
+      error: "Une édition avec ce titre existe déjà"
+    });
+  }
+}
+    
 
     const updatedArtists = [];
     const updatedGuests = [];
