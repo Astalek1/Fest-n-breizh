@@ -25,7 +25,6 @@ function App() {
     '/',
     '/About',
     '/Editions',
-    '/Editions/:editionId',
     '/photos',
     '/Posters',
     '/Videos',
@@ -34,7 +33,9 @@ function App() {
     '/Contact',
     '/Login',
   ]
-  const isError = !knownPaths.includes(location.pathname)
+  const isError =
+    !knownPaths.includes(location.pathname) &&
+    !location.pathname.startsWith('/Editions/')
 
   return (
     <>
