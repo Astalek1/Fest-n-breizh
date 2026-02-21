@@ -17,7 +17,8 @@ export const createEdition = async (req, res) => {
       return res.status(400).json({ error: "Titre et affiche requis." });
 
     const duplicate = await Edition.findOne({
-  title: editionData.title
+      title: editionData.title,
+       year: editionData.year
 });
 
 if (duplicate) {
@@ -224,17 +225,18 @@ export const updateEdition = async (req, res) => {
 
     // Vérifier doublon seulement si le titre est modifié
 if (
-  editionData.title &&
-  editionData.title !== existingEdition.title
+  (editionData.title && editionData.title !== existingEdition.title) ||
+  (editionData.year && editionData.year !== existingEdition.year)
 ) {
   const duplicate = await Edition.findOne({
-    title: editionData.title,
+    title: editionData.title ?? existingEdition.title,
+    year: editionData.year ?? existingEdition.year,
     _id: { $ne: existingEdition._id }
   });
 
   if (duplicate) {
     return res.status(400).json({
-      error: "Une édition avec ce titre existe déjà"
+      error: "Une édition avec ce titre et cette année existe déjà"
     });
   }
 }
