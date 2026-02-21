@@ -25,6 +25,7 @@ function App() {
     '/',
     '/About',
     '/Editions',
+    'Editions/:editionId',
     '/photos',
     '/Posters',
     '/Videos',

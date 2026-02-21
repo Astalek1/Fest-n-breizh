@@ -1,12 +1,49 @@
-//import './Editions.scss'
-/*import { useParams, useNavigate } from 'react-router-dom'*/
+import './Editions.scss'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+
 function Editions() {
-  //const { editionId } = useParams()
-  //const navigate = useNavigate()
+  const { editionId } = useParams()
+  const navigate = useNavigate()
 
-  //const selectedEdition = editions.find((e) => e._id === editionId)
+  const [editions, setEditions] = useState([])
 
-  return <> Les Editions</>
+  useEffect(() => {
+    fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
+      .then((res) => res.json())
+      .then((data) => setEditions(data))
+      .catch((err) => console.error(err))
+  }, [])
+
+  const selectedEdition = editions.find((e) => e._id === editionId)
+
+  return (
+    <div className="editions">
+      {/* MENU DYNAMIQUE */}
+      <div className="editions__menu">
+        {editions.map((edition) => (
+          <button
+            className="editions__button"
+            key={edition._id}
+            onClick={() => navigate(`/Editions/${edition._id}`)}
+          >
+            {`${edition.title} ${edition.year}`}
+          </button>
+        ))}
+      </div>
+
+      {/* CONTENU */}
+      <div className="editions__content">
+        {!editionId && <p>Présentation générale des éditions</p>}
+
+        {selectedEdition && (
+          <div className="edition">
+            <h2 className="edition__title">{selectedEdition.title}</h2>
+            <p className="edition__txt">{selectedEdition.description}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
-
 export default Editions
