@@ -73,12 +73,14 @@
   overflow: auto; /* Permet le défilement si nécessaire */
   justify-content: center;
   align-items: center;
+
   background-image: none;
 
   &--content {
     position: relative;
     display: inline-block;
     background-image: none;
+    margin-bottom: 5%;
   }
 
   &--img {

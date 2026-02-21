@@ -63,6 +63,7 @@
 }
 
 /* Styles pour le modal */
+
 .modal__poster {
   display: flex; /* Masquer le modal par défaut */
   position: fixed;
@@ -80,6 +81,7 @@
   &--content {
     position: relative;
     display: inline-block;
+    background-image: none;
   }
 
   &--img {
