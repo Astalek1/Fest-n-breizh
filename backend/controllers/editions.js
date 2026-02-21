@@ -300,6 +300,7 @@ if (
       edition: existingEdition,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Erreur serveur (updateEdition)" });
   }
 };
