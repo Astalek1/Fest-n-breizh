@@ -8,7 +8,7 @@
     background-image: none;
     cursor: pointer;
   }
-  &__content {
+  &__container {
     background-image: none;
   }
 }
@@ -20,5 +20,20 @@
   }
   &__txt {
     color: green;
+  }
+  &__content {
+    background-image: none;
+  }
+}
+
+.edition__artist {
+  background-image: none;
+  &--media {
+    background-image: none;
+  }
+
+  &--video {
+    width: 150px;
+    height: auto;
   }
 }

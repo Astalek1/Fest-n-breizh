@@ -37,15 +37,50 @@ function Editions() {
       </div>
 
       {/* CONTENU */}
-      <div className="editions__content">
+      <div className="editions__container">
         {!editionId && <p>Présentation générale des éditions</p>}
 
         {selectedEdition && (
           <div className="edition">
-            <h2 className="edition__title">
+            <h1 className="edition__title">
               {`${selectedEdition.title} ${selectedEdition.year}`}
-            </h2>
+            </h1>
             <p className="edition__txt">{selectedEdition.description}</p>
+
+            <article className="edition__content">
+              {selectedEdition.artists?.map((artist) => (
+                <div key={artist._id} className="edition__artist">
+                  <h2 className="edition__artist--title">{artist.name}</h2>
+                  <p className="edition__artist--txt">{artist.description}</p>
+                  <div className="edition__artist--media">
+                    {artist.media && (
+                      <img
+                        src={artist.media}
+                        alt={artist.name}
+                        className="edition__artist--img"
+                      />
+                    )}
+
+                    {!artist.media && artist.logo && (
+                      <img
+                        src={artist.logo}
+                        alt={artist.name}
+                        className="edition__artist--img"
+                      />
+                    )}
+
+                    {artist.media === 'video' && (
+                      <iframe
+                        src={artist.media.replace('watch?v=', 'embed/')}
+                        title={artist.name}
+                        allowFullScreen
+                        className="edition__artist--video"
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </article>
           </div>
         )}
       </div>

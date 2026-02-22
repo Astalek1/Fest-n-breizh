@@ -58,7 +58,7 @@ function About() {
       </p>
       <img
         className="about__img"
-        src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/equipefnb.webp?updatedAt=1769902471228"
+        src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/equipefnb.webp"
         alt="photo des organisateurs "
       ></img>
     </article>

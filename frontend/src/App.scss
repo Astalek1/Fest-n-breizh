@@ -8,7 +8,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
-  background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB-24.webp');
+  background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB%2024.webp');
   background-size: cover;
   background-position: top;
   //background-repeat: no-repeat;
@@ -43,6 +43,13 @@ h1 {
 }
 h2 {
   font-size: 42px;
+  margin-bottom: 10px;
+  text-decoration: underline;
+  background-image: none;
+}
+
+h3 {
+  font-size: 32px;
   margin-bottom: 10px;
   text-decoration: underline;
   background-image: none;
