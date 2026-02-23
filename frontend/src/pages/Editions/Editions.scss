@@ -1,8 +1,21 @@
+@use '../../styles/variables' as *;
+
 .editions {
   background-image: none;
 
   &__menu {
+    position: absolute;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     background-image: none;
+    background-color: $main-color;
+    padding: 10px;
+    border-radius: 20px;
+
+    width: 500px;
+    height: auto;
   }
   &__button {
     background-image: none;
@@ -13,6 +26,14 @@
   }
 }
 
+.main__editions {
+  background-image: none;
+
+  &--img {
+    width: 500px;
+    height: auto;
+  }
+}
 .edition {
   background-image: none;
   &__title {
