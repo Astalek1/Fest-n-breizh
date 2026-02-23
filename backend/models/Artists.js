@@ -5,7 +5,7 @@ const artistSchema = mongoose.Schema({
   description: { type: String, required: true },
   media: { type: String },
   mediaType: {
-    type: String, enum: ["photo", "video"
+    type: String, enum: ["image", "video"
    ], }, 
   mediaFileId: { type: String },
   logo: { type: String },
