@@ -71,9 +71,12 @@ function Editions() {
 
                     {artist.mediaType === 'video' && artist.media && (
                       <iframe
-                        src={artist.media.replace('watch?v=', 'embed/')}
+                        src={
+                          artist.media.includes('youtu.be')
+                            ? `https://www.youtube.com/embed/${artist.media.split('youtu.be/')[1]}`
+                            : artist.media.replace('watch?v=', 'embed/')
+                        }
                         title={artist.name}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         className="edition__artist--video"
                       />
