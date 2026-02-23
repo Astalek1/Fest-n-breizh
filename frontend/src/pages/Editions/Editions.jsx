@@ -69,10 +69,11 @@ function Editions() {
                       />
                     )}
 
-                    {artist.media === 'video' && (
+                    {artist.mediaType === 'video' && artist.media && (
                       <iframe
                         src={artist.media.replace('watch?v=', 'embed/')}
                         title={artist.name}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         className="edition__artist--video"
                       />
