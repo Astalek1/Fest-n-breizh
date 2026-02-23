@@ -77,7 +77,7 @@ export const createArtist = async (req, res, silent = false) => {
       logo: isLogo ? up.url : null,
       logoFileId: isLogo ? up.fileId : null,
       mediaName: up.fileName || baseName,
-      mediaType,
+      mediaType: body.mediaType,
     });
 
     await doc.save();
