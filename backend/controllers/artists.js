@@ -11,6 +11,9 @@ export const createArtist = async (req, res, silent = false) => {
   try {
     const body = JSON.parse(req.body.artist || "{}");
     const mediaType = (body.mediaType || "").toLowerCase();
+      if (mediaType) {
+  filtered.mediaType = mediaType;
+}
     const isLogo = mediaType === "logo";
 
     const baseName =
@@ -143,9 +146,7 @@ export const updateArtist = async (req, res, silent = false) => {
       req.body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       body.fileName?.trim()?.replace(/\s+/g, "-").toLowerCase() ||
       toSlug(filtered.name || existing.name);
-    if (mediaType) {
-  filtered.mediaType = mediaType;
-}
+  
 
     // --- Détermination du type de média ---
     const mediaType = (body.mediaType || "").toLowerCase();
