@@ -4,22 +4,32 @@
   background-image: none;
 
   &__menu {
-    position: absolute;
+    position: fixed;
     right: 0;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     background-image: none;
     background-color: $main-color;
     padding: 10px;
+    gap: 5px;
     border-radius: 20px;
-
-    width: 500px;
+    width: 20%;
     height: auto;
+    transition: transform 50ms ease-in-out;
   }
   &__button {
+    font-size: 22px;
     background-image: none;
     cursor: pointer;
+    border-radius: 20px;
+    width: 48%;
+    height: 35px;
+    margin: 2px;
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 100ms ease-in-out;
+    }
   }
   &__container {
     background-image: none;
@@ -27,29 +37,74 @@
 }
 
 .main__editions {
-  background-image: none;
+  width: 90%;
 
+  height: auto;
+  background-image: none;
+  margin: 0 5%;
+  display: flex;
+  flex-direction: column;
+
+  &--title {
+    padding: 1%;
+  }
+
+  &--txt {
+    padding: 2%;
+  }
   &--img {
-    width: 500px;
+    position: relative;
+    width: 30%;
     height: auto;
+    left: 35%;
   }
 }
 .edition {
   background-image: none;
   &__title {
-    color: red;
   }
   &__txt {
-    color: green;
   }
   &__content {
     background-image: none;
+  }
+  &__prog {
+    display: flex;
+    font-size: 48px;
+    font-weight: bold;
+    justify-content: center;
   }
 }
 
 .edition__artist {
   background-image: none;
   &--media {
+    background-image: none;
+  }
+
+  &--video {
+    width: 600px;
+    height: 350px;
+    border-radius: 20px;
+    margin: 50px;
+    margin-top: 0;
+    border: 1px solid black;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.edition__guest {
+  background-image: none;
+
+  &--media {
+    background-image: none;
+  }
+
+  &--logo {
+    background-image: none;
+  }
+
+  &--imag {
     background-image: none;
   }
 

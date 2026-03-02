@@ -58,7 +58,14 @@ function Editions() {
             <h1 className="main__editions--title">
               Présentation générale des éditions
             </h1>
-            <p className="main__editions--txt">text a venir</p>
+            <p className="main__editions--txt">
+              Bienvenue sur la page de sélection des éditions de Fest'n Breizh.
+              <br />
+              Les pages dédiées à chaque édition, depuis le début de l'événement
+              jusqu'à aujourd'hui, sont disponibles ici. <br /> Rendez-vous dans
+              le menu de sélection pour accéder à la programmation de l'édition
+              que vous souhaitez voir.
+            </p>
             <img
               className="main__editions--img"
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/affiche-min.webp"
@@ -80,11 +87,13 @@ function Editions() {
                 alt={`affiche ${selectedEdition.title} ${selectedEdition.year}`}
               />
             )}
+            <p className="edition__prog">La Programmation</p>
             {/*CONTENU ARTISTES*/}
             <article className="edition__content">
+              <h2 className="edition__section">les Artistes</h2>
               {selectedEdition.artists?.map((artist) => (
                 <div key={artist._id} className="edition__artist">
-                  <h2 className="edition__artist--title">{artist.name}</h2>
+                  <h3 className="edition__artist--title">{artist.name}</h3>
                   <p className="edition__artist--txt">{artist.description}</p>
                   <div className="edition__artist--media">
                     {/* IMAGE */}
@@ -136,9 +145,10 @@ function Editions() {
             </article>
             {/*CONTENU INVITES*/}
             <article className="edition__content">
+              <h2 className="edition__section">les Invités</h2>
               {selectedEdition.guests?.map((guest) => (
                 <div key={guest._id} className="edition__guest">
-                  <h2 className="edition__guest--title">{guest.name}</h2>
+                  <h3 className="edition__guest--title">{guest.name}</h3>
                   <p className="edition__guest--txt">{guest.description}</p>
                   <div className="edition__guest--media">
                     {/* IMAGE */}
