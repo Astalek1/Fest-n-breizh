@@ -146,6 +146,9 @@ export const updateGuest = async (req, res, silent = false) => {
 
     // --- Détermination du type de média ---
     const mediaType = (body.mediaType || "").toLowerCase();
+    if (mediaType) {
+  filtered.mediaType = mediaType;
+}
     const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;

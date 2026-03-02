@@ -80,7 +80,7 @@ function Editions() {
                 alt={`affiche ${selectedEdition.title} ${selectedEdition.year}`}
               />
             )}
-
+            {/*CONTENU ARTISTES*/}
             <article className="edition__content">
               {selectedEdition.artists?.map((artist) => (
                 <div key={artist._id} className="edition__artist">
@@ -128,6 +128,60 @@ function Editions() {
                       ) : (
                         <video controls className="edition__artist--video">
                           <source src={artist.media} />
+                        </video>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </article>
+            {/*CONTENU INVITES*/}
+            <article className="edition__content">
+              {selectedEdition.guests?.map((guest) => (
+                <div key={guest._id} className="edition__guest">
+                  <h2 className="edition__guest--title">{guest.name}</h2>
+                  <p className="edition__guest--txt">{guest.description}</p>
+                  <div className="edition__guest--media">
+                    {/* IMAGE */}
+                    {guest.mediaType === 'image' && (
+                      <img
+                        src={guest.media}
+                        alt={guest.name}
+                        className="edition__guest--img"
+                      />
+                    )}
+
+                    {/* LOGO (nouveau) */}
+                    {guest.mediaType === 'logo' && (
+                      <img
+                        src={guest.logo}
+                        alt={guest.name}
+                        className="edition__guest--logo"
+                      />
+                    )}
+
+                    {/* LOGO ancien (stocké dans media sans mediaType) */}
+                    {!guest.mediaType && guest.media && (
+                      <img
+                        src={guest.media}
+                        alt={guest.name}
+                        className="edition__guest--logo"
+                      />
+                    )}
+
+                    {guest.mediaType === 'video' &&
+                      guest.media &&
+                      (guest.media.includes('youtube') ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${new URL(
+                            guest.media,
+                          ).searchParams.get('v')}`}
+                          title={guest.name}
+                          allowFullScreen
+                          className="edition__guest--video"
+                        />
+                      ) : (
+                        <video controls className="edition__guest--video">
+                          <source src={guest.media} />
                         </video>
                       ))}
                   </div>
