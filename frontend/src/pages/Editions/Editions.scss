@@ -22,10 +22,11 @@
     font-size: 22px;
     background-image: none;
     cursor: pointer;
-    border-radius: 20px;
-    width: 48%;
-    height: 35px;
-    margin: 2px;
+    border-radius: 10px;
+    width: 49%;
+    height: 40px;
+    margin: 1px;
+
     &:hover {
       transform: scale(1.05);
       transition: transform 100ms ease-in-out;
@@ -61,59 +62,154 @@
 }
 .edition {
   background-image: none;
+
+  &__section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+  }
+
+  &__intro {
+    background-image: none;
+    width: 100%;
+    position: relative;
+  }
+
   &__title {
+    padding: 2%;
+    padding-bottom: 0;
+    width: 60%;
   }
   &__txt {
+    padding: 1% 3%;
+    width: 60%;
+  }
+  &__img {
+    position: absolute;
+    top: 0.5rem;
+    right: 15rem;
+    width: 350px;
+    height: auto;
+    border: 1px solid rgba(0, 0, 0, 0.493);
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  &__prog {
+    width: 100%;
+    font-size: 48px;
+    font-weight: bold;
+    margin-top: 25rem;
+    margin-bottom: 5rem;
+    text-align: center;
+  }
+
+  &__columns {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background-image: none;
+  }
+
+  &__columns > .edition__content {
+    flex: 1; // 50% / 50%
+  }
+  // Trait vertical
+  &__columns > .edition__content:first-child {
+    border-right: 3px solid black; // ajuste couleur / épaisseur
   }
   &__content {
     background-image: none;
-  }
-  &__prog {
     display: flex;
-    font-size: 48px;
-    font-weight: bold;
-    justify-content: center;
+    flex-direction: column;
   }
 }
 
 .edition__artist {
   background-image: none;
+  padding: 0 2rem;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 100%; // longueur du trait (modifiable)
+    height: 1px; // épaisseur du trait
+    background-color: $main-color; // couleur
+    margin: 20px auto; // centre la ligne
+    margin-bottom: 50px;
+    margin-top: 25px;
+  }
+
   &--media {
     background-image: none;
   }
 
   &--video {
-    width: 600px;
-    height: 350px;
+    width: 400px;
+    height: 250px;
     border-radius: 20px;
-    margin: 50px;
+    margin: 30px;
+    margin-left: 10px;
     margin-top: 0;
     border: 1px solid black;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  &--logo {
+    width: 150px;
+    height: auto;
+    margin: 30px;
+  }
+  &--img {
+    width: auto;
+    max-width: 300px;
+    height: auto;
+    max-height: 300px;
+    margin: 30px;
     box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
   }
 }
 
 .edition__guest {
   background-image: none;
+  padding: 0 2rem;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 100%; // longueur du trait (modifiable)
+    height: 1px; // épaisseur du trait
+    background-color: $main-color; // couleur
+    margin: 20px auto; // centre la ligne
+    margin-bottom: 50px;
+    margin-top: 25px;
+  }
 
   &--media {
     background-image: none;
   }
 
   &--logo {
-    background-image: none;
+    width: 150px;
+    height: auto;
+    margin: 30px;
   }
 
-  &--imag {
-    background-image: none;
+  &--img {
+    width: auto;
+    max-width: 300px;
+    height: auto;
+    max-height: 300px;
+    margin: 30px;
+    box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
   }
 
   &--video {
-    width: 600px;
-    height: 350px;
+    width: 400px;
+    height: 250px;
     border-radius: 20px;
-    margin: 50px;
+    margin: 30px;
     margin-top: 0;
+    margin-left: 10px;
     border: 1px solid black;
     box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
   }
