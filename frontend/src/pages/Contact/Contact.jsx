@@ -1,5 +1,5 @@
 import './Contact.scss'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 function Contact() {
   const [name, setName] = useState('')
@@ -9,11 +9,26 @@ function Contact() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
 
+  const timeoutRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     setError(null)
     setSuccess(null)
+
+    //Nettoie un ancien timeout s’il existe
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
 
     try {
       const res = await fetch(
@@ -32,12 +47,21 @@ function Contact() {
       }
 
       setSuccess('Message envoyé avec succès.')
+
+      timeoutRef.current = setTimeout(() => {
+        setSuccess(null)
+      }, 5000)
+
       setName('')
       setEmail('')
       setSubject("Demande d'information")
       setMessage('')
     } catch (err) {
       setError(err.message || 'Une erreur est survenue.')
+
+      timeoutRef.current = setTimeout(() => {
+        setError(null)
+      }, 5000)
     }
   }
 
