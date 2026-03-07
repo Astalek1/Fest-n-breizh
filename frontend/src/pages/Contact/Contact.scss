@@ -1,0 +1,89 @@
+@use '../../styles/variables' as *;
+
+.contact {
+  background-image: none;
+  width: 100%;
+  height: auto;
+  &__title,
+  &__txt {
+    margin: 2%;
+  }
+  &__form {
+    background-image: none;
+    border: 1px solid #0000002f;
+    background-color: $main-color;
+    border-radius: 5px;
+    padding: 2%;
+    margin: 2%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  &__error {
+    color: red;
+    margin-top: 10px;
+    background-image: none;
+    background-color: white;
+    font-size: 25px;
+    width: 35%;
+  }
+  &__success {
+    color: green;
+    margin-top: 10px;
+    background-image: none;
+    background-color: white;
+    font-size: 25px;
+    width: 35%;
+  }
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: border 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #000;
+  }
+}
+
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: $secondary-color;
+  color: black;
+  font-size: 16px;
+  width: 10%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  transition: transform 100ms ease-in-out;
+
+  &:hover {
+    transform: scale(1.08);
+    transition: transform 100ms ease-in-out;
+  }
+}
+
+input,
+select,
+textarea,
+button {
+  background-image: none;
+}
