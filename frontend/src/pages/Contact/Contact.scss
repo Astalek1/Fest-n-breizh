@@ -29,6 +29,7 @@
     display: flex;
     justify-content: center;
     border-radius: 2px;
+    transition: opacity 0.3s ease;
   }
   &__success {
     color: green;
@@ -40,6 +41,7 @@
     display: flex;
     justify-content: center;
     border-radius: 2px;
+    transition: opacity 0.3s ease;
   }
 }
 

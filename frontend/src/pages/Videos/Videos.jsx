@@ -33,7 +33,21 @@ function Videos() {
           de curieux qui ne foulent pas toujours le plancher.
           <br />
           <br />
+          cette page vous propose un échantillon de nos vidéos.
+          <br /> vous pouvez retrouver l'ensemble de notre contenu sur notre
+          chaîne YouTube
         </p>
+        <a
+          href="https://www.youtube.com/@festnbreizh2300"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/logos/logo-youtube-1770820920343_O4sGrxN1J.webp?updatedAt=1770820921179"
+            className="video__intro--logo"
+            alt="logo youtube"
+          />
+        </a>
       </div>
       <div className="videos">
         {videos.map((item) => (

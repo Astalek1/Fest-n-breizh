@@ -68,7 +68,13 @@ function Contact() {
   return (
     <section className="contact">
       <h1 className="contact__title">Contact</h1>
-      <p className="contact__txt">texte a venir</p>
+      <p className="contact__txt">
+        pour toute demande d'information ou pour tout autre sujet ( prise de
+        contact artistes, demande de bénévolat ou de partenariat), vous pouvez
+        nous envoyer un mail,
+        <br /> soit grâce au formulaire suivant ou directement à cette adresse :
+        contact@festnbreizh.bzh
+      </p>
 
       <form onSubmit={handleSubmit} className="contact__form">
         <input
