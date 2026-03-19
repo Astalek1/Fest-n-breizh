@@ -43,7 +43,7 @@ function Videos() {
           rel="noopener noreferrer"
         >
           <img
-            src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/logos/logo-youtube-1770820920343_O4sGrxN1J.webp?updatedAt=1770820921179"
+            src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-youtube-1770820920343_O4sGrxN1J.webp"
             className="video__intro--logo"
             alt="logo youtube"
           />
