@@ -1,5 +1,5 @@
 import './Login.scss'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function Login({ setIsEditing }) {
@@ -7,9 +7,28 @@ function Login({ setIsEditing }) {
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
-  const handleSubmit = (e) => {
-    e.preventDefault() // On empêche le rechargement de la page
 
+  useEffect(() => {
+    let timer
+    if (errorMessage) {
+      timer = setTimeout(() => {
+        setErrorMessage('') // Efface le message après 5 secondes
+      }, 5000)
+    }
+    return () => {
+      if (timer) {
+        clearTimeout(timer) // Nettoyage du timer
+      }
+    }
+  }, [errorMessage, navigate])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (!username || !password) {
+      setErrorMessage('Champs obligatoires')
+      return
+    }
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/login', {
       method: 'POST',
       headers: {
@@ -19,7 +38,9 @@ function Login({ setIsEditing }) {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Identifiants incorrects')
+          return response.json().then((data) => {
+            throw new Error(data.error || 'Identifiants incorrects')
+          })
         }
         return response.json()
       })
@@ -28,13 +49,19 @@ function Login({ setIsEditing }) {
         sessionStorage.setItem('token', data.token)
         setIsEditing(true)
         navigate('/')
-
+        console.log('Token stocké :', data.token)
         // Traitement en cas de succès
       })
       .catch((error) => {
         console.error('Erreur :', error.message)
         setErrorMessage(error.message)
       })
+    // Vérification du token dès le début
+    const token = sessionStorage.getItem('token')
+    if (token) {
+      setErrorMessage('Utilisateur déjà connecté')
+      return
+    }
   }
 
   return (
