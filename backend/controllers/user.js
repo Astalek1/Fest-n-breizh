@@ -31,13 +31,18 @@ export const login = async (req, res) => {
     if (!valid) {
       return res.status(401).json({ error: "Mot de passe incorrect !" });
     }
-
+ const token = jwt.sign(
+  { userId: user._id },
+  process.env.TOKEN_SECRET,
+  { expiresIn: "24h" }
+    );
+    user.tokenActif = token;
+    await user.save();
     res.status(200).json({
-      userId: user._id,
-      token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
-        expiresIn: "24h",
-      }),
-    });
+  userId: user._id,
+  token: token
+});
+ 
   } catch (error) {
     res.status(500).json({ error });
   }

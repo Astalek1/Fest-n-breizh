@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -37,10 +38,15 @@ function App() {
     !knownPaths.includes(location.pathname) &&
     !location.pathname.startsWith('/Editions/')
 
+  const [isEditing, setIsEditing] = useState(false)
+
   return (
     <>
       <Header />
-      <div className={isError ? '' : 'page__container'}>
+      {isEditing && <p>MODE ÉDITION ACTIF</p>}
+      <div
+        className={`${isError ? '' : 'page__container'} ${isEditing ? 'edit-mode' : ''}`}
+      >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />
@@ -52,7 +58,10 @@ function App() {
           <Route path="/Links" element={<Links />} />
           <Route path="/Partners" element={<Partners />} />
           <Route path="/Contact" element={<Contact />} />
-          <Route path="/Login" element={<Login />} />
+          <Route
+            path="/Login"
+            element={<Login setIsEditing={setIsEditing} />}
+          />
           <Route path="*" element={<Error />} />
         </Routes>
       </div>

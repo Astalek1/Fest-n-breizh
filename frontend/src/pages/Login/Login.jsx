@@ -1,9 +1,40 @@
 import './Login.scss'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-function Login() {
+function Login({ setIsEditing }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate()
+  const handleSubmit = (e) => {
+    e.preventDefault() // On empêche le rechargement de la page
+
+    fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Identifiants incorrects')
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log('Connexion réussie !', data)
+        sessionStorage.setItem('token', data.token)
+        setIsEditing(true)
+        navigate('/')
+
+        // Traitement en cas de succès
+      })
+      .catch((error) => {
+        console.error('Erreur :', error.message)
+        // Traitement de l'erreur
+      })
+  }
 
   return (
     <>
@@ -12,10 +43,7 @@ function Login() {
         Cette section est réservée à l'équipe de Fest'n breizh.
       </p>
 
-      <form
-        className="formulaire__connexion"
-        onSubmit={(e) => e.preventDefault()}
-      >
+      <form className="formulaire__connexion" onSubmit={handleSubmit}>
         <label htmlFor="username" className="formulaire__connexion--label">
           Nom d'utilisateur :
         </label>
