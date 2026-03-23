@@ -33,7 +33,7 @@ function Login({ setIsEditing }) {
       })
       .catch((error) => {
         console.error('Erreur :', error.message)
-        // Traitement de l'erreur
+        setErrorMessage(error.message)
       })
   }
 
