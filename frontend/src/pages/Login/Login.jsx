@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 function Login({ setIsEditing }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
   const handleSubmit = (e) => {
     e.preventDefault() // On empêche le rechargement de la page
@@ -72,6 +73,12 @@ function Login({ setIsEditing }) {
         <button type="submit" className="formulaire__connexion--button">
           Connexion
         </button>
+
+        {errorMessage && (
+          <div className="formulaire__connexion--txt">
+            <p>{errorMessage}</p>
+          </div>
+        )}
       </form>
     </>
   )
