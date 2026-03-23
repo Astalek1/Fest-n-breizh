@@ -9,6 +9,21 @@ function Login({ setIsEditing }) {
   const navigate = useNavigate()
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      }) // si tu as besoin d’envoyer des cookies
+        .then(() => {
+          sessionStorage.clear()
+        })
+        .catch((err) => {
+          console.error('Erreur lors de la déconnexion', err)
+        })
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
     let timer
     if (errorMessage) {
       timer = setTimeout(() => {
@@ -16,13 +31,15 @@ function Login({ setIsEditing }) {
       }, 5000)
     }
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
       if (timer) {
-        clearTimeout(timer) // Nettoyage du timer
+        clearTimeout(timer)
       }
     }
   }, [errorMessage, navigate])
 
   const handleSubmit = (e) => {
+    const token = sessionStorage.getItem('token')
     e.preventDefault()
 
     if (!username || !password) {
@@ -47,6 +64,7 @@ function Login({ setIsEditing }) {
       .then((data) => {
         console.log('Connexion réussie !', data)
         sessionStorage.setItem('token', data.token)
+        console.log('Token après stockage :', sessionStorage.getItem('token'))
         setIsEditing(true)
         navigate('/')
         console.log('Token stocké :', data.token)
@@ -56,8 +74,9 @@ function Login({ setIsEditing }) {
         console.error('Erreur :', error.message)
         setErrorMessage(error.message)
       })
+    console.log('Token lu avant vérif :', token)
     // Vérification du token dès le début
-    const token = sessionStorage.getItem('token')
+
     if (token) {
       setErrorMessage('Utilisateur déjà connecté')
       return

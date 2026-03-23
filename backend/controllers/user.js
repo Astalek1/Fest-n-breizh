@@ -58,6 +58,7 @@ export const logout = async (req, res) => {
   try {
     req.user.tokenActif = null;
     await req.user.save();
+    console.log('Token avant suppression :', req.user.tokenActif)
     res.status(200).json({ message: "Déconnexion réussie" });
   } catch (error) {
     res.status(500).json({ error: "Erreur de déconnexion" });
