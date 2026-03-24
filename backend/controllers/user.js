@@ -32,8 +32,18 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: "Mot de passe incorrect !" });
     }
 
-    if (user.tokenActif) {
-  return res.status(403).json({ error: "Utilisateur déjà connecté !" });
+const TIMEOUT = 10000 // 10 secondes
+
+if (user.tokenActif) {
+  const inactive = Date.now() - user.lastSeen > TIMEOUT
+
+  if (!inactive) {
+    return res.status(403).json({
+      error: "Utilisateur déjà connecté !"
+    })
+  }
+
+  user.tokenActif = null
 }
     const token = jwt.sign(
  
@@ -53,6 +63,17 @@ export const login = async (req, res) => {
     res.status(500).json({ error });
   }
 };
+
+export const ping = async (req, res) => {
+  try {
+    req.user.lastSeen = Date.now()
+    await req.user.save()
+
+    res.status(200).json({ message: 'OK' })
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur ping' })
+  }
+}
 
 export const logout = async (req, res) => {
   try {

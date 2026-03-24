@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -21,6 +21,22 @@ import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
 
 function App() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = sessionStorage.getItem('token')
+
+      if (token) {
+        fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/ping', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token,
+          },
+        })
+      }
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
   const location = useLocation()
   const knownPaths = [
     '/',

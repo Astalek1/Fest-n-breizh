@@ -22,7 +22,7 @@ function Login({ setIsEditing }) {
         })
     }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('beforeUnload', handleBeforeUnload)
 
     let timer
     if (errorMessage) {
@@ -31,7 +31,7 @@ function Login({ setIsEditing }) {
       }, 5000)
     }
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('beforeUnload', handleBeforeUnload)
       if (timer) {
         clearTimeout(timer)
       }
@@ -68,14 +68,12 @@ function Login({ setIsEditing }) {
         setIsEditing(true)
         navigate('/')
         console.log('Token stocké :', data.token)
-        // Traitement en cas de succès
       })
       .catch((error) => {
         console.error('Erreur :', error.message)
         setErrorMessage(error.message)
       })
     console.log('Token lu avant vérif :', token)
-    // Vérification du token dès le début
 
     if (token) {
       setErrorMessage('Utilisateur déjà connecté')
