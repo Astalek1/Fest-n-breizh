@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/User.js"
 
 export const signup = async (req, res) => {
   try {
@@ -66,7 +66,7 @@ res.status(200).json({
   }
 };
 
-export const ping = async (req, res) => {
+/*export const ping = async (req, res) => {
   try {
       const user = await User.findById(req.auth.userId)
 
@@ -82,7 +82,36 @@ export const ping = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Erreur ping" });
   }
-};
+};*/
+
+export const ping = async (req, res) => {
+  try {
+    console.log("PING reçu")
+
+    console.log("req.auth :", req.auth)
+
+    if (!req.auth || !req.auth.userId) {
+      console.log("userId manquant")
+      return res.status(401).json({ error: "userId manquant" })
+    }
+
+    const user = await User.findById(req.auth.userId)
+
+    console.log("user trouvé :", user)
+
+    if (!user) {
+      return res.status(401).json({ error: "Utilisateur non trouvé" })
+    }
+
+    user.lastSeen = Date.now()
+    await user.save()
+
+    res.status(200).json({ message: "OK" })
+  } catch (error) {
+    console.error("ERREUR PING :", error)
+    res.status(500).json({ error: "Erreur ping" })
+  }
+}
 
 export const logout = async (req, res) => {
   try {
