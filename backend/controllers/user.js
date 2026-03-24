@@ -36,7 +36,7 @@ const TIMEOUT = 10000 // 10 secondes
 
 if (user.tokenActif) {
   const inactive = Date.now() - user.lastSeen > TIMEOUT
-
+console.log("lastSeen :", user.lastSeen)
   if (!inactive) {
     return res.status(403).json({
       error: "Utilisateur déjà connecté !"
@@ -66,14 +66,21 @@ if (user.tokenActif) {
 
 export const ping = async (req, res) => {
   try {
-    req.user.lastSeen = Date.now()
-    await req.user.save()
+    console.log("PING reçu");
 
-    res.status(200).json({ message: 'OK' })
+    if (!req.user) {
+      return res.status(401).json({ error: "Utilisateur non identifié" });
+    }
+
+    req.user.lastSeen = Date.now();
+    await req.user.save();
+
+    res.status(200).json({ message: "OK" });
   } catch (error) {
-    res.status(500).json({ error: 'Erreur ping' })
+    console.error(error);
+    res.status(500).json({ error: "Erreur ping" });
   }
-}
+};
 
 export const logout = async (req, res) => {
   try {
