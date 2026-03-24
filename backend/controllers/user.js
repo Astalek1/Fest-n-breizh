@@ -68,14 +68,14 @@ res.status(200).json({
 
 export const ping = async (req, res) => {
   try {
-    console.log("PING reçu");
+      const user = await User.findById(req.auth.userId)
 
-    if (!req.user) {
+    if (user) {
       return res.status(401).json({ error: "Utilisateur non identifié" });
     }
 
-    req.user.lastSeen = Date.now();
-    await req.user.save();
+    user.lastSeen = Date.now();
+    await user.save();
 
     res.status(200).json({ message: "OK" });
   } catch (error) {
