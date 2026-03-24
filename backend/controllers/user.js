@@ -45,16 +45,18 @@ console.log("lastSeen :", user.lastSeen)
 
   user.tokenActif = null
 }
-    const token = jwt.sign(
- 
+const token = jwt.sign(
   { userId: user._id },
   process.env.TOKEN_SECRET,
   { expiresIn: "24h" }
-    );
-    user.tokenActif = token;
-    
-    await user.save();
-    res.status(200).json({
+);
+
+user.tokenActif = token;
+user.lastSeen = Date.now(); // ✅ CRUCIAL
+
+await user.save();
+
+res.status(200).json({
   userId: user._id,
   token: token
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,24 +19,9 @@ import Partners from './pages/Partners/Partners.jsx'
 import Contact from './pages/Contact/Contact.jsx'
 import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
+import PingManager from './components/PingManager/pingManager.jsx'
 
 function App() {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const token = sessionStorage.getItem('token')
-
-      if (token) {
-        fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/ping', {
-          method: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-        })
-      }
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [])
   const location = useLocation()
   const knownPaths = [
     '/',
@@ -60,6 +45,7 @@ function App() {
     <>
       <Header />
       {isEditing && <p>MODE ÉDITION ACTIF</p>}
+      <PingManager isEditing={isEditing} />
       <div
         className={`${isError ? '' : 'page__container'} ${isEditing ? 'edit-mode' : ''}`}
       >
