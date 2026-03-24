@@ -66,23 +66,7 @@ res.status(200).json({
   }
 };
 
-/*export const ping = async (req, res) => {
-  try {
-      const user = await User.findById(req.auth.userId)
 
-    if (!ser) {
-      return res.status(401).json({ error: "Utilisateur non identifié" });
-    }
-
-    user.lastSeen = Date.now();
-    await user.save();
-
-    res.status(200).json({ message: "OK" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur ping" });
-  }
-};*/
 
 export const ping = async (req, res) => {
   try {

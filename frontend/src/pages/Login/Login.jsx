@@ -62,18 +62,15 @@ function Login({ setIsEditing }) {
         return response.json()
       })
       .then((data) => {
-        console.log('Connexion réussie !', data)
         sessionStorage.setItem('token', data.token)
-        console.log('Token après stockage :', sessionStorage.getItem('token'))
+        setErrorMessage('')
         setIsEditing(true)
         navigate('/')
-        console.log('Token stocké :', data.token)
       })
       .catch((error) => {
         console.error('Erreur :', error.message)
         setErrorMessage(error.message)
       })
-    console.log('Token lu avant vérif :', token)
 
     if (token) {
       setErrorMessage('Utilisateur déjà connecté')
