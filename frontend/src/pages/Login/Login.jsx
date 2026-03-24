@@ -39,7 +39,6 @@ function Login({ setIsEditing }) {
   }, [errorMessage, navigate])
 
   const handleSubmit = (e) => {
-    const token = sessionStorage.getItem('token')
     e.preventDefault()
 
     if (!username || !password) {
@@ -71,11 +70,6 @@ function Login({ setIsEditing }) {
         console.error('Erreur :', error.message)
         setErrorMessage(error.message)
       })
-
-    if (token) {
-      setErrorMessage('Utilisateur déjà connecté')
-      return
-    }
   }
 
   return (
