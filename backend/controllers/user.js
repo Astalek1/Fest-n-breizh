@@ -52,7 +52,7 @@ const token = jwt.sign(
 );
 
 user.tokenActif = token;
-user.lastSeen = Date.now(); // ✅ CRUCIAL
+user.lastSeen = Date.now(); 
 
 await user.save();
 
@@ -70,7 +70,7 @@ export const ping = async (req, res) => {
   try {
       const user = await User.findById(req.auth.userId)
 
-    if (user) {
+    if (!ser) {
       return res.status(401).json({ error: "Utilisateur non identifié" });
     }
 
