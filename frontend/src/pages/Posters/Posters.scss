@@ -2,7 +2,6 @@
 
 .page__title {
   margin: 15px;
-  background-image: none;
 }
 
 .poster__container {
@@ -10,7 +9,6 @@
   flex-wrap: wrap;
   justify-content: start;
   padding: 60px;
-  background-image: none;
 }
 .poster {
   margin: 0 10px;
@@ -18,7 +16,6 @@
   padding-bottom: 0;
   display: block;
   transition: transform 230ms ease-in-out;
-  background-image: none;
 
   &__img {
     width: 300px;
@@ -29,9 +26,6 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
   }
 
-  &__caption {
-    background-image: none;
-  }
   &__figcaption {
     width: 300px;
     height: auto;
@@ -41,7 +35,6 @@
     bottom: 15px;
     left: 20px;
     margin: 0;
-    background-image: none;
   }
   &__title {
     text-decoration: none;
@@ -54,8 +47,6 @@
 
 .poster:hover {
   background-color: rgba(0, 0, 0, 0.082);
-  //background-color: rgba(0, 0, 0, 0.849);
-  //color: white;
   border-radius: 8px;
   cursor: pointer;
   transform: scale(1.05);
@@ -76,12 +67,10 @@
   overflow: auto; /* Permet le défilement si nécessaire */
   justify-content: center;
   align-items: center;
-  background-image: none;
 
   &--content {
     position: relative;
     display: inline-block;
-    background-image: none;
   }
 
   &--img {
@@ -104,7 +93,6 @@
   }
   &--close:hover {
     color: $secondary-color;
-    //background-color: rgba(0, 0, 0, 0.219);
   }
 }
 
@@ -112,4 +100,3 @@
 .no-scroll {
   overflow: hidden;
 }
-/**/

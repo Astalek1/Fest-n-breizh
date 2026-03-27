@@ -1,15 +1,13 @@
 @use '../../styles/variables' as *;
 
 .editions {
-  background-image: none;
-
   &__menu {
     position: fixed;
     right: 0;
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
-    background-image: none;
+
     background-color: $main-color;
     padding: 10px;
     gap: 5px;
@@ -20,7 +18,7 @@
   }
   &__button {
     font-size: 22px;
-    background-image: none;
+
     cursor: pointer;
     border-radius: 10px;
     width: 49%;
@@ -32,16 +30,11 @@
       transition: transform 100ms ease-in-out;
     }
   }
-  &__container {
-    background-image: none;
-  }
 }
 
 .main__editions {
   width: 90%;
-
   height: auto;
-  background-image: none;
   margin: 0 5%;
   display: flex;
   flex-direction: column;
@@ -61,8 +54,6 @@
   }
 }
 .edition {
-  background-image: none;
-
   &__section {
     display: flex;
     justify-content: center;
@@ -70,7 +61,6 @@
   }
 
   &__intro {
-    background-image: none;
     width: 100%;
     position: relative;
   }
@@ -107,7 +97,6 @@
     display: flex;
     gap: 1rem;
     align-items: flex-start;
-    background-image: none;
   }
 
   &__columns > .edition__content {
@@ -118,14 +107,12 @@
     border-right: 3px solid black; // ajuste couleur / épaisseur
   }
   &__content {
-    background-image: none;
     display: flex;
     flex-direction: column;
   }
 }
 
 .edition__artist {
-  background-image: none;
   padding: 0 2rem;
 
   &::before {
@@ -137,10 +124,6 @@
     margin: 20px auto; // centre la ligne
     margin-bottom: 50px;
     margin-top: 25px;
-  }
-
-  &--media {
-    background-image: none;
   }
 
   &--video {
@@ -170,7 +153,6 @@
 }
 
 .edition__guest {
-  background-image: none;
   padding: 0 2rem;
 
   &::before {
@@ -182,10 +164,6 @@
     margin: 20px auto; // centre la ligne
     margin-bottom: 50px;
     margin-top: 25px;
-  }
-
-  &--media {
-    background-image: none;
   }
 
   &--logo {

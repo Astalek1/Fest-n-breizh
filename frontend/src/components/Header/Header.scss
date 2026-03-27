@@ -6,7 +6,6 @@
   width: 100%;
   height: auto;
   background-color: $main-color;
-  background-image: none;
 
   &__img {
     width: 230px;
@@ -25,7 +24,6 @@
     margin-top: 10px;
     padding: 10px;
     margin-right: 10%;
-    background-image: none;
   }
 
   &__link {
@@ -84,7 +82,6 @@
     height: auto;
     overflow: visible; // Évite le scroll interne
     padding: 5px;
-    background-image: none;
   }
 
   &__dropdown--content {
@@ -106,6 +103,5 @@
 
   .Header__dropdown--content.show {
     display: flex;
-    background-image: none;
   }
 }

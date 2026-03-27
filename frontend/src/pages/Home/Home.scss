@@ -5,10 +5,9 @@
   flex-direction: column;
   width: 100%;
   margin-top: 40px;
-  background-image: none;
+
   &__intro {
     margin-left: 20px;
-    background-image: none;
   }
 
   &__txt {
@@ -26,7 +25,6 @@
   margin-left: -50vw;
   margin-right: -50vw;
   border: 1px solid black;
-  background-image: none;
 
   &__img {
     width: 100%;
@@ -79,7 +77,6 @@
     font-weight: 700;
     margin-bottom: 10px;
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    background-image: none;
   }
 }
 
@@ -88,11 +85,9 @@
   margin-top: 40px;
   margin-bottom: 40px;
   padding: 0 100px;
-  background-image: none;
 }
 
 .announcement {
-  background-image: none;
   &::before {
     content: '';
     display: block;

@@ -61,6 +61,7 @@ function App() {
 
   return (
     <>
+      <div className={`site-background ${isEditing ? 'edit-mode' : ''}`}></div>
       <Header isEditing={isEditing} />
       <div className="edition__mode">
         {isEditing && (
@@ -104,6 +105,7 @@ function App() {
         </Routes>
       </div>
       <Footer isEditing={isEditing} />
+      <div />
     </>
   )
 }

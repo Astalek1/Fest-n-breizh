@@ -7,10 +7,41 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
+}
+.site-background {
+  min-height: 100vh;
   background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB%2024.webp');
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.edition__mode {
+  background-color: red;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+
+  &--txt {
+    display: flex;
+    width: 94%;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  &--btn {
+    width: 5%;
+    margin: 10px;
+  }
+}
+.edit-mode {
+  background-image: none;
+  background-color: black;
 }
 
 .page__container {
@@ -72,23 +103,4 @@ a {
 
 span {
   background-image: none;
-}
-
-.edition__mode {
-  background-image: none;
-  background-color: red;
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  &--txt {
-    display: flex;
-    width: 94%;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-  &--btn {
-    width: 5%;
-    margin: 10px;
-  }
 }

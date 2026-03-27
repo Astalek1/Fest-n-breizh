@@ -1,7 +1,6 @@
 @use '../../styles/variables' as *;
 
 .contact {
-  background-image: none;
   width: 100%;
   height: auto;
   &__title,
@@ -9,7 +8,6 @@
     margin: 2%;
   }
   &__form {
-    background-image: none;
     border: 1px solid #0000002f;
     background-color: $main-color;
     border-radius: 5px;
@@ -22,7 +20,7 @@
   &__error {
     color: red;
     margin-top: 10px;
-    background-image: none;
+
     background-color: white;
     font-size: 25px;
     width: 60%;
@@ -34,7 +32,7 @@
   &__success {
     color: green;
     margin-top: 10px;
-    background-image: none;
+
     background-color: white;
     font-size: 25px;
     width: 35%;
@@ -87,11 +85,4 @@ button {
     transform: scale(1.08);
     transition: transform 100ms ease-in-out;
   }
-}
-
-input,
-select,
-textarea,
-button {
-  background-image: none;
 }

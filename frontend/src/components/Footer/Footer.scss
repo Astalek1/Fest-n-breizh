@@ -8,7 +8,6 @@
   height: 181px;
   max-height: 5%;
   background-color: $main-color;
-  background-image: none;
 
   &__img {
     width: 230px;
@@ -24,7 +23,6 @@
     align-items: center;
     margin-top: 50px;
     flex: 1;
-    background-image: none;
   }
 
   &__copyright {
@@ -42,7 +40,6 @@
   &__bottom {
     display: flex;
     justify-content: space-between;
-    background-image: none;
 
     &.disabled {
       pointer-events: none; // ❌ clic bloqué
