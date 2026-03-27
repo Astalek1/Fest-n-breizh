@@ -34,13 +34,13 @@ function Header({ isEditing }) {
 
         <nav className="Header__nav">
           <Link
-            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/"
           >
             Accueil
           </Link>
           <Link
-            className={`Header__link about ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link about ${isEditing ? 'edit-mode' : ''}`}
             to="/About"
           >
             A-propos
@@ -48,21 +48,21 @@ function Header({ isEditing }) {
 
           <div className="Header__dropdown">
             <span
-              className={`Header__span ${isEditing ? 'disabled' : ''}`}
+              className={`Header__span ${isEditing ? 'edit-mode' : ''}`}
               onClick={toggleDropdown}
             >
               Galerie
             </span>
             <div className={`Header__dropdown--content ${open ? 'show' : ''}`}>
               <Link
-                className={`Header__link ${isEditing ? 'disabled' : ''}`}
+                className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
                 to="/Posters"
                 onClick={() => setOpen(false)}
               >
                 Affiches
               </Link>
               <Link
-                className={`Header__link ${isEditing ? 'disabled' : ''}`}
+                className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
                 to="/photos"
                 onClick={() => setOpen(false)}
               >
@@ -71,25 +71,25 @@ function Header({ isEditing }) {
             </div>
           </div>
           <Link
-            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Editions"
           >
             Les Editions
           </Link>
           <Link
-            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Videos"
           >
             Nos Vidéos
           </Link>
           <Link
-            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Links"
           >
             Nos Réseaux
           </Link>
           <Link
-            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Partners"
           >
             Nos Partenaires

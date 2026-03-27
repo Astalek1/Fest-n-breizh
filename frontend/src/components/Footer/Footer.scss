@@ -41,7 +41,7 @@
     display: flex;
     justify-content: space-between;
 
-    &.disabled {
+    &.edit-mode {
       pointer-events: none; // ❌ clic bloqué
       opacity: 0.5; // visuel désactivé
       cursor: not-allowed;
@@ -71,7 +71,7 @@
     align-items: start;
     margin-right: 10%;
     margin-bottom: 10%;
-    &.disabled {
+    &.edit-mode {
       pointer-events: none; // ❌ clic bloqué
       opacity: 0.5; // visuel désactivé
       cursor: not-allowed;

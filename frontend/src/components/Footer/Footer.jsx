@@ -15,7 +15,7 @@ function Footer({ isEditing }) {
             {' '}
             Fest'n Breizh - 2026 - tous droits réservés
           </h2>
-          <div className={`Footer__bottom ${isEditing ? 'disabled' : ''}`}>
+          <div className={`Footer__bottom ${isEditing ? 'edit-mode' : ''}`}>
             <Link className="Footer__contact" to="/Contact">
               Contact
             </Link>
@@ -33,7 +33,7 @@ function Footer({ isEditing }) {
             </Link>
           </div>
         </div>
-        <div className={`Footer__logo ${isEditing ? 'disabled' : ''}`}>
+        <div className={`Footer__logo ${isEditing ? 'edit-mode' : ''}`}>
           <a
             target="_blank"
             href="https://www.facebook.com/people/Festn-Bzh/100067739030441/?locale=fr_FR"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './Home.scss'
 
-function Home() {
+function Home({ isEditing }) {
   const carouselImages = [
     'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-1.webp?updatedAt=1765968510369',
     'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-2.webp?updatedAt=1765968510579',
@@ -31,7 +31,7 @@ function Home() {
 
   return (
     <>
-      <div className="slideshow">
+      <div className={`slideshow ${isEditing ? 'edit-mode' : ''}`}>
         <div
           className="slideshow__img"
           style={{ backgroundImage: `url(${carouselImages[index]})` }}
