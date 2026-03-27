@@ -2,7 +2,7 @@ import './Header.scss'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
-function Header() {
+function Header({ isEditing }) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -33,27 +33,36 @@ function Header() {
         />
 
         <nav className="Header__nav">
-          <Link className="Header__link" to="/">
+          <Link
+            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            to="/"
+          >
             Accueil
           </Link>
-          <Link className="Header__link" to="/About">
+          <Link
+            className={`Header__link about ${isEditing ? 'disabled' : ''}`}
+            to="/About"
+          >
             A-propos
           </Link>
 
           <div className="Header__dropdown">
-            <span className="Header__span" onClick={toggleDropdown}>
+            <span
+              className={`Header__span ${isEditing ? 'disabled' : ''}`}
+              onClick={toggleDropdown}
+            >
               Galerie
             </span>
             <div className={`Header__dropdown--content ${open ? 'show' : ''}`}>
               <Link
-                className="Header__link"
+                className={`Header__link ${isEditing ? 'disabled' : ''}`}
                 to="/Posters"
                 onClick={() => setOpen(false)}
               >
                 Affiches
               </Link>
               <Link
-                className="Header__link"
+                className={`Header__link ${isEditing ? 'disabled' : ''}`}
                 to="/photos"
                 onClick={() => setOpen(false)}
               >
@@ -61,16 +70,28 @@ function Header() {
               </Link>
             </div>
           </div>
-          <Link className="Header__link" to="/Editions">
+          <Link
+            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            to="/Editions"
+          >
             Les Editions
           </Link>
-          <Link className="Header__link" to="/Videos">
+          <Link
+            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            to="/Videos"
+          >
             Nos Vidéos
           </Link>
-          <Link className="Header__link" to="/Links">
+          <Link
+            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            to="/Links"
+          >
             Nos Réseaux
           </Link>
-          <Link className="Header__link" to="/Partners">
+          <Link
+            className={`Header__link ${isEditing ? 'disabled' : ''}`}
+            to="/Partners"
+          >
             Nos Partenaires
           </Link>
         </nav>

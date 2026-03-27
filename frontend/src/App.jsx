@@ -61,7 +61,7 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header isEditing={isEditing} />
       <div className="edition__mode">
         {isEditing && (
           <>
@@ -77,15 +77,24 @@ function App() {
         className={`${isError ? '' : 'page__container'} ${isEditing ? 'edit-mode' : ''}`}
       >
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home isEditing={isEditing} />} />
           <Route path="/About" element={<About />} />
-          <Route path="/Editions/" element={<Editions />} />
-          <Route path="/Editions/:editionId" element={<Editions />} />
-          <Route path="/Photos" element={<Photos />} />
-          <Route path="/Posters" element={<Posters />} />
-          <Route path="/Videos" element={<Videos />} />
-          <Route path="/Links" element={<Links />} />
-          <Route path="/Partners" element={<Partners />} />
+          <Route
+            path="/Editions/"
+            element={<Editions isEditing={isEditing} />}
+          />
+          <Route
+            path="/Editions/:editionId"
+            element={<Editions isEditing={isEditing} />}
+          />
+          <Route path="/Photos" element={<Photos isEditing={isEditing} />} />
+          <Route path="/Posters" element={<Posters isEditing={isEditing} />} />
+          <Route path="/Videos" element={<Videos isEditing={isEditing} />} />
+          <Route path="/Links" element={<Links isEditing={isEditing} />} />
+          <Route
+            path="/Partners"
+            element={<Partners isEditing={isEditing} />}
+          />
           <Route path="/Contact" element={<Contact />} />
           <Route
             path="/Login"

@@ -39,6 +39,19 @@
       color 0.2s ease,
       background-color 0.2s ease,
       transform 0.2s ease;
+    &:hover {
+      color: $main-color;
+      background-color: $secondary-color;
+      border-radius: 3px;
+      transform: scale(1.05);
+    }
+    &.disabled:hover {
+      background-color: red;
+    }
+  }
+
+  .Header__link.about.disabled {
+    display: none;
   }
 
   &__span {
@@ -52,18 +65,15 @@
       color 0.2s ease,
       background-color 0.2s ease,
       transform 0.2s ease;
-  }
-  &__link:hover {
-    color: $main-color;
-    background-color: $secondary-color;
-    border-radius: 3px;
-    transform: scale(1.05);
-  }
-  &__span:hover {
-    color: $main-color;
-    background-color: $secondary-color;
-    border-radius: 3px;
-    transform: scale(1.05);
+    &:hover {
+      color: $main-color;
+      background-color: $secondary-color;
+      border-radius: 3px;
+      transform: scale(1.05);
+    }
+    &.disabled:hover {
+      background-color: red;
+    }
   }
 
   &__dropdown {
