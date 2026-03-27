@@ -43,6 +43,12 @@
     display: flex;
     justify-content: space-between;
     background-image: none;
+
+    &.disabled {
+      pointer-events: none; // ❌ clic bloqué
+      opacity: 0.5; // visuel désactivé
+      cursor: not-allowed;
+    }
   }
 
   &__login,
@@ -68,6 +74,11 @@
     align-items: start;
     margin-right: 10%;
     margin-bottom: 10%;
+    &.disabled {
+      pointer-events: none; // ❌ clic bloqué
+      opacity: 0.5; // visuel désactivé
+      cursor: not-allowed;
+    }
   }
   &__lien--logo {
     width: 80%;

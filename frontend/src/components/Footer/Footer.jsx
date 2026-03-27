@@ -10,13 +10,12 @@ function Footer({ isEditing }) {
           src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp"
           alt="Logo Fest'n Breizh"
         />
-
         <div className="Footer__txt">
           <h2 className="Footer__copyright">
             {' '}
             Fest'n Breizh - 2026 - tous droits réservés
           </h2>
-          <div className="Footer__bottom">
+          <div className={`Footer__bottom ${isEditing ? 'disabled' : ''}`}>
             <Link className="Footer__contact" to="/Contact">
               Contact
             </Link>
@@ -28,15 +27,13 @@ function Footer({ isEditing }) {
             >
               <span>Par Kévin Goujon</span>
             </a>
-            {!isEditing && (
-              <Link className="Footer__login" to="/Login">
-                Connexion
-              </Link>
-            )}
-            {isEditing && <></>}
+
+            <Link className="Footer__login" to="/Login">
+              Connexion
+            </Link>
           </div>
         </div>
-        <div className="Footer__logo">
+        <div className={`Footer__logo ${isEditing ? 'disabled' : ''}`}>
           <a
             target="_blank"
             href="https://www.facebook.com/people/Festn-Bzh/100067739030441/?locale=fr_FR"
