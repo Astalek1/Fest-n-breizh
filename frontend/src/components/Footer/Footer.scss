@@ -44,22 +44,19 @@
     justify-content: space-between;
     background-image: none;
   }
-  &__portfolio {
-    color: $secondary-color;
-  }
 
-  &__login {
-    color: $secondary-color;
-  }
   &__login,
-  &__portfolio {
+  &__portfolio,
+  &__contact {
+    color: $secondary-color;
     margin: 0 12px;
     margin-bottom: 10px;
     text-decoration: none;
   }
 
   &__login:hover,
-  &__portfolio:hover {
+  &__portfolio:hover,
+  &__contact:hover {
     text-decoration: underline;
   }
 

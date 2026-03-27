@@ -41,10 +41,37 @@ function App() {
 
   const [isEditing, setIsEditing] = useState(false)
 
+  const handleLogout = () => {
+    const token = sessionStorage.getItem('token')
+
+    fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .catch((error) => {
+        console.error('Erreur logout :', error)
+      })
+      .finally(() => {
+        sessionStorage.removeItem('token')
+        setIsEditing(false)
+      })
+  }
+
   return (
     <>
       <Header />
-      {isEditing && <p>MODE ÉDITION ACTIF</p>}
+      <div className="edition__mode">
+        {isEditing && (
+          <>
+            <p className="edition__mode--txt">MODE ÉDITION ACTIF</p>
+            <button className="edition__mode--btn" onClick={handleLogout}>
+              Déconnexion
+            </button>
+          </>
+        )}
+      </div>
       <PingManager isEditing={isEditing} />
       <div
         className={`${isError ? '' : 'page__container'} ${isEditing ? 'edit-mode' : ''}`}
@@ -67,7 +94,7 @@ function App() {
           <Route path="*" element={<Error />} />
         </Routes>
       </div>
-      <Footer />
+      <Footer isEditing={isEditing} />
     </>
   )
 }

@@ -73,3 +73,22 @@ a {
 span {
   background-image: none;
 }
+
+.edition__mode {
+  background-image: none;
+  background-color: red;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  &--txt {
+    display: flex;
+    width: 94%;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  &--btn {
+    width: 5%;
+    margin: 10px;
+  }
+}

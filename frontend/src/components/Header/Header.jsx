@@ -73,9 +73,6 @@ function Header() {
           <Link className="Header__link" to="/Partners">
             Nos Partenaires
           </Link>
-          <Link className="Header__link" to="/Contact">
-            Nous Contacter
-          </Link>
         </nav>
       </div>
     </header>

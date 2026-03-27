@@ -1,7 +1,7 @@
 import './Footer.scss'
 import { Link } from 'react-router-dom'
 
-function Footer() {
+function Footer({ isEditing }) {
   return (
     <footer>
       <div className="Footer">
@@ -12,19 +12,28 @@ function Footer() {
         />
 
         <div className="Footer__txt">
-          <h2 className="Footer__copyright">Copyright Fest'n Breizh 2026</h2>
+          <h2 className="Footer__copyright">
+            {' '}
+            Fest'n Breizh - 2026 - tous droits réservés
+          </h2>
           <div className="Footer__bottom">
+            <Link className="Footer__contact" to="/Contact">
+              Contact
+            </Link>
             <a
               className="Footer__portfolio"
               target="_blank"
               href="https://astalek1.github.io/portfolio/"
               rel="noopener noreferrer"
             >
-              <span>By Kévin Goujon</span>
+              <span>Par Kévin Goujon</span>
             </a>
-            <Link className="Footer__login" to="/Login">
-              Connexion
-            </Link>
+            {!isEditing && (
+              <Link className="Footer__login" to="/Login">
+                Connexion
+              </Link>
+            )}
+            {isEditing && <></>}
           </div>
         </div>
         <div className="Footer__logo">
