@@ -14,7 +14,7 @@ import videosRoutes from "./routes/videos.js";
 import partnersRoutes from "./routes/partners.js";
 import linksRoutes from "./routes/links.js";
 import contactRoutes from "./routes/contact.js";
-import filesRoutes from './routes/files_temp.js';
+import filesRoutes from '../backend/routes/files.js';
 
 dotenv.config();
 
