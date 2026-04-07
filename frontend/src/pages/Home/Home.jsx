@@ -15,7 +15,7 @@ function Home({ isEditing }) {
   const [modalMode, setModalMode] = useState(null)
   const [selectedMediaType, setSelectedMediaType] = useState('photo')
 
-  const getFields = () => [
+  const fields = [
     { name: 'title', type: 'text', label: 'Titre' },
     { name: 'text', type: 'textarea', label: 'Texte' },
 
@@ -188,10 +188,11 @@ function Home({ isEditing }) {
         </div>
       </div>
       <Modal
+        key={selectedMediaType}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
-        fields={getFields()}
+        fields={fields()}
         onChangeField={(name, value) => {
           if (name === 'mediaType') {
             setSelectedMediaType(value)
