@@ -15,7 +15,7 @@ function Home({ isEditing }) {
   const [modalMode, setModalMode] = useState(null)
   const [selectedMediaType, setSelectedMediaType] = useState('photo')
 
-  const fields = [
+  const getFields = () => [
     { name: 'title', type: 'text', label: 'Titre' },
     { name: 'text', type: 'textarea', label: 'Texte' },
 
@@ -30,13 +30,9 @@ function Home({ isEditing }) {
       ],
     },
 
-    // 👇 champ dynamique
     {
       name: 'media',
-      type:
-        modalMode === 'create' && selectedMediaType === 'video'
-          ? 'url'
-          : 'file',
+      type: selectedMediaType === 'video' ? 'url' : 'file',
       label: 'Média',
     },
   ]
@@ -195,7 +191,7 @@ function Home({ isEditing }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
-        fields={fields}
+        fields={getFields()}
         onChangeField={(name, value) => {
           if (name === 'mediaType') {
             setSelectedMediaType(value)
