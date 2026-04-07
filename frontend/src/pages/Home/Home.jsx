@@ -33,9 +33,12 @@ function Home({ isEditing }) {
 
       // logo existant
       if (data.mediaType === 'logo' && data.file) {
-        formData.append('file', data.file)
+        formData.append('media', data.file)
       }
-
+      console.log('DATA SENT:', data)
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1])
+      }
       const res = await fetch(
         'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
         {

@@ -3,7 +3,11 @@ import { useState, useEffect } from 'react'
 
 function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
   // state local (simplifié)
-  const [formData, setFormData] = useState(data || {})
+  const [formData, setFormData] = useState({
+    title: '',
+    text: '',
+    mediaType: data?.mediaType || 'image',
+  })
   const [mediaType, setMediaType] = useState(data?.mediaType || 'image')
   const [mediaSource, setMediaSource] = useState('upload')
   const [logos, setLogos] = useState([])
@@ -74,6 +78,7 @@ function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
                   }))
                 }}
               >
+                <option value="photo">Image</option>
                 <option value="image">Image</option>
                 <option value="logo">Logo</option>
                 <option value="video">Vidéo</option>
