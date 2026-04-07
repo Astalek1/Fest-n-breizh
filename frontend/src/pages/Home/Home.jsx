@@ -37,18 +37,16 @@ function Home({ isEditing }) {
 
       const formData = new FormData()
 
-      // 👇 ENVOI JSON comme attendu par le backend
       formData.append(
         'announcement',
         JSON.stringify({
           title: data.title,
           text: data.text,
-          mediaType: data.mediaType,
+          mediaType: data.mediaType || 'photo',
           media: data.media, // URL ou null
         }),
       )
 
-      // 👇 fichier (si photo ou logo upload)
       if (data.media instanceof File) {
         formData.append('media', data.media)
       }

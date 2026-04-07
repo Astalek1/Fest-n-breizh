@@ -12,7 +12,7 @@ const announcementSchema = mongoose.Schema({
     required: true,
   },
   mediaName: { type: String },
-});
+},{ timestamps: true });
 
 const Announcement = mongoose.model("Announcement", announcementSchema);
 
