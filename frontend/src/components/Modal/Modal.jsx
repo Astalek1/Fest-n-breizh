@@ -1,11 +1,24 @@
 import './Modal.scss'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
   // state local (simplifié)
   const [formData, setFormData] = useState(data || {})
   const [mediaType, setMediaType] = useState(data?.mediaType || 'image')
   const [mediaSource, setMediaSource] = useState('upload')
+  const [logos, setLogos] = useState([])
+
+  useEffect(() => {
+    if (mediaType === 'logo' && mediaSource === 'existing') {
+      fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos')
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('LOGOS:', data)
+          setLogos(data)
+        })
+        .catch((err) => console.error(err))
+    }
+  }, [mediaType, mediaSource])
 
   if (!isOpen) return null
 
@@ -80,7 +93,24 @@ function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
                 </select>
 
                 {mediaSource === 'upload' && <input type="file" />}
-                {mediaSource === 'existing' && <select>{/* logos */}</select>}
+                {mediaSource === 'existing' && (
+                  <select
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        file: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Choisir un logo</option>
+
+                    {logos.map((logo) => (
+                      <option key={logo.fileId} value={logo.fileId}>
+                        {logo.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             )}
           </div>

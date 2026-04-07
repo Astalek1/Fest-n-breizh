@@ -18,11 +18,43 @@ function Home({ isEditing }) {
     { name: 'text', type: 'textarea', label: 'Texte' },
   ]
 
-  const handleSubmit = (data) => {
-    console.log(data)
+  const handleSubmit = async (data) => {
+    try {
+      const token = sessionStorage.getItem('token')
+
+      const formData = new FormData()
+
+      // champs texte
+      formData.append('title', data.title || '')
+      formData.append('text', data.text || '')
+
+      // type de média
+      formData.append('mediaType', data.mediaType)
+
+      // logo existant
+      if (data.mediaType === 'logo' && data.file) {
+        formData.append('file', data.file)
+      }
+
+      const res = await fetch(
+        'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token,
+          },
+          body: formData,
+        },
+      )
+
+      const result = await res.json()
+      console.log('RESULT:', JSON.stringify(result, null, 2))
+    } catch (err) {
+      console.error(err)
+    }
+
     setIsModalOpen(false)
   }
-
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length)
