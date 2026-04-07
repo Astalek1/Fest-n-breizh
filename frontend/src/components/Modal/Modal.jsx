@@ -2,7 +2,12 @@ import './Modal.scss'
 import { useState, useEffect } from 'react'
 
 function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState({
+    title: '',
+    text: '',
+    mediaType: '',
+    media: null,
+  })
 
   useEffect(() => {
     if (isOpen) {
@@ -40,7 +45,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {/* TEXT */}
                 {field.type === 'text' && (
                   <input
-                    value={formData[field.name] || ''}
+                    defaultValue={formData[field.name] || ''}
                     onChange={(e) => handleChange(field.name, e.target.value)}
                   />
                 )}
@@ -48,7 +53,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {/* TEXTAREA */}
                 {field.type === 'textarea' && (
                   <textarea
-                    value={formData[field.name] || ''}
+                    defaultValue={formData[field.name] || ''}
                     onChange={(e) => handleChange(field.name, e.target.value)}
                   />
                 )}
