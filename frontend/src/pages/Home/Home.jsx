@@ -13,6 +13,8 @@ function Home({ isEditing }) {
   const [index, setIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState(null)
+  const [selectedMediaType, setSelectedMediaType] = useState('photo')
+
   const fields = [
     { name: 'title', type: 'text', label: 'Titre' },
     { name: 'text', type: 'textarea', label: 'Texte' },
@@ -28,7 +30,15 @@ function Home({ isEditing }) {
       ],
     },
 
-    { name: 'media', type: 'file', label: 'Fichier' },
+    // 👇 champ dynamique
+    {
+      name: 'media',
+      type:
+        modalMode === 'create' && selectedMediaType === 'video'
+          ? 'url'
+          : 'file',
+      label: 'Média',
+    },
   ]
 
   const handleSubmit = async (data) => {
@@ -186,6 +196,11 @@ function Home({ isEditing }) {
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
         fields={fields}
+        onChangeField={(name, value) => {
+          if (name === 'mediaType') {
+            setSelectedMediaType(value)
+          }
+        }}
         data={null}
         entityName="announcement"
         onSubmit={handleSubmit}
