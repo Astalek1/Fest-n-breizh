@@ -12,10 +12,10 @@
   min-height: 100vh;
   background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB%2024.webp');
   background-size: cover;
-  background-position: top;
+  background-position: center;
   background-repeat: no-repeat;
   position: fixed;
-  top: 0;
+  top: 0px;
   left: 0;
   width: 100%;
   height: 100%;
@@ -63,7 +63,7 @@ body,
   overflow-x: hidden;
   background-color: $margin-color;
   background-image: none;
-  backdrop-filter: blur(5px);
+  //backdrop-filter: blur(5px);
 }
 
 h1 {

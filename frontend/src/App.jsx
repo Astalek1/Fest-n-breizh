@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,7 +20,6 @@ import Contact from './pages/Contact/Contact.jsx'
 import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
 import PingManager from './components/PingManager/pingManager.jsx'
-import Modal from './components/Modal/Modal.jsx'
 
 function App() {
   const location = useLocation()
@@ -58,44 +57,6 @@ function App() {
         sessionStorage.removeItem('token')
         setIsEditing(false)
       })
-  }
-  function ParentComponent() {
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    useEffect(() => {
-      const handleKeyPress = (event) => {
-        if (event.key === 'e' || event.key === 'E') {
-          setIsModalOpen(true)
-        }
-        if (event.key === 'Escape' || event.key === 'ESCAPE') {
-          setIsModalOpen(false)
-        }
-      }
-
-      document.addEventListener('keydown', handleKeyPress)
-      return () => {
-        document.removeEventListener('keydown', handleKeyPress)
-      }
-    }, [])
-
-    return (
-      <div>
-        {isModalOpen && (
-          <Modal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            mode="create"
-            entityName="annonce"
-            fields={[
-              { name: 'title', type: 'text', label: 'Titre' },
-              { name: 'description', type: 'textarea', label: 'Texte' },
-            ]}
-            data={{}} // Données initiales vides
-            onSubmit={(formData) => console.log(formData)}
-          />
-        )}
-      </div>
-    )
   }
 
   return (
@@ -142,7 +103,6 @@ function App() {
           />
           <Route path="*" element={<Error />} />
         </Routes>
-        <ParentComponent />
       </div>
       <Footer isEditing={isEditing} />
       <div />

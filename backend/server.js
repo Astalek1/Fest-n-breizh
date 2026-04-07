@@ -14,6 +14,7 @@ import videosRoutes from "./routes/videos.js";
 import partnersRoutes from "./routes/partners.js";
 import linksRoutes from "./routes/links.js";
 import contactRoutes from "./routes/contact.js";
+import filesRoutes from './routes/files.js'
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use("/api/videos", videosRoutes);
 app.use("/api/partners", partnersRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/contact", contactRoutes);
+app.use('/api/files', filesRoutes)
 
 // Route test (healthcheck)
 app.get("/health", (req, res) => {

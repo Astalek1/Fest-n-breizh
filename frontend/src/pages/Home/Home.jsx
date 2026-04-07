@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './Home.scss'
+import Modal from '../../components/Modal/Modal'
 
 function Home({ isEditing }) {
   const carouselImages = [
@@ -10,6 +11,17 @@ function Home({ isEditing }) {
   ]
 
   const [index, setIndex] = useState(0)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState(null)
+  const fields = [
+    { name: 'title', type: 'text', label: 'Titre' },
+    { name: 'text', type: 'textarea', label: 'Texte' },
+  ]
+
+  const handleSubmit = (data) => {
+    console.log(data)
+    setIsModalOpen(false)
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -57,6 +69,17 @@ function Home({ isEditing }) {
             venir.
           </p>
         </div>
+        {isEditing && (
+          <button
+            className="button__create"
+            onClick={() => {
+              setModalMode('create')
+              setIsModalOpen(true)
+            }}
+          >
+            créé une annonce
+          </button>
+        )}
         <div className="announcements">
           {announcements.length === 0 ? (
             <>
@@ -103,6 +126,15 @@ function Home({ isEditing }) {
           )}
         </div>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        fields={fields}
+        data={null}
+        entityName="announcement"
+        onSubmit={handleSubmit}
+      />
     </>
   )
 }

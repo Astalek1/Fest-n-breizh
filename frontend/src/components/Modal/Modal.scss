@@ -1,0 +1,41 @@
+.container__modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(128, 128, 128, 0.534);
+  top: 0;
+  left: 0;
+}
+
+.modal {
+  display: flex;
+  background-color: burlywood;
+  width: 35%;
+  height: auto;
+  border-radius: 10px;
+  flex-direction: column;
+
+  &__title {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+  }
+
+  &__body {
+    font-size: 18px;
+  }
+  &__button {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+    &--close {
+      background-color: red;
+    }
+    &--valid {
+      background-color: green;
+    }
+  }
+}
