@@ -79,7 +79,7 @@ function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
                 }}
               >
                 <option value="photo">Image</option>
-                <option value="image">Image</option>
+
                 <option value="logo">Logo</option>
                 <option value="video">Vidéo</option>
               </select>
