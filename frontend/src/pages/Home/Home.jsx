@@ -37,15 +37,20 @@ function Home({ isEditing }) {
 
       const formData = new FormData()
 
-      // champs obligatoires
-      formData.append('title', data.title)
-      formData.append('text', data.text)
-      formData.append('mediaType', data.mediaType)
-      formData.append('media', data.media)
+      // 👇 ENVOI JSON comme attendu par le backend
+      formData.append(
+        'announcement',
+        JSON.stringify({
+          title: data.title,
+          text: data.text,
+          mediaType: data.mediaType,
+          media: data.media, // URL ou null
+        }),
+      )
 
-      // DEBUG
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1])
+      // 👇 fichier (si photo ou logo upload)
+      if (data.media instanceof File) {
+        formData.append('media', data.media)
       }
 
       const res = await fetch(
@@ -60,7 +65,7 @@ function Home({ isEditing }) {
       )
 
       const result = await res.json()
-      console.log('RESULT:', result)
+      console.log(result)
     } catch (err) {
       console.error(err)
     }
