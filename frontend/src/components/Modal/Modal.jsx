@@ -45,24 +45,30 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {/* TEXT */}
                 {field.type === 'text' && (
                   <input
-                    defaultValue={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    name={field.name}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                   />
                 )}
 
                 {/* TEXTAREA */}
                 {field.type === 'textarea' && (
                   <textarea
-                    defaultValue={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    name={field.name}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                   />
                 )}
 
                 {/* SELECT */}
                 {field.type === 'select' && (
                   <select
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    name={field.name}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                   >
                     {field.options.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -76,8 +82,9 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {field.type === 'file' && (
                   <input
                     type="file"
+                    name={field.name}
                     onChange={(e) =>
-                      handleChange(field.name, e.target.files[0])
+                      handleChange(e.target.name, e.target.files[0])
                     }
                   />
                 )}
