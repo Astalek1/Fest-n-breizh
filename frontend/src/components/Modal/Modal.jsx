@@ -2,27 +2,11 @@ import './Modal.scss'
 import { useState, useEffect } from 'react'
 
 function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
-  // state local (simplifié)
-  const [formData, setFormData] = useState({
-    title: '',
-    text: '',
-    mediaType: data?.mediaType || 'image',
-  })
-  const [mediaType, setMediaType] = useState(data?.mediaType || 'image')
-  const [mediaSource, setMediaSource] = useState('upload')
-  const [logos, setLogos] = useState([])
+  const [formData, setFormData] = useState({})
 
   useEffect(() => {
-    if (mediaType === 'logo' && mediaSource === 'existing') {
-      fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos')
-        .then((res) => res.json())
-        .then((data) => {
-          console.log('LOGOS:', data)
-          setLogos(data)
-        })
-        .catch((err) => console.error(err))
-    }
-  }, [mediaType, mediaSource])
+    setFormData(data || {})
+  }, [data, isOpen])
 
   if (!isOpen) return null
 
@@ -47,10 +31,11 @@ function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
         {/* BODY */}
         {mode !== 'delete' ? (
           <div className="modal__body">
-            {/* champs dynamiques */}
             {fields.map((field) => (
               <div key={field.name}>
-                <label htmlFor={field.name}>{field.label || field.name}</label>
+                <label>{field.label || field.name}</label>
+
+                {/* TEXT */}
                 {field.type === 'text' && (
                   <input
                     value={formData[field.name] || ''}
@@ -58,66 +43,48 @@ function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
                   />
                 )}
 
+                {/* TEXTAREA */}
                 {field.type === 'textarea' && (
                   <textarea
                     value={formData[field.name] || ''}
                     onChange={(e) => handleChange(field.name, e.target.value)}
                   />
                 )}
-              </div>
-            ))}
-            <div>
-              <label>Type de média</label>
-              <select
-                value={mediaType}
-                onChange={(e) => {
-                  setMediaType(e.target.value)
-                  setFormData((prev) => ({
-                    ...prev,
-                    mediaType: e.target.value,
-                  }))
-                }}
-              >
-                <option value="photo">Image</option>
 
-                <option value="logo">Logo</option>
-                <option value="video">Vidéo</option>
-              </select>
-            </div>
-
-            {/* gestion media */}
-            {mediaType === 'image' && <input type="file" />}
-
-            {mediaType === 'video' && <input placeholder="URL vidéo" />}
-
-            {mediaType === 'logo' && (
-              <div>
-                <select onChange={(e) => setMediaSource(e.target.value)}>
-                  <option value="upload">Upload</option>
-                  <option value="existing">Existant</option>
-                </select>
-
-                {mediaSource === 'upload' && <input type="file" />}
-                {mediaSource === 'existing' && (
+                {/* SELECT */}
+                {field.type === 'select' && (
                   <select
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        file: e.target.value,
-                      }))
-                    }
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
                   >
-                    <option value="">Choisir un logo</option>
-
-                    {logos.map((logo) => (
-                      <option key={logo.fileId} value={logo.fileId}>
-                        {logo.name}
+                    {field.options.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
                       </option>
                     ))}
                   </select>
                 )}
+
+                {/* FILE */}
+                {field.type === 'file' && (
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      handleChange(field.name, e.target.files[0])
+                    }
+                  />
+                )}
+
+                {/* URL */}
+                {field.type === 'url' && (
+                  <input
+                    placeholder={field.placeholder || 'URL'}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                  />
+                )}
               </div>
-            )}
+            ))}
           </div>
         ) : (
           <p>Supprimer cet élément ?</p>

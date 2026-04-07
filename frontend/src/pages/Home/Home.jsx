@@ -16,6 +16,19 @@ function Home({ isEditing }) {
   const fields = [
     { name: 'title', type: 'text', label: 'Titre' },
     { name: 'text', type: 'textarea', label: 'Texte' },
+
+    {
+      name: 'mediaType',
+      type: 'select',
+      label: 'Type de média',
+      options: [
+        { value: 'photo', label: 'Image' },
+        { value: 'logo', label: 'Logo' },
+        { value: 'video', label: 'Vidéo' },
+      ],
+    },
+
+    { name: 'media', type: 'file', label: 'Fichier' },
   ]
 
   const handleSubmit = async (data) => {
@@ -24,21 +37,19 @@ function Home({ isEditing }) {
 
       const formData = new FormData()
 
-      // champs texte
-      formData.append('title', data.title || '')
-      formData.append('text', data.text || '')
-
-      // type de média
+      // champs obligatoires
+      formData.append('title', data.title)
+      formData.append('text', data.text)
       formData.append('mediaType', data.mediaType)
 
-      // logo existant
-      if (data.mediaType === 'logo' && data.file) {
-        formData.append('media', data.file)
-      }
-      console.log('DATA SENT:', data)
+      // 👇 LE POINT CRITIQUE
+      formData.append('media', data.media)
+
+      // DEBUG
       for (let pair of formData.entries()) {
         console.log(pair[0], pair[1])
       }
+
       const res = await fetch(
         'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
         {
@@ -51,7 +62,7 @@ function Home({ isEditing }) {
       )
 
       const result = await res.json()
-      console.log('RESULT:', JSON.stringify(result, null, 2))
+      console.log('RESULT:', result)
     } catch (err) {
       console.error(err)
     }
