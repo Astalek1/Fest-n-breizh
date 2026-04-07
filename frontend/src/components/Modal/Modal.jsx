@@ -1,12 +1,14 @@
 import './Modal.scss'
 import { useState, useEffect } from 'react'
 
-function Modal({ isOpen, onClose, mode, fields, data, entityName, onSubmit }) {
+function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
   const [formData, setFormData] = useState({})
 
   useEffect(() => {
-    setFormData(data || {})
-  }, [data, isOpen])
+    if (isOpen) {
+      setFormData({})
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 

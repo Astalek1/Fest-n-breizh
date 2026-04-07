@@ -41,8 +41,6 @@ function Home({ isEditing }) {
       formData.append('title', data.title)
       formData.append('text', data.text)
       formData.append('mediaType', data.mediaType)
-
-      // 👇 LE POINT CRITIQUE
       formData.append('media', data.media)
 
       // DEBUG
