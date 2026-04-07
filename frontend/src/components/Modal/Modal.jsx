@@ -1,7 +1,15 @@
 import './Modal.scss'
 import { useState, useEffect } from 'react'
 
-function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
+function Modal({
+  isOpen,
+  onClose,
+  mode,
+  fields,
+  entityName,
+  onSubmit,
+  onChangeField,
+}) {
   const [formData, setFormData] = useState({
     title: '',
     text: '',
@@ -19,6 +27,10 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    if (onChangeField) {
+      onChangeField(name, value)
+    }
   }
 
   const handleSubmit = () => {

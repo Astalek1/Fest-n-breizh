@@ -29,10 +29,23 @@ function Home({ isEditing }) {
         { value: 'video', label: 'Vidéo' },
       ],
     },
+    {
+      name: 'logoMode',
+      type: selectedMediaType === 'logo' ? 'select' : null,
+      options: [
+        { value: 'upload', label: 'Upload' },
+        { value: 'existing', label: 'Existant' },
+      ],
+    },
 
     {
       name: 'media',
-      type: selectedMediaType === 'video' ? 'url' : 'file',
+      type:
+        selectedMediaType === 'video'
+          ? 'url'
+          : selectedMediaType === 'logo'
+            ? 'logo'
+            : 'file',
       label: 'Média',
     },
   ]
@@ -188,11 +201,11 @@ function Home({ isEditing }) {
         </div>
       </div>
       <Modal
-        key={selectedMediaType}
+        key={selectedMediaType + isModalOpen}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
-        fields={fields()}
+        fields={fields}
         onChangeField={(name, value) => {
           if (name === 'mediaType') {
             setSelectedMediaType(value)
