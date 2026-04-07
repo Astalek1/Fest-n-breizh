@@ -62,8 +62,16 @@ function Home({ isEditing }) {
         },
       )
 
+      // attendre que le backend ait fini
       const result = await res.json()
       console.log(result)
+
+      // ensuite refresh
+      const updatedList = await fetch(
+        'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
+      ).then((res) => res.json())
+
+      setAnnouncements(updatedList)
     } catch (err) {
       console.error(err)
     }
