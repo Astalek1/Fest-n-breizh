@@ -1,5 +1,5 @@
 import express from 'express'
-import imagekit from '../config/imagekit.js'
+import imagekit from '../config/imageKit.js'
 
 const router = express.Router()
 
