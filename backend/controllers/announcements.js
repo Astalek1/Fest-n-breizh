@@ -19,9 +19,29 @@ export const newAnnouncement = async (req, res) => {
     if (data.mediaType === "video") {
       mediaResult.url = data.media || null;
     } else if (req.file || data.media) {
-      const folder = data.mediaType === "logo" ? "/festn_breizh/logos" : "/festn_breizh/accueil";
-      mediaResult = await resolveMedia(data.media, req.file, folder, cleanName);
-    }
+  const isFileId =
+    data.mediaType === "logo" &&
+    typeof data.media === "string" &&
+    !data.media.includes("/");
+
+  if (isFileId) {
+    const details = await imagekit.getFileDetails(data.media);
+    mediaResult.url = details.url;
+    mediaResult.fileId = details.fileId;
+  } else {
+    const folder =
+      data.mediaType === "logo"
+        ? "/festn_breizh/logos"
+        : "/festn_breizh/accueil";
+
+    mediaResult = await resolveMedia(
+      data.media,
+      req.file,
+      folder,
+      cleanName
+    );
+  }
+}
 
     const newAnnouncement = new Announcement({
       title: data.title,

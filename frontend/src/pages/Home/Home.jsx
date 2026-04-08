@@ -29,6 +29,25 @@ function Home({ isEditing }) {
         { value: 'video', label: 'Vidéo' },
       ],
     },
+    {
+      name: 'logoMode',
+      type: selectedMediaType === 'logo' ? 'select' : null,
+      options: [
+        { value: 'upload', label: 'Upload' },
+        { value: 'existing', label: 'Existant' },
+      ],
+    },
+
+    {
+      name: 'media',
+      type:
+        selectedMediaType === 'video'
+          ? 'url'
+          : selectedMediaType === 'logo'
+            ? 'logo'
+            : 'file',
+      label: 'Média',
+    },
   ]
 
   const handleSubmit = async (data) => {
@@ -167,15 +186,22 @@ function Home({ isEditing }) {
                     alt={`logo ${item.name}`}
                   />
                 )}
-
-                {item.mediaType === 'video' && (
-                  <iframe
-                    className="announcement__video"
-                    src={item.url.replace('watch?v=', 'embed/')}
-                    title={item.title}
-                    allowFullScreen
-                  />
-                )}
+                {item.mediaType === 'video' &&
+                  (item.media || item.url) &&
+                  ((item.media || item.url).includes('youtube') ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${new URL(
+                        item.media || item.url,
+                      ).searchParams.get('v')}`}
+                      title={item.title}
+                      allowFullScreen
+                      className="announcement__video"
+                    />
+                  ) : (
+                    <video controls className="announcement__video">
+                      <source src={item.media || item.url} />
+                    </video>
+                  ))}
               </article>
             ))
           )}

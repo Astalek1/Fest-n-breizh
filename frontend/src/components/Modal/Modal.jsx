@@ -5,6 +5,18 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
   const [formData, setFormData] = useState({})
   const [mediaType, setMediaType] = useState('photo')
   const [logoMode, setLogoMode] = useState('upload')
+  const [logos, setLogos] = useState([])
+
+  useEffect(() => {
+    if (mediaType === 'logo' && logoMode === 'existing') {
+      fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos')
+        .then((res) => res.json())
+        .then((data) => {
+          setLogos(data)
+        })
+        .catch((err) => console.error(err))
+    }
+  }, [mediaType, logoMode])
 
   useEffect(() => {
     if (isOpen) {
@@ -69,7 +81,11 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                       handleChange(e.target.name, e.target.value)
 
                       if (field.name === 'mediaType') {
-                        setMediaType(e.target.value)
+                        const value = e.target.value
+                        setMediaType(value)
+
+                        // reset propre quand on change de type
+                        setLogoMode('upload')
                       }
                     }}
                   >
@@ -118,11 +134,17 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 )}
 
                 {logoMode === 'existing' && (
-                  <input
-                    type="text"
-                    placeholder="fileId du logo"
+                  <select
                     onChange={(e) => handleChange('media', e.target.value)}
-                  />
+                  >
+                    <option value="">Choisir un logo</option>
+
+                    {logos.map((logo) => (
+                      <option key={logo.fileId} value={logo.fileId}>
+                        {logo.name}
+                      </option>
+                    ))}
+                  </select>
                 )}
               </div>
             )}
@@ -133,8 +155,10 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
 
         {/* FOOTER */}
         <div className="modal__button">
-          <button onClick={onClose}>Annuler</button>
-          <button onClick={handleSubmit}>
+          <button className="modal__button--close" onClick={onClose}>
+            Annuler
+          </button>
+          <button className="modal__button--valid" onClick={handleSubmit}>
             {mode === 'delete' ? 'Supprimer' : 'Valider'}
           </button>
         </div>
