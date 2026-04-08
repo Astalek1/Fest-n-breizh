@@ -17,6 +17,7 @@
   height: auto;
   border-radius: 10px;
   flex-direction: column;
+  padding: 20px;
 
   &__title {
     display: flex;
@@ -33,9 +34,23 @@
     margin: 10px;
     &--close {
       background-color: red;
+      margin: 0 10px;
     }
     &--valid {
       background-color: green;
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
     }
   }
+  &__select--existing {
+    margin: 5px 0;
+  }
+}
+
+input[type='file'] {
+  background: white;
+  margin: 5px 0;
 }

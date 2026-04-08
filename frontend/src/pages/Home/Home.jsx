@@ -30,7 +30,6 @@ function Home({ isEditing }) {
       ],
     },
     {
-      name: 'logoMode',
       type: selectedMediaType === 'logo' ? 'select' : null,
       options: [
         { value: 'upload', label: 'Upload' },
@@ -219,7 +218,7 @@ function Home({ isEditing }) {
           }
         }}
         data={null}
-        entityName="announcement"
+        entityName="une annonce"
         onSubmit={handleSubmit}
       />
     </>
