@@ -29,25 +29,6 @@ function Home({ isEditing }) {
         { value: 'video', label: 'Vidéo' },
       ],
     },
-    {
-      name: 'logoMode',
-      type: selectedMediaType === 'logo' ? 'select' : null,
-      options: [
-        { value: 'upload', label: 'Upload' },
-        { value: 'existing', label: 'Existant' },
-      ],
-    },
-
-    {
-      name: 'media',
-      type:
-        selectedMediaType === 'video'
-          ? 'url'
-          : selectedMediaType === 'logo'
-            ? 'logo'
-            : 'file',
-      label: 'Média',
-    },
   ]
 
   const handleSubmit = async (data) => {

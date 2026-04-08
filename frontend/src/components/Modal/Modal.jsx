@@ -1,25 +1,16 @@
 import './Modal.scss'
 import { useState, useEffect } from 'react'
 
-function Modal({
-  isOpen,
-  onClose,
-  mode,
-  fields,
-  entityName,
-  onSubmit,
-  onChangeField,
-}) {
-  const [formData, setFormData] = useState({
-    title: '',
-    text: '',
-    mediaType: '',
-    media: null,
-  })
+function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
+  const [formData, setFormData] = useState({})
+  const [mediaType, setMediaType] = useState('photo')
+  const [logoMode, setLogoMode] = useState('upload')
 
   useEffect(() => {
     if (isOpen) {
       setFormData({})
+      setMediaType('photo')
+      setLogoMode('upload')
     }
   }, [isOpen])
 
@@ -27,10 +18,6 @@ function Modal({
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
-
-    if (onChangeField) {
-      onChangeField(name, value)
-    }
   }
 
   const handleSubmit = () => {
@@ -78,9 +65,13 @@ function Modal({
                 {field.type === 'select' && (
                   <select
                     name={field.name}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       handleChange(e.target.name, e.target.value)
-                    }
+
+                      if (field.name === 'mediaType') {
+                        setMediaType(e.target.value)
+                      }
+                    }}
                   >
                     {field.options.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -89,28 +80,52 @@ function Modal({
                     ))}
                   </select>
                 )}
+              </div>
+            ))}
 
-                {/* FILE */}
-                {field.type === 'file' && (
+            {/* MEDIA DYNAMIQUE */}
+
+            {/* PHOTO */}
+            {mediaType === 'photo' && (
+              <input
+                type="file"
+                onChange={(e) => handleChange('media', e.target.files[0])}
+              />
+            )}
+
+            {/* VIDEO */}
+            {mediaType === 'video' && (
+              <input
+                type="text"
+                placeholder="URL vidéo"
+                onChange={(e) => handleChange('media', e.target.value)}
+              />
+            )}
+
+            {/* LOGO */}
+            {mediaType === 'logo' && (
+              <div>
+                <select onChange={(e) => setLogoMode(e.target.value)}>
+                  <option value="upload">Upload</option>
+                  <option value="existing">Existant</option>
+                </select>
+
+                {logoMode === 'upload' && (
                   <input
                     type="file"
-                    name={field.name}
-                    onChange={(e) =>
-                      handleChange(e.target.name, e.target.files[0])
-                    }
+                    onChange={(e) => handleChange('media', e.target.files[0])}
                   />
                 )}
 
-                {/* URL */}
-                {field.type === 'url' && (
+                {logoMode === 'existing' && (
                   <input
-                    placeholder={field.placeholder || 'URL'}
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    type="text"
+                    placeholder="fileId du logo"
+                    onChange={(e) => handleChange('media', e.target.value)}
                   />
                 )}
               </div>
-            ))}
+            )}
           </div>
         ) : (
           <p>Supprimer cet élément ?</p>
@@ -118,10 +133,8 @@ function Modal({
 
         {/* FOOTER */}
         <div className="modal__button">
-          <button className="modal__button--close" onClick={onClose}>
-            Annuler
-          </button>
-          <button className="modal__button--valid" onClick={handleSubmit}>
+          <button onClick={onClose}>Annuler</button>
+          <button onClick={handleSubmit}>
             {mode === 'delete' ? 'Supprimer' : 'Valider'}
           </button>
         </div>
