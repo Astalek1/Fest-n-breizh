@@ -130,12 +130,11 @@
 
 .button {
   &__create {
-    background-color: red;
+    background-color: green;
     border: 1px solid black;
     width: 150px;
     position: absolute;
     right: 600px;
     top: 260px;
-    font-weight: bold;
   }
 }

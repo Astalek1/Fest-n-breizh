@@ -11,6 +11,7 @@
 }
 
 .modal {
+  position: absolute;
   display: flex;
   background-color: burlywood;
   width: 35%;
@@ -35,9 +36,20 @@
     &--close {
       background-color: red;
       margin: 0 10px;
+      display: flex;
+      position: relative;
+      //bottom: 16vw;
+      left: 58vh;
+      width: 10%;
+      height: auto;
     }
     &--valid {
+      display: flex;
+      position: relative;
+      right: 8vh;
       background-color: green;
+      width: 10%;
+      height: auto;
       &:disabled {
         background: #ccc;
         cursor: not-allowed;

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './Home.scss'
 import Modal from '../../components/Modal/Modal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 function Home({ isEditing }) {
   const carouselImages = [
@@ -51,6 +53,69 @@ function Home({ isEditing }) {
 
   const handleSubmit = async (data) => {
     try {
+      if (modalMode === 'delete') {
+        const token = sessionStorage.getItem('token')
+
+        await fetch(
+          `https://fnb-backend.dokku.festnbreizh.bzh/api/announcements/${selectedItem._id}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: 'Bearer ' + token,
+            },
+          },
+        )
+
+        // refresh
+        const updatedList = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
+        ).then((res) => res.json())
+
+        setAnnouncements(updatedList)
+
+        setIsModalOpen(false)
+        return
+      }
+      if (modalMode === 'edit') {
+        const token = sessionStorage.getItem('token')
+
+        const formData = new FormData()
+
+        formData.append(
+          'announcement',
+          JSON.stringify({
+            title: data.title,
+            text: data.text,
+            mediaType: data.mediaType,
+            media: data.media,
+          }),
+        )
+
+        if (data.media instanceof File) {
+          formData.append('media', data.media)
+        }
+
+        await fetch(
+          `https://fnb-backend.dokku.festnbreizh.bzh/api/announcements/${selectedItem._id}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: 'Bearer ' + token,
+            },
+            body: formData,
+          },
+        )
+
+        // refresh
+        const updatedList = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/announcements',
+        ).then((res) => res.json())
+
+        setAnnouncements(updatedList)
+
+        setIsModalOpen(false)
+        return
+      }
       const token = sessionStorage.getItem('token')
 
       const formData = new FormData()
@@ -96,6 +161,21 @@ function Home({ isEditing }) {
 
     setIsModalOpen(false)
   }
+
+  const [selectedItem, setSelectedItem] = useState(null)
+
+  const handleEdit = (item) => {
+    setModalMode('edit')
+    setSelectedItem(item)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = (item) => {
+    setModalMode('delete')
+    setSelectedItem(item)
+    setIsModalOpen(true)
+  }
+
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % carouselImages.length)
@@ -169,6 +249,24 @@ function Home({ isEditing }) {
               <article className="announcement" key={item._id}>
                 <h2>{item.title}</h2>
                 <p>{item.text}</p>
+                {isEditing && (
+                  <div className="announcements__button">
+                    <button
+                      title="modifier"
+                      className="announcements__button--edit"
+                      onClick={() => handleEdit(item)}
+                    >
+                      <FontAwesomeIcon icon={faFilePen} />
+                    </button>
+                    <button
+                      title="suprimer"
+                      className="announcements__button--suprim"
+                      onClick={() => handleDelete(item)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
+                )}
 
                 {item.mediaType === 'photo' && (
                   <img
@@ -217,7 +315,7 @@ function Home({ isEditing }) {
             setSelectedMediaType(value)
           }
         }}
-        data={null}
+        data={selectedItem}
         entityName="une annonce"
         onSubmit={handleSubmit}
       />

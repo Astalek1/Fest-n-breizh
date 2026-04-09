@@ -1,13 +1,14 @@
 import './Modal.scss'
 import { useState, useEffect } from 'react'
 
-function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
+function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
   const [formData, setFormData] = useState({})
   const [mediaType, setMediaType] = useState('photo')
   const [logoMode, setLogoMode] = useState('upload')
   const [logos, setLogos] = useState([])
 
-  const isValid = formData.title && formData.text && formData.media
+  const isValid =
+    mode === 'delete' || (formData.title && formData.text && formData.media)
 
   useEffect(() => {
     if (mediaType === 'logo' && logoMode === 'existing') {
@@ -21,12 +22,27 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
   }, [mediaType, logoMode])
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return
+
+    //  EDIT → remplir avec les données
+    if (mode === 'edit' && data) {
+      setFormData({
+        title: data.title || '',
+        text: data.text || '',
+        mediaType: data.mediaType || 'photo',
+        media: data.media || null,
+      })
+
+      setMediaType(data.mediaType || 'photo')
+    }
+
+    //  CREATE → reset
+    else if (mode === 'create') {
       setFormData({})
       setMediaType('photo')
       setLogoMode('upload')
     }
-  }, [isOpen])
+  }, [isOpen, mode, data])
 
   if (!isOpen) return null
 
@@ -59,6 +75,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {field.type === 'text' && (
                   <input
                     name={field.name}
+                    value={formData[field.name] || ''}
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
@@ -69,6 +86,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {field.type === 'textarea' && (
                   <textarea
                     name={field.name}
+                    value={formData[field.name] || ''}
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
@@ -79,12 +97,12 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit }) {
                 {field.type === 'select' && (
                   <select
                     name={field.name}
+                    value={formData[field.name] || ''}
                     onChange={(e) => {
                       handleChange(e.target.name, e.target.value)
 
                       if (field.name === 'mediaType') {
                         const value = e.target.value
-
                         setMediaType(value)
                         setLogoMode('upload')
                         handleChange('media', null)
