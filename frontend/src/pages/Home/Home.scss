@@ -137,4 +137,25 @@
     right: 600px;
     top: 260px;
   }
+  &__edit {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 20px;
+    &--modif {
+      background-color: blue;
+      font-size: 40px;
+      width: 60px;
+      height: 60px;
+      border: 1px solid black;
+    }
+
+    &--suprim {
+      background-color: red;
+      font-size: 50px;
+      width: 60px;
+      height: 60px;
+      border: 1px solid black;
+    }
+  }
 }

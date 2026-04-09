@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import './Home.scss'
 import Modal from '../../components/Modal/Modal'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 function Home({ isEditing }) {
   const carouselImages = [
@@ -247,26 +245,26 @@ function Home({ isEditing }) {
           ) : (
             announcements.map((item) => (
               <article className="announcement" key={item._id}>
-                <h2>{item.title}</h2>
-                <p>{item.text}</p>
                 {isEditing && (
-                  <div className="announcements__button">
+                  <div className="button__edit">
                     <button
                       title="modifier"
-                      className="announcements__button--edit"
+                      className="button__edit--modif"
                       onClick={() => handleEdit(item)}
                     >
-                      <FontAwesomeIcon icon={faFilePen} />
+                      📝
                     </button>
                     <button
                       title="suprimer"
-                      className="announcements__button--suprim"
+                      className="button__edit--suprim"
                       onClick={() => handleDelete(item)}
                     >
-                      <FontAwesomeIcon icon={faTrash} />
+                      🗑
                     </button>
                   </div>
                 )}
+                <h2>{item.title}</h2>
+                <p>{item.text}</p>
 
                 {item.mediaType === 'photo' && (
                   <img

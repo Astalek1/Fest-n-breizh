@@ -40,7 +40,7 @@
       position: relative;
       //bottom: 16vw;
       left: 58vh;
-      width: 10%;
+      width: auto;
       height: auto;
     }
     &--valid {
@@ -48,7 +48,7 @@
       position: relative;
       right: 8vh;
       background-color: green;
-      width: 10%;
+      width: auto;
       height: auto;
       &:disabled {
         background: #ccc;
