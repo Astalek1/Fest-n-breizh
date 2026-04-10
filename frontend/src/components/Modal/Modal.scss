@@ -59,6 +59,14 @@
   }
   &__select--existing {
     margin: 5px 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  &__preview {
+    margin: 10px;
+    max-width: 200px;
+    height: auto;
+    max-height: 200px;
   }
 }
 

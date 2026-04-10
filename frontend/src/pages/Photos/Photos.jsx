@@ -19,8 +19,10 @@ function Photos() {
       <div className="page__title">
         <h1>les Photos</h1>
         <p>
-          Voici quelques photos des différents événements. cliquez sur la photo
-          Pour la voir en plus grand.
+          Voici quelques photos des différents événements. <br />
+          Nous remercions tous les photographes qui ont travaillé avec nous.
+          <br />
+          <br /> cliquez sur la photo Pour la voir en plus grand.
         </p>
       </div>
 

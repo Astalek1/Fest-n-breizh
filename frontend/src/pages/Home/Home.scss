@@ -130,12 +130,11 @@
 
 .button {
   &__create {
-    background-color: green;
+    background-color: rgb(0, 197, 0);
     border: 1px solid black;
-    width: 150px;
-    position: absolute;
-    right: 600px;
-    top: 260px;
+    width: 200px;
+    height: auto;
+    margin: 0 100px;
   }
   &__edit {
     display: flex;
@@ -143,7 +142,7 @@
     justify-content: end;
     gap: 20px;
     &--modif {
-      background-color: blue;
+      background-color: rgb(0, 47, 255);
       font-size: 40px;
       width: 60px;
       height: 60px;
@@ -151,7 +150,7 @@
     }
 
     &--suprim {
-      background-color: red;
+      background-color: rgb(255, 0, 0);
       font-size: 50px;
       width: 60px;
       height: 60px;

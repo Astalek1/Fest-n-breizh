@@ -18,8 +18,8 @@
   transition: transform 230ms ease-in-out;
 
   &__img {
-    width: 300px;
-    height: 450px;
+    width: 250px;
+    height: 350px;
     object-fit: cover;
     border: 1px solid #00000065;
     margin: 0 15px;
@@ -29,7 +29,7 @@
   &__figcaption {
     width: 300px;
     height: auto;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     position: relative;
     bottom: 15px;
@@ -38,7 +38,7 @@
   }
   &__title {
     text-decoration: none;
-    font-size: 24px;
+    font-size: 22px;
     display: flex;
     position: relative;
     left: 20px;

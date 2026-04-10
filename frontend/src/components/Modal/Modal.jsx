@@ -32,6 +32,11 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
         mediaType: data.mediaType || 'photo',
         media: data.media || null,
       })
+      if (data.mediaType === 'logo') {
+        setLogoMode('existing')
+      } else {
+        setLogoMode('upload')
+      }
 
       setMediaType(data.mediaType || 'photo')
     }
@@ -69,11 +74,12 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
           <div className="modal__body">
             {fields.map((field) => (
               <div key={field.name}>
-                <label>{field.label || field.name}</label>
+                <label htmlFor={field.name}>{field.label || field.name}</label>
 
                 {/* TEXT */}
                 {field.type === 'text' && (
                   <input
+                    id={field.name}
                     name={field.name}
                     value={formData[field.name] || ''}
                     onChange={(e) =>
@@ -122,22 +128,58 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
             {/* MEDIA DYNAMIQUE */}
 
             {/* PHOTO */}
+
             {mediaType === 'photo' && (
-              <input
-                type="file"
-                onChange={(e) => handleChange('media', e.target.files[0])}
-              />
+              <>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange('media', e.target.files[0])}
+                />
+                {formData.media && (
+                  <img
+                    className="modal__preview"
+                    src={
+                      formData.media instanceof File
+                        ? URL.createObjectURL(formData.media)
+                        : formData.media
+                    }
+                    alt={formData.title || 'image'}
+                  />
+                )}
+              </>
             )}
 
             {/* VIDEO */}
             {mediaType === 'video' && (
-              <input
-                type="text"
-                placeholder="URL vidéo"
-                onChange={(e) => handleChange('media', e.target.value)}
-              />
-            )}
+              <>
+                <input
+                  type="text"
+                  placeholder="URL vidéo"
+                  onChange={(e) => handleChange('media', e.target.value)}
+                />
 
+                {formData.media &&
+                  (formData.media.includes('youtube.com') ||
+                  formData.media.includes('youtu.be') ? (
+                    <iframe
+                      className="modal__preview"
+                      src={`https://www.youtube.com/embed/${
+                        formData.media.split('v=')[1]?.split('&')[0] ||
+                        formData.media.split('youtu.be/')[1]?.split('?')[0]
+                      }`}
+                      allowFullScreen
+                      title={formData.title || 'video'}
+                      aria-label={formData.title || 'video'}
+                    />
+                  ) : (
+                    <video
+                      className="modal__preview"
+                      src={formData.media}
+                      controls
+                    />
+                  ))}
+              </>
+            )}
             {/* LOGO */}
             {mediaType === 'logo' && (
               <div>
@@ -152,25 +194,47 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                 </select>
 
                 {logoMode === 'upload' && (
-                  <input
-                    type="file"
-                    onChange={(e) => handleChange('media', e.target.files[0])}
-                  />
+                  <>
+                    <input
+                      type="file"
+                      onChange={(e) => handleChange('media', e.target.files[0])}
+                    />
+                    {formData.media && (
+                      <img
+                        className="modal__preview"
+                        src={URL.createObjectURL(formData.media)}
+                        alt={formData.title || 'image'}
+                      />
+                    )}
+                  </>
                 )}
 
                 {logoMode === 'existing' && (
-                  <select
-                    className="modal__select--existing"
-                    onChange={(e) => handleChange('media', e.target.value)}
-                  >
-                    <option value="">Choisir un logo</option>
+                  <div>
+                    <select
+                      className="modal__select--existing"
+                      onChange={(e) => handleChange('media', e.target.value)}
+                    >
+                      <option value="">Choisir un logo</option>
 
-                    {logos.map((logo) => (
-                      <option key={logo.fileId} value={logo.fileId}>
-                        {logo.name}
-                      </option>
-                    ))}
-                  </select>
+                      {logos.map((logo) => (
+                        <option key={logo.fileId} value={logo.fileId}>
+                          {logo.name}
+                        </option>
+                      ))}
+                    </select>
+
+                    {formData.media && (
+                      <img
+                        className="modal__preview"
+                        src={
+                          logos.find((logo) => logo.fileId === formData.media)
+                            ?.url
+                        }
+                        alt={formData.title || 'image'}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
             )}
