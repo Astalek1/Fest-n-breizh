@@ -172,11 +172,9 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                       aria-label={formData.title || 'video'}
                     />
                   ) : (
-                    <video
-                      className="modal__preview"
-                      src={formData.media}
-                      controls
-                    />
+                    <video className="modal__preview" controls>
+                      <source src={formData.media} />
+                    </video>
                   ))}
               </>
             )}
@@ -184,6 +182,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
             {mediaType === 'logo' && (
               <div>
                 <select
+                  value={logoMode}
                   onChange={(e) => {
                     setLogoMode(e.target.value)
                     handleChange('media', null)
@@ -228,8 +227,11 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                       <img
                         className="modal__preview"
                         src={
-                          logos.find((logo) => logo.fileId === formData.media)
-                            ?.url
+                          formData.media?.startsWith('http')
+                            ? formData.media
+                            : logos.find(
+                                (logo) => logo.fileId === formData.media,
+                              )?.url
                         }
                         alt={formData.title || 'image'}
                       />

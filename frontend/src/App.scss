@@ -1,13 +1,21 @@
 @use './styles/variables' as *;
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@font-face {
+  font-family: 'TitleFont';
+  src: url('../src/assets/fonts/TITRE-Doradani\ Bl.ttf');
+}
+
+@font-face {
+  font-family: 'BodyFont';
+  src: url('../assets/fonts/EncodeSans-SemiBold.ttf');
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Montserrat', sans-serif;
 }
+
 .site-background {
   min-height: 100vh;
   background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB%2024.webp');
@@ -42,6 +50,7 @@
 }
 .edit-mode {
   background-color: black;
+  background-image: none;
 }
 
 .page__container {
@@ -60,27 +69,31 @@ body,
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  //overflow-x: hidden;
   background-color: $margin-color;
-
+  font-family: $font-body;
   //backdrop-filter: blur(5px);
 }
 
 h1 {
   font-size: 50px;
   margin-bottom: 10px;
-  text-decoration: underline;
+  font-family: $font-title;
+  width: 95%;
+  display: inline-flex;
+  justify-content: center;
 }
+
 h2 {
   font-size: 42px;
   margin-bottom: 10px;
-  text-decoration: underline;
+  font-family: $font-title;
 }
 
 h3 {
   font-size: 32px;
   margin-bottom: 10px;
-  text-decoration: underline;
+  font-family: $font-title;
 }
 
 p {
@@ -90,4 +103,5 @@ p {
 
 img {
   font-size: 14px;
+  font-family: $font-body;
 }
