@@ -8,7 +8,31 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
   const [logos, setLogos] = useState([])
 
   const isValid =
-    mode === 'delete' || (formData.title && formData.text && formData.media)
+    mode === 'delete' ||
+    // 🔵 HOME (prioritaire, inchangé)
+    (formData.text !== undefined &&
+      formData.title &&
+      formData.text.trim() !== '' &&
+      (formData.mediaType === 'video'
+        ? formData.media && formData.media.trim() !== ''
+        : formData.media !== null && formData.media !== undefined)) ||
+    // POSTERS / GALLERY
+    fields.every((field) => {
+      const value = formData[field.name]
+
+      if (field.name === 'media') {
+        if (formData.mediaType === 'video') {
+          return value && value.trim() !== ''
+        }
+        return value !== null && value !== undefined
+      }
+
+      if (typeof value === 'string') {
+        return value.trim() !== ''
+      }
+
+      return value !== null && value !== undefined
+    })
 
   useEffect(() => {
     if (mediaType === 'logo' && logoMode === 'existing') {
@@ -30,20 +54,17 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
         title: data.title || '',
         text: data.text || '',
         mediaType: data.mediaType || 'photo',
-        media: data.media || null,
+        media: data.media || data.url || null,
+        year: data.year || '',
+        caption: data.caption || '',
       })
-      if (data.mediaType === 'logo') {
-        setLogoMode('existing')
-      } else {
-        setLogoMode('upload')
-      }
 
       setMediaType(data.mediaType || 'photo')
+      setLogoMode(data.mediaType === 'logo' ? 'existing' : 'upload')
     }
-
     //  CREATE → reset
     else if (mode === 'create') {
-      setFormData({})
+      setFormData(data || {})
       setMediaType('photo')
       setLogoMode('upload')
     }
@@ -52,6 +73,10 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
   if (!isOpen) return null
 
   const handleChange = (name, value) => {
+    if (name === 'caption') {
+      value = value.replace(/^©\s*/, '')
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -81,7 +106,12 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                   <input
                     id={field.name}
                     name={field.name}
-                    value={formData[field.name] || ''}
+                    value={
+                      field.name === 'text'
+                        ? formData.text || formData.caption || ''
+                        : formData[field.name] || ''
+                    }
+                    readOnly={field.readonly}
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
