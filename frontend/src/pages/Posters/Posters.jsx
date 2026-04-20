@@ -99,8 +99,8 @@ function Posters({ isEditing }) {
       `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${selectedItem._id}`,
       {
         method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token },
         body: formDataToSend,
+        headers: { Authorization: 'Bearer ' + token },
       },
     )
 
@@ -219,7 +219,7 @@ function Posters({ isEditing }) {
                 : item.title + ' ' + item.year}
             </h2>
             <img
-              src={item.urlSmall || item.url}
+              src={item.url}
               alt={`affiche ${item.title} ${item.year}`}
               className="poster__img"
             />
