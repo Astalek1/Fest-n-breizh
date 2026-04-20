@@ -221,7 +221,7 @@ export const updatePhoto = async (req, res) => {
       if (body[field] !== undefined) filteredData[field] = body[field];
     }
 
-    if (req.file || body.media) {
+    if (req.file) {
       const cleanName = req.body.fileName?.trim()
         ? req.body.fileName.replace(/\s+/g, "-").toLowerCase()
         : body.title
