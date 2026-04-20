@@ -74,3 +74,9 @@ input[type='file'] {
   background: white;
   margin: 5px 0;
 }
+
+input[readonly] {
+  background-color: burlywood;
+  color: #666;
+  cursor: default;
+}

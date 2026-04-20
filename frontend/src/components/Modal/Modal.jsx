@@ -9,7 +9,6 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
 
   const isValid =
     mode === 'delete' ||
-    // 🔵 HOME (prioritaire, inchangé)
     (formData.text !== undefined &&
       formData.title &&
       formData.text.trim() !== '' &&
@@ -86,7 +85,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
 
   return (
     <div className="container__modal">
-      <div className="modal">
+      <div className={`modal modal--${entityName}`}>
         {/* HEADER */}
         <h2 className="modal__title">
           {mode === 'create' && `Ajouter ${entityName}`}
