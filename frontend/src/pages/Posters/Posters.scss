@@ -100,3 +100,16 @@
 .no-scroll {
   overflow: hidden;
 }
+
+//mode Edition
+
+.button__edit--gallery {
+  &--modif {
+    width: 40px;
+    height: 40px;
+  }
+  &--suprim {
+    width: 40px;
+    height: 40px;
+  }
+}
