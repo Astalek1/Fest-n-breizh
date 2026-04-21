@@ -30,12 +30,13 @@
   z-index: -1;
 }
 
+//******mode Edition******//
+
 .edition__mode {
   background-color: red;
   display: flex;
   width: 100%;
   flex-direction: row;
-
   &--txt {
     display: flex;
     width: 94%;
@@ -52,6 +53,38 @@
   background-color: black;
   background-image: none;
 }
+
+.button {
+  &__create {
+    background-color: rgb(0, 197, 0);
+    border: 1px solid black;
+    width: 200px;
+    height: auto;
+    margin: 0 100px;
+  }
+  &__edit {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 20px;
+    &--modif {
+      background-color: rgb(0, 47, 255);
+      font-size: 40px;
+      width: 60px;
+      height: 60px;
+      border: 1px solid black;
+    }
+
+    &--suprim {
+      background-color: rgb(255, 0, 0);
+      font-size: 50px;
+      width: 60px;
+      height: 60px;
+      border: 1px solid black;
+    }
+  }
+}
+// *************************//
 
 .page__container {
   min-height: 74vh; // prend tout l’écran
@@ -104,37 +137,4 @@ p {
 img {
   font-size: 14px;
   font-family: $font-body;
-}
-
-//mode Edition
-
-.button {
-  &__create {
-    background-color: rgb(0, 197, 0);
-    border: 1px solid black;
-    width: 200px;
-    height: auto;
-    margin: 0 100px;
-  }
-  &__edit {
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
-    gap: 20px;
-    &--modif {
-      background-color: rgb(0, 47, 255);
-      font-size: 40px;
-      width: 60px;
-      height: 60px;
-      border: 1px solid black;
-    }
-
-    &--suprim {
-      background-color: rgb(255, 0, 0);
-      font-size: 50px;
-      width: 60px;
-      height: 60px;
-      border: 1px solid black;
-    }
-  }
 }
