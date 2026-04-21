@@ -248,7 +248,7 @@ function Photos({ isEditing }) {
         fields={fields}
         onSubmit={handleSubmitModal}
         data={selectedItem}
-        entityName="photo"
+        entityName="une Photo"
       />
     </>
   )
