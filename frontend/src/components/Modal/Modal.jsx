@@ -64,7 +64,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
     //  CREATE → reset
     else if (mode === 'create') {
       setFormData(data || {})
-      setMediaType('photo')
+      setMediaType(data?.mediaType || 'photo')
       setLogoMode('upload')
     }
   }, [isOpen, mode, data])
@@ -184,6 +184,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                 <input
                   type="text"
                   placeholder="URL vidéo"
+                  value={formData.media || ''}
                   onChange={(e) => handleChange('media', e.target.value)}
                 />
 

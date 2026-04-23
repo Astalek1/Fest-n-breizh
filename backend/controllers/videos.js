@@ -23,6 +23,7 @@ export const newVideo = async (req, res) => {
 
 // trouver toutes les vidéos//
 export const getAllVideos = async (req, res) => {
+  const videos = await Video.find().sort({ createdAt: -1 });
   try {
     const videos = await Video.find();
     res.status(200).json(videos);

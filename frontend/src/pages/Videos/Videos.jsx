@@ -1,20 +1,157 @@
 import './Videos.scss'
 import { useState, useEffect } from 'react'
+import Modal from '../../components/Modal/Modal'
 
-function Videos() {
-  const [videos, setvideos] = useState([])
+function Videos({ isEditing }) {
+  const [videos, setVideos] = useState([])
+  const [modalMode, setModalMode] = useState('create')
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false)
 
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/videos')
       .then((res) => res.json())
-      .then((data) => setvideos(data))
+      .then((data) => setVideos(data))
       .catch((err) => console.error(err))
   }, [])
+
+  const handleCreate = () => {
+    setModalMode('create')
+
+    setSelectedItem({
+      title: '',
+      text: '',
+      media: '',
+      mediaType: 'video',
+      mediaFile: undefined, // IMPORTANT
+    })
+
+    setIsFormModalOpen(true)
+  }
+
+  const handleCreateVideo = async (formData) => {
+    const videoData = {
+      title: formData.title,
+      description: formData.text,
+      url: formData.media,
+    }
+
+    const token = sessionStorage.getItem('token')
+    await fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/videos', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+
+      body: JSON.stringify(videoData),
+    })
+
+    const res = await fetch(
+      'https://fnb-backend.dokku.festnbreizh.bzh/api/videos',
+    )
+
+    const data = await res.json()
+    setVideos([...data].reverse())
+    setIsFormModalOpen(false)
+  }
+
+  const handleEdit = (video) => {
+    setModalMode('edit')
+
+    setSelectedItem({
+      _id: video._id,
+      title: video.title,
+      text: video.description,
+      media: video.url,
+      mediaType: 'video',
+    })
+    setIsFormModalOpen(true)
+  }
+
+  const handleUpdateVideo = async (formData) => {
+    const videoData = {
+      title: formData.title,
+      description: formData.text,
+      url: formData.media,
+    }
+
+    const token = sessionStorage.getItem('token')
+
+    await fetch(
+      `https://fnb-backend.dokku.festnbreizh.bzh/api/videos/${selectedItem._id}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(videoData),
+      },
+    )
+
+    setVideos((prev) =>
+      prev.map((v) =>
+        v._id === selectedItem._id ? { ...v, ...videoData } : v,
+      ),
+    )
+
+    setIsFormModalOpen(false)
+  }
+
+  const handleDeleteVideo = async () => {
+    const token = sessionStorage.getItem('token')
+
+    await fetch(
+      `https://fnb-backend.dokku.festnbreizh.bzh/api/videos/${selectedItem._id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      },
+    )
+
+    setVideos((prev) => prev.filter((v) => v._id !== selectedItem._id))
+
+    setIsFormModalOpen(false)
+  }
+
+  const handleSubmitModal = async (formData) => {
+    if (modalMode === 'create') {
+      handleCreateVideo(formData)
+    } else if (modalMode === 'edit') {
+      handleUpdateVideo(formData)
+    } else if (modalMode === 'delete') {
+      handleDeleteVideo()
+    }
+  }
+
+  const fields = [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Titre',
+      require: true,
+    },
+    { name: 'text', type: 'text', label: 'description', required: true },
+  ]
 
   return (
     <>
       <div className="video__intro">
         <h1 className="video__intro--title">Nos vidéo sur Youtube</h1>
+        {isEditing && (
+          <button
+            title="créé"
+            className="button__create"
+            onClick={handleCreate}
+          >
+            ajouter une nouvelle
+            <br />
+            vidéo
+          </button>
+        )}
 
         <p className="video__intro--txt">
           Fest’n Breizh, c’est aussi une diffusion de la musique bretonne hors
@@ -53,17 +190,55 @@ function Videos() {
         {videos.map((item) => (
           <article className="videos__content" key={item._id}>
             <h2 className="videos__title">{item.title}</h2>
+            {isEditing && (
+              <div className="button__edit">
+                <button
+                  title="modifier"
+                  className="button__edit--modif"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleEdit(item)
+                  }}
+                >
+                  📝
+                </button>
+                <button
+                  title="suprimer"
+                  className="button__edit--suprim"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setModalMode('delete')
+                    setSelectedItem(item)
+                    setIsFormModalOpen(true)
+                  }}
+                >
+                  🗑
+                </button>
+              </div>
+            )}
             <p className="videos__txt">{item.description}</p>
 
             <iframe
               className="videos__windows"
-              src={item.url.replace('watch?v=', 'embed/')}
+              src={`https://www.youtube.com/embed/${
+                item.url.split('v=')[1]?.split('&')[0] ||
+                item.url.split('youtu.be/')[1]?.split('?')[0]
+              }`}
               title={item.title}
               allowFullScreen
             />
           </article>
         ))}
       </div>
+      <Modal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        mode={modalMode}
+        fields={fields}
+        onSubmit={handleSubmitModal}
+        data={selectedItem}
+        entityName="une vidéo"
+      />
     </>
   )
 }
