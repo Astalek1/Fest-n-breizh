@@ -37,13 +37,13 @@ function Videos({ isEditing }) {
     }
 
     const token = sessionStorage.getItem('token')
+
     await fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/videos', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
         'Content-Type': 'application/json',
       },
-
       body: JSON.stringify(videoData),
     })
 
@@ -52,7 +52,8 @@ function Videos({ isEditing }) {
     )
 
     const data = await res.json()
-    setVideos([...data].reverse())
+
+    setVideos(data)
     setIsFormModalOpen(false)
   }
 
@@ -90,12 +91,11 @@ function Videos({ isEditing }) {
       },
     )
 
-    setVideos((prev) =>
-      prev.map((v) =>
-        v._id === selectedItem._id ? { ...v, ...videoData } : v,
-      ),
+    const res = await fetch(
+      'https://fnb-backend.dokku.festnbreizh.bzh/api/videos',
     )
-
+    const data = await res.json()
+    setVideos(data)
     setIsFormModalOpen(false)
   }
 
@@ -112,8 +112,11 @@ function Videos({ isEditing }) {
       },
     )
 
-    setVideos((prev) => prev.filter((v) => v._id !== selectedItem._id))
-
+    const res = await fetch(
+      'https://fnb-backend.dokku.festnbreizh.bzh/api/videos',
+    )
+    const data = await res.json()
+    setVideos(data)
     setIsFormModalOpen(false)
   }
 
