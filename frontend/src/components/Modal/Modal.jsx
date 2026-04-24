@@ -52,6 +52,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
       setFormData({
         title: data.title || '',
         text: data.text || '',
+        url: data.url || '',
         mediaType: data.mediaType || 'photo',
         media: data.media || data.url || null,
         year: data.year || '',

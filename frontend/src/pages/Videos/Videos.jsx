@@ -8,6 +8,16 @@ function Videos({ isEditing }) {
   const [selectedItem, setSelectedItem] = useState(null)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
 
+  const fields = [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Titre',
+      require: true,
+    },
+    { name: 'text', type: 'text', label: 'description', required: true },
+  ]
+
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/videos')
       .then((res) => res.json())
@@ -23,7 +33,7 @@ function Videos({ isEditing }) {
       text: '',
       media: '',
       mediaType: 'video',
-      mediaFile: undefined, // IMPORTANT
+      mediaFile: undefined,
     })
 
     setIsFormModalOpen(true)
@@ -129,16 +139,6 @@ function Videos({ isEditing }) {
       handleDeleteVideo()
     }
   }
-
-  const fields = [
-    {
-      name: 'title',
-      type: 'text',
-      label: 'Titre',
-      require: true,
-    },
-    { name: 'text', type: 'text', label: 'description', required: true },
-  ]
 
   return (
     <>

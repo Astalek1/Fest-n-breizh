@@ -70,7 +70,7 @@ cleanName = cleanName
 // Récupérer tous les liens //
 export const getAllLinks = async (req, res) => {
   try {
-    const links = await Link.find();
+    const links = await Link.find().sort({ _id: -1 });
     res.status(200).json(links);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");

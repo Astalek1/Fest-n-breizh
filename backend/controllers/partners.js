@@ -71,7 +71,7 @@ cleanName = cleanName
 // Récupérer tous les partenaires //
 export const getAllPartners = async (req, res) => {
   try {
-    const partners = await Partner.find();
+    const partners = await Partner.find().sort({ _id: -1 });
     res.status(200).json(partners);
   } catch {
     res.status(500).json("Erreur serveur, base de données inaccessible");

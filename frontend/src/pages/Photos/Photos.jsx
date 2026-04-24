@@ -10,6 +10,17 @@ function Photos({ isEditing }) {
   const [selectedItem, setSelectedItem] = useState(null)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
 
+  const fields = [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Titre',
+      require: true,
+    },
+    { name: 'caption', type: 'text', label: 'caption', required: true },
+    { name: 'media', type: 'media', label: ' media', required: true },
+  ]
+
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/photos')
       .then((res) => res.json())
@@ -139,17 +150,6 @@ function Photos({ isEditing }) {
       handleDeletePhoto()
     }
   }
-
-  const fields = [
-    {
-      name: 'title',
-      type: 'text',
-      label: 'Titre',
-      require: true,
-    },
-    { name: 'caption', type: 'text', label: 'caption', required: true },
-    { name: 'media', type: 'media', label: ' media', required: true },
-  ]
 
   return (
     <>

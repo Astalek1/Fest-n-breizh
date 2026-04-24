@@ -10,6 +10,19 @@ function Posters({ isEditing }) {
   const [selectedItem, setSelectedItem] = useState(null)
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
 
+  const fields = [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Titre',
+      readonly: true,
+      require: true,
+    },
+    { name: 'year', type: 'text', label: 'année', required: true },
+    { name: 'caption', type: 'text', label: 'caption', required: true },
+    { name: 'media', type: 'media', label: ' media', required: true },
+  ]
+
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters')
       .then((res) => res.json())
@@ -146,18 +159,6 @@ function Posters({ isEditing }) {
       handleDeletePoster()
     }
   }
-  const fields = [
-    {
-      name: 'title',
-      type: 'text',
-      label: 'Titre',
-      readonly: true,
-      require: true,
-    },
-    { name: 'year', type: 'text', label: 'année', required: true },
-    { name: 'caption', type: 'text', label: 'caption', required: true },
-    { name: 'media', type: 'media', label: ' media', required: true },
-  ]
 
   return (
     <>
