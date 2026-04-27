@@ -50,7 +50,7 @@ function Links({ isEditing }) {
       file: formData.media, // ← IMPORTANT pour existing logo
     }
 
-    formDataToSend.append('fileName', formData.title) // ← 🔥 FIX
+    formDataToSend.append('fileName', formData.title) //  FIX
     formDataToSend.append('link', JSON.stringify(linkData))
 
     const token = sessionStorage.getItem('token')
@@ -93,12 +93,12 @@ function Links({ isEditing }) {
       url: formData.url,
     }
 
-    // 🔥 CAS 1 : upload fichier
+    // CAS 1 : upload fichier
     if (formData.media instanceof File) {
       formDataToSend.append('file', formData.media)
     }
 
-    // 🔥 CAS 2 : fileId ou URL
+    // CAS 2 : fileId ou URL
     else if (typeof formData.media === 'string') {
       linkData.file = formData.media
     }
