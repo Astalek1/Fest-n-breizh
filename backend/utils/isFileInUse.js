@@ -3,6 +3,7 @@ import Guest from "../models/Guests.js";
 import Link from "../models/Links.js";
 import Partner from "../models/Partners.js";
 import Announcement from "../models/Announcements.js";
+import Gallery from "../models/Gallery.js"
 
 export const isFileInUse = async (fileId) => {
   console.log("isFileInUse check:", fileId);
@@ -17,6 +18,8 @@ export const isFileInUse = async (fileId) => {
     Announcement.exists({
       $and: [{ mediaFileId: fileId }, { mediaType: "logo" }],
     }),
+    Gallery.exists({mediaFileIdSmall: fileId}),
+
   ]);
   console.log("isFileInUse results:", checks);
 
