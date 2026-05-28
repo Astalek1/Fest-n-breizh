@@ -1,16 +1,15 @@
 import { useState } from 'react'
 
-function ModalArtist({ data, onClose, onValidate }) {
+function ModalGuest({ data, onClose, onValidate }) {
   const [formData, setFormData] = useState({
     name: data?.name || '',
     description: data?.description || '',
     mediaType: data?.mediaType || null,
     media: data?.media || '',
   })
-
   return (
-    <div className="artist__modal">
-      <div className="artist__modal--content">
+    <div className="guest__modal">
+      <div className="guest__modal--content">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -64,7 +63,7 @@ function ModalArtist({ data, onClose, onValidate }) {
             </select>
           </label>
 
-          <div className="artist__modal--media">
+          <div className="guest__modal--media">
             {formData.mediaType === 'photo' && (
               <>
                 <input
@@ -79,7 +78,7 @@ function ModalArtist({ data, onClose, onValidate }) {
 
                 {formData.media && (
                   <img
-                    className="artist__modal--preview"
+                    className="guest__modal--preview"
                     src={
                       formData.media instanceof File
                         ? URL.createObjectURL(formData.media)
@@ -105,7 +104,7 @@ function ModalArtist({ data, onClose, onValidate }) {
                   }
                 />
                 <iframe
-                  className="artist__modal--preview"
+                  className="guest__modal--preview"
                   src={`https://www.youtube.com/embed/${
                     formData.media.split('v=')[1]?.split('&')[0] ||
                     formData.media.split('youtu.be/')[1]?.split('?')[0]
@@ -130,7 +129,7 @@ function ModalArtist({ data, onClose, onValidate }) {
 
                 {formData.media && (
                   <img
-                    className="artist__modal--preview"
+                    className="guest__modal--preview"
                     src={
                       formData.media instanceof File
                         ? URL.createObjectURL(formData.media)
@@ -154,4 +153,4 @@ function ModalArtist({ data, onClose, onValidate }) {
   )
 }
 
-export default ModalArtist
+export default ModalGuest

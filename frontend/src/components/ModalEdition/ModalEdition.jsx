@@ -6,6 +6,9 @@ function ModalEdition({ data, onClose, onValidate }) {
     description: data?.description || '',
     poster: data?.poster || null,
   })
+
+  const posters = []
+
   return (
     <div className="edition__modal">
       <div className="edition__modal--content">
@@ -42,6 +45,36 @@ function ModalEdition({ data, onClose, onValidate }) {
           </label>
 
           <button type="button">Sélectionner une affiche</button>
+
+          <select
+            value={formData.poster?.fileId || ''}
+            onChange={(e) => {
+              const selectedPoster = posters.find(
+                (poster) => poster.mediaFileIdSmall === e.target.value,
+              )
+
+              setFormData({
+                ...formData,
+                poster: selectedPoster
+                  ? {
+                      url: selectedPoster.mediaUrlSmall,
+                      fileId: selectedPoster.mediaFileIdSmall,
+                    }
+                  : null,
+              })
+            }}
+          >
+            <option value="">Choisir une affiche</option>
+
+            {posters.map((poster) => (
+              <option
+                key={poster.mediaFileIdSmall}
+                value={poster.mediaFileIdSmall}
+              >
+                {poster.title || poster.name || 'Affiche'}
+              </option>
+            ))}
+          </select>
 
           <button type="submit">Valider</button>
 
