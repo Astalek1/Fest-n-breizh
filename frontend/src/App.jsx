@@ -20,7 +20,7 @@ import Contact from './pages/Contact/Contact.jsx'
 import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
 import PingManager from './components/PingManager/pingManager.jsx'
-import CreateEditionPage from './pages/Editions/CreateEditionPage.jsx'
+import CreateEditionPage from './pages/CreateEditionPage/CreateEditionPage.jsx'
 
 function App() {
   const location = useLocation()
