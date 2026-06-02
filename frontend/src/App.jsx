@@ -20,6 +20,7 @@ import Contact from './pages/Contact/Contact.jsx'
 import Login from './pages/Login/Login.jsx'
 import Error from './pages/Error/Error.jsx'
 import PingManager from './components/PingManager/pingManager.jsx'
+import CreateEditionPage from './pages/Editions/CreateEditionPage.jsx'
 
 function App() {
   const location = useLocation()
@@ -83,6 +84,16 @@ function App() {
           <Route
             path="/Editions/"
             element={<Editions isEditing={isEditing} />}
+          />
+
+          <Route
+            path="/Editions/create"
+            element={<CreateEditionPage isEditing={isEditing} />}
+          />
+
+          <Route
+            path="/Editions/edit/:editionId"
+            element={<CreateEditionPage isEditing={isEditing} />}
           />
           <Route
             path="/Editions/:editionId"

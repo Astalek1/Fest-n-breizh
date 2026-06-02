@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 
-function CreateEditionPage({ editionId = null }) {
+function CreateEditionPage() {
   const [editionDraft, setEditionDraft] = useState({
     year: '',
     description: '',
     poster: null,
   })
+  const { editionId } = useParams()
   const isEditEdition = Boolean(editionId)
   const [artistsDraft, setArtistsDraft] = useState([])
   const [guestsDraft, setGuestsDraft] = useState([])
@@ -29,14 +31,19 @@ function CreateEditionPage({ editionId = null }) {
       }
 
       const response = await fetch(
-        `https://fnb-backend.dokku.festnbreizh.bzh/api/editions`,
+        isEditEdition
+          ? `https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionId}`
+          : `https://fnb-backend.dokku.festnbreizh.bzh/api/editions`,
         {
-          method: 'POST',
+          method: isEditEdition ? 'PUT' : 'POST',
           body: formData,
         },
       )
 
       const createdEdition = await response.json()
+      const finalEditionId = isEditEdition
+        ? editionId
+        : createdEdition.edition._id
 
       for (const artist of artistsDraft) {
         const artistFormData = new FormData()
@@ -45,7 +52,7 @@ function CreateEditionPage({ editionId = null }) {
         artistFormData.append('description', artist.description)
         artistFormData.append('mediaType', artist.mediaType)
         artistFormData.append('media', artist.media)
-        artistFormData.append('editionId', createdEdition.edition._id)
+        artistFormData.append('editionId', finalEditionId)
 
         await fetch(`https://fnb-backend.dokku.festnbreizh.bzh/api/artists`, {
           method: 'POST',
@@ -60,7 +67,7 @@ function CreateEditionPage({ editionId = null }) {
         guestFormData.append('description', guest.description)
         guestFormData.append('mediaType', guest.mediaType)
         guestFormData.append('media', guest.media)
-        guestFormData.append('editionId', createdEdition.edition._id)
+        guestFormData.append('editionId', finalEditionId)
 
         await fetch(`https://fnb-backend.dokku.festnbreizh.bzh/api/guests`, {
           method: 'POST',

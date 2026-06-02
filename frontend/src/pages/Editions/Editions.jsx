@@ -2,7 +2,7 @@ import './Editions.scss'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
-function Editions() {
+function Editions({ isEditing }) {
   const { editionId } = useParams()
   const navigate = useNavigate()
 
@@ -35,6 +35,14 @@ function Editions() {
       .catch((err) => console.error(err))
   }, [selectedEdition?.poster])
 
+  const handleEdit = (edition) => {
+    navigate(`/Editions/edit/${edition._id}`)
+  }
+
+  const handleDelete = (edition) => {
+    console.log('Suppression édition', edition)
+  }
+
   return (
     <div className="editions">
       {/* MENU DYNAMIQUE */}
@@ -49,6 +57,19 @@ function Editions() {
             {`${edition.title} ${edition.year}`}
           </button>
         ))}
+
+        {isEditing && (
+          <button
+            type="button"
+            title="créer"
+            className="button__create"
+            onClick={() => {
+              navigate('/Editions/create')
+            }}
+          >
+            Créer une édition
+          </button>
+        )}
       </div>
 
       {/* CONTENU */}
@@ -76,6 +97,24 @@ function Editions() {
 
         {selectedEdition && (
           <div className="edition">
+            {isEditing && (
+              <div className="button__edit">
+                <button
+                  title="modifier"
+                  className="button__edit--modif"
+                  onClick={() => handleEdit(selectedEdition)}
+                >
+                  📝
+                </button>
+                <button
+                  title="suprimer"
+                  className="button__edit--suprim"
+                  onClick={() => handleDelete(selectedEdition)}
+                >
+                  🗑
+                </button>
+              </div>
+            )}
             <div className="edition__intro">
               <h1 className="edition__title">
                 {`${selectedEdition.title} ${selectedEdition.year}`}
