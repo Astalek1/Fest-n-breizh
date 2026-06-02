@@ -14,7 +14,7 @@ function CreateEditionPage() {
   const [guestsDraft, setGuestsDraft] = useState([])
   const [editingArtist, setEditingArtist] = useState(null)
   const [editingGuest, setEditingGuest] = useState(null)
-  const [isEditionModalOpen, setIsEditionModalOpen] = useState(false)
+  const [isEditionModalOpen, setIsEditionModalOpen] = useState(!isEditEdition)
   const [isArtistModalOpen, setIsArtistModalOpen] = useState(false)
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false)
 

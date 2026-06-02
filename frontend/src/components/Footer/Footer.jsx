@@ -22,7 +22,7 @@ function Footer({ isEditing }) {
             <a
               className="Footer__portfolio"
               target="_blank"
-              href="https://astalek1.github.io/portfolio/"
+              href="https://portfolio.kg-interactive.workers.dev"
               rel="noopener noreferrer"
             >
               <span>Par Kévin Goujon</span>
