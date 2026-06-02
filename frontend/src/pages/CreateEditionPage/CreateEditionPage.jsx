@@ -140,15 +140,17 @@ function CreateEditionPage() {
 
       <section className="edition__actions">
         <button onClick={() => setIsEditionModalOpen(true)}>
-          Modifier les infos de l’édition
+          {isEditEdition
+            ? 'Modifier les infos de l’édition'
+            : 'Ajouter les infos de l’édition'}
         </button>
 
         <button onClick={() => setIsArtistModalOpen(true)}>
-          Ajouter un artiste
+          {isEditEdition ? 'Modifier un Artiste' : 'Ajouter un Artiste'}
         </button>
 
         <button onClick={() => setIsGuestModalOpen(true)}>
-          Ajouter un invité
+          {isEditEdition ? 'Modifier un Invité' : 'Ajouter un Invité'}
         </button>
       </section>
 
