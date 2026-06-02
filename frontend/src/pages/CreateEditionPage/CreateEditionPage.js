@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-function CreateEditionPage() {
+function CreateEditionPage({ editionId = null }) {
   const [editionDraft, setEditionDraft] = useState({
     year: '',
     description: '',
     poster: null,
   })
-
+  const isEditEdition = Boolean(editionId)
   const [artistsDraft, setArtistsDraft] = useState([])
   const [guestsDraft, setGuestsDraft] = useState([])
   const [editingArtist, setEditingArtist] = useState(null)
@@ -73,6 +73,51 @@ function CreateEditionPage() {
   }
 
   const canValidateEdition = artistsDraft.length > 0
+
+  useEffect(() => {
+    if (!isEditEdition) return
+
+    const fetchEdition = async () => {
+      try {
+        const response = await fetch(
+          `https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionId}`,
+        )
+
+        const data = await response.json()
+        console.log('Réponse édition:', data)
+
+        setEditionDraft({
+          year: data.edition.year || '',
+          description: data.edition.description || '',
+          poster: data.edition.poster
+            ? // a surveiller pour l'affichage prewiew du poster//
+              {
+                fileId: data.edition.poster,
+                url: '',
+              }
+            : null,
+        })
+
+        setArtistsDraft(
+          (data.edition.artists || []).map((artist) => ({
+            ...artist,
+            tempId: artist._id,
+          })),
+        )
+
+        setGuestsDraft(
+          (data.edition.guests || []).map((guest) => ({
+            ...guest,
+            tempId: guest._id,
+          })),
+        )
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchEdition()
+  }, [editionId, isEditEdition])
 
   return (
     <main className="create__edition--page">
