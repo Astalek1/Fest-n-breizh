@@ -94,26 +94,26 @@ function CreateEditionPage() {
         console.log('Réponse édition:', data)
 
         setEditionDraft({
-          year: data.edition.year || '',
-          description: data.edition.description || '',
-          poster: data.edition.poster
+          year: data.year || '',
+          description: data.description || '',
+          poster: data.poster
             ? // a surveiller pour l'affichage prewiew du poster//
               {
-                fileId: data.edition.poster,
+                fileId: data.poster,
                 url: '',
               }
             : null,
         })
 
         setArtistsDraft(
-          (data.edition.artists || []).map((artist) => ({
+          (data.artists || []).map((artist) => ({
             ...artist,
             tempId: artist._id,
           })),
         )
 
         setGuestsDraft(
-          (data.edition.guests || []).map((guest) => ({
+          (data.guests || []).map((guest) => ({
             ...guest,
             tempId: guest._id,
           })),
