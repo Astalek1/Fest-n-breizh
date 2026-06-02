@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './ModalEdition.scss'
 
 function ModalEdition({ data, onClose, onValidate }) {
+  console.log('ModalEdition ouverte')
   const [formData, setFormData] = useState({
     year: data?.year || '',
     description: data?.description || '',

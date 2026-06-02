@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import ModalEdition from '../../components/ModalEdition/ModalEdition.jsx'
 
 function CreateEditionPage() {
   const [editionDraft, setEditionDraft] = useState({
