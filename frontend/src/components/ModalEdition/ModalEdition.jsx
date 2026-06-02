@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './ModalEdition.scss'
 
 function ModalEdition({ data, onClose, onValidate }) {
   const [formData, setFormData] = useState({
