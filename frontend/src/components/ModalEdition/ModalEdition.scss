@@ -8,4 +8,15 @@
   background-color: rgba(128, 128, 128, 0.534);
   top: 0;
   left: 0;
+
+  &--content {
+    position: absolute;
+    display: flex;
+    background-color: burlywood;
+    width: 35%;
+    height: auto;
+    border-radius: 10px;
+    flex-direction: column;
+    padding: 20px;
+  }
 }
