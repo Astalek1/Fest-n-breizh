@@ -3,7 +3,7 @@ import ModalArtist from '../ModalArtist/ModalArtist.jsx'
 import ModalGuest from '../ModalGuest/ModalGuest.jsx'
 import './ModalEdition.scss'
 
-function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
+function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
   const [editionDraft, setEditionDraft] = useState({
     year: '',
     description: '',
@@ -265,6 +265,10 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
           onClick={handleValidateEdition}
         >
           {isEditEdition ? 'Valider les modifications' : 'Créer l’édition'}
+        </button>
+
+        <button type="button" onClick={onCancel}>
+          Annuler
         </button>
 
         {isArtistModalOpen && (

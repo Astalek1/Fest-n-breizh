@@ -1,10 +1,17 @@
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import ModalEdition from '../../components/ModalEdition/ModalEdition.jsx'
 
-function CreateEditionPage() {
+function CreateEditionPage({ isEditing }) {
   const { editionId } = useParams()
   const isEditEdition = Boolean(editionId)
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!isEditing) {
+      navigate('/Editions')
+    }
+  }, [isEditing, navigate])
 
   const [previewEdition, setPreviewEdition] = useState({
     year: '',
@@ -57,6 +64,7 @@ function CreateEditionPage() {
         editionId={editionId}
         isEditEdition={isEditEdition}
         onPreviewChange={setPreviewEdition}
+        onCancel={() => navigate('/Editions')}
       />
     </main>
   )
