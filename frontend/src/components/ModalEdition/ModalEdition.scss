@@ -1,4 +1,4 @@
-.edition__modal {
+.modalEdition {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,14 +9,68 @@
   top: 0;
   left: 0;
 
-  &--content {
-    position: absolute;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+}
+
+.modalEdition__content {
+  position: absolute;
+  display: flex;
+  background-color: burlywood;
+  width: 35%;
+  height: auto;
+  border-radius: 10px;
+  flex-direction: column;
+  padding: 20px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+
+  &--title {
+    font-size: 30px;
+  }
+
+  &--label {
+    font-size: 22px;
+  }
+
+  .modalEdition__button {
+    margin-top: 20px;
     display: flex;
-    background-color: burlywood;
-    width: 35%;
-    height: auto;
-    border-radius: 10px;
-    flex-direction: column;
-    padding: 20px;
+    flex-direction: row;
+    justify-content: space-around;
+
+    &--artist {
+      width: 15%;
+      height: auto;
+    }
+    &--guest {
+      width: 15%;
+      height: auto;
+    }
+
+    &--guest:hover,
+    &--artist:hover {
+      background-color: yellow;
+    }
+  }
+
+  .modalEdition__buttonCreate {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    &--create {
+      background-color: green;
+      width: 15%;
+      height: auto;
+    }
+    &--cancel {
+      background-color: red;
+      width: 15%;
+      height: auto;
+    }
   }
 }

@@ -41,13 +41,25 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
         const data = await response.json()
 
+        let posterUrl = ''
+
+        if (data.poster) {
+          const responsePoster = await fetch(
+            `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${data.poster}`,
+          )
+
+          const posterData = await responsePoster.json()
+
+          posterUrl = posterData.url
+        }
+
         setEditionDraft({
           year: data.year || '',
           description: data.description || '',
           poster: data.poster
             ? {
                 fileId: data.poster,
-                url: '',
+                url: posterUrl,
               }
             : null,
         })
@@ -134,13 +146,13 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
   }
 
   return (
-    <div className="edition__modal">
-      <div className="edition__modal--content">
-        <h2>
+    <div className="modalEdition">
+      <div className="modalEdition__content">
+        <h2 className="modalEdition__content--title">
           {isEditEdition ? 'Modifier l’édition' : 'Créer une nouvelle édition'}
         </h2>
 
-        <label>
+        <label className="modalEdition__content--label">
           Année
           <input
             type="text"
@@ -154,7 +166,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
           />
         </label>
 
-        <label>
+        <label className="modalEdition__content--label">
           Description
           <textarea
             value={editionDraft.description}
@@ -166,7 +178,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             }
           />
         </label>
-
+        <label className="modalEdition__content--label">Affiche</label>
         <select
           value={editionDraft.poster?.fileId || ''}
           onChange={(e) => {
@@ -196,41 +208,52 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             </option>
           ))}
         </select>
+        <div className="modalEdition__button">
+          <button
+            className="modalEdition__button--artist"
+            type="button"
+            onClick={() => setIsArtistModalOpen(true)}
+          >
+            Ajouter un artiste
+          </button>
 
-        <button type="button" onClick={() => setIsArtistModalOpen(true)}>
-          Ajouter un artiste
-        </button>
+          {artistsDraft.map((artist) => (
+            <div key={artist.tempId}>
+              <p>{artist.name}</p>
 
-        {artistsDraft.map((artist) => (
-          <div key={artist.tempId}>
-            <p>{artist.name}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingArtist(artist)
+                  setIsArtistModalOpen(true)
+                }}
+              >
+                Modifier l'artiste
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setEditingArtist(artist)
-                setIsArtistModalOpen(true)
-              }}
-            >
-              Modifier
-            </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setArtistsDraft(
+                    artistsDraft.filter(
+                      (item) => item.tempId !== artist.tempId,
+                    ),
+                  )
+                }
+              >
+                Supprimer l'artiste
+              </button>
+            </div>
+          ))}
 
-            <button
-              type="button"
-              onClick={() =>
-                setArtistsDraft(
-                  artistsDraft.filter((item) => item.tempId !== artist.tempId),
-                )
-              }
-            >
-              Supprimer
-            </button>
-          </div>
-        ))}
-
-        <button type="button" onClick={() => setIsGuestModalOpen(true)}>
-          Ajouter un invité
-        </button>
+          <button
+            className="modalEdition__button--guest"
+            type="button"
+            onClick={() => setIsGuestModalOpen(true)}
+          >
+            Ajouter un invité
+          </button>
+        </div>
 
         {guestsDraft.map((guest) => (
           <div key={guest.tempId}>
@@ -243,7 +266,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
                 setIsGuestModalOpen(true)
               }}
             >
-              Modifier
+              Modifier l'invité
             </button>
 
             <button
@@ -254,22 +277,28 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
                 )
               }
             >
-              Supprimer
+              Supprimer l'invité
             </button>
           </div>
         ))}
+        <div className="modalEdition__buttonCreate">
+          <button
+            className="modalEdition__buttonCreate--create"
+            type="button"
+            disabled={!canValidateEdition}
+            onClick={handleValidateEdition}
+          >
+            {isEditEdition ? 'Valider les modifications' : 'Créer l’édition'}
+          </button>
 
-        <button
-          type="button"
-          disabled={!canValidateEdition}
-          onClick={handleValidateEdition}
-        >
-          {isEditEdition ? 'Valider les modifications' : 'Créer l’édition'}
-        </button>
-
-        <button type="button" onClick={onCancel}>
-          Annuler
-        </button>
+          <button
+            className="modalEdition__buttonCreate--cancel"
+            type="button"
+            onClick={onCancel}
+          >
+            Annuler
+          </button>
+        </div>
 
         {isArtistModalOpen && (
           <ModalArtist
