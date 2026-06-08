@@ -209,78 +209,185 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
           ))}
         </select>
         <div className="modalEdition__button">
-          <button
-            className="modalEdition__button--artist"
-            type="button"
-            onClick={() => setIsArtistModalOpen(true)}
-          >
-            Ajouter un artiste
-          </button>
-
-          {artistsDraft.map((artist) => (
-            <div key={artist.tempId}>
-              <p>{artist.name}</p>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingArtist(artist)
-                  setIsArtistModalOpen(true)
-                }}
-              >
-                Modifier l'artiste
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setArtistsDraft(
-                    artistsDraft.filter(
-                      (item) => item.tempId !== artist.tempId,
-                    ),
-                  )
-                }
-              >
-                Supprimer l'artiste
-              </button>
-            </div>
-          ))}
-
-          <button
-            className="modalEdition__button--guest"
-            type="button"
-            onClick={() => setIsGuestModalOpen(true)}
-          >
-            Ajouter un invité
-          </button>
-        </div>
-
-        {guestsDraft.map((guest) => (
-          <div key={guest.tempId}>
-            <p>{guest.name}</p>
-
+          <div className="modalEdition__button--artistcolumn">
             <button
+              className="modalEdition__button--artist"
               type="button"
-              onClick={() => {
-                setEditingGuest(guest)
-                setIsGuestModalOpen(true)
-              }}
+              onClick={() => setIsArtistModalOpen(true)}
             >
-              Modifier l'invité
+              Ajouter un artiste
             </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                setGuestsDraft(
-                  guestsDraft.filter((item) => item.tempId !== guest.tempId),
-                )
-              }
-            >
-              Supprimer l'invité
-            </button>
+            {artistsDraft.map((artist) => (
+              <div className="modalEdition__info" key={artist.tempId}>
+                <p>{artist.name}</p>
+                <p>{artist.description}</p>
+
+                {/* IMAGE */}
+                {artist.mediaType === 'image' && (
+                  <img
+                    src={artist.media}
+                    alt={artist.name}
+                    className="modalEdition__media--img"
+                  />
+                )}
+
+                {/* LOGO (nouveau) */}
+                {artist.mediaType === 'logo' && (
+                  <img
+                    src={artist.logo}
+                    alt={artist.name}
+                    className="modalEdition__media--logo"
+                  />
+                )}
+
+                {/* LOGO ancien (stocké dans media sans mediaType) */}
+                {!artist.mediaType && artist.media && (
+                  <img
+                    src={artist.media}
+                    alt={artist.name}
+                    className="ModalEdition__media--logo"
+                  />
+                )}
+
+                {artist.mediaType === 'video' &&
+                  artist.media &&
+                  (artist.media.includes('youtube') ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${new URL(
+                        artist.media,
+                      ).searchParams.get('v')}`}
+                      title={artist.name}
+                      allowFullScreen
+                      className="modalEdition__media--video"
+                    />
+                  ) : (
+                    <video controls className="modalEdition__media--video">
+                      <source src={artist.media} />
+                    </video>
+                  ))}
+
+                <section className="modalEdition__button--EditSup">
+                  <button
+                    className="modalEdition__button--edit"
+                    type="button"
+                    onClick={() => {
+                      setEditingArtist(artist)
+                      setIsArtistModalOpen(true)
+                    }}
+                  >
+                    Modifier l'artiste
+                  </button>
+
+                  <button
+                    className="modalEdition__button--sup"
+                    type="button"
+                    onClick={() =>
+                      setArtistsDraft(
+                        artistsDraft.filter(
+                          (item) => item.tempId !== artist.tempId,
+                        ),
+                      )
+                    }
+                  >
+                    Supprimer l'artiste
+                  </button>
+                </section>
+              </div>
+            ))}
           </div>
-        ))}
+          <div className="modalEdition__button--guestcolumn">
+            <button
+              className="modalEdition__button--guest"
+              type="button"
+              onClick={() => setIsGuestModalOpen(true)}
+            >
+              Ajouter un invité
+            </button>
+
+            {guestsDraft.map((guest) => (
+              <div className="modalEdition__info" key={guest.tempId}>
+                <p>{guest.name}</p>
+                <p>{guest.description}</p>
+
+                {/* IMAGE */}
+                {guest.mediaType === 'image' && (
+                  <img
+                    src={guest.media}
+                    alt={guest.name}
+                    className="modalEdition__media--img"
+                  />
+                )}
+
+                {/* LOGO (nouveau) */}
+                {guest.mediaType === 'logo' && (
+                  <img
+                    src={guest.logo}
+                    alt={guest.name}
+                    className="modalEdition__media--logo"
+                  />
+                )}
+
+                {/* LOGO ancien (stocké dans media sans mediaType) */}
+                {!guest.mediaType && guest.media && (
+                  <img
+                    src={guest.media}
+                    alt={guest.name}
+                    className="ModalEdition__media--logo"
+                  />
+                )}
+
+                {guest.mediaType === 'video' &&
+                  guest.media &&
+                  (guest.media.includes('youtube') ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${new URL(
+                        guest.media,
+                      ).searchParams.get('v')}`}
+                      title={guest.name}
+                      allowFullScreen
+                      className="ModalEdition__media--video"
+                    />
+                  ) : (
+                    <video controls className="modalEdition__media--video">
+                      <source src={guest.media} />
+                    </video>
+                  ))}
+                <section className="modalEdition__button--EditSup">
+                  <button
+                    className="modalEdition__button--edit"
+                    type="button"
+                    onClick={() => {
+                      setEditingGuest(guest)
+                      setIsGuestModalOpen(true)
+                    }}
+                  >
+                    Modifier l'invité
+                  </button>
+
+                  <button
+                    className="modalEdition__button--sup"
+                    type="button"
+                    onClick={() =>
+                      setGuestsDraft(
+                        guestsDraft.filter(
+                          (item) => item.tempId !== guest.tempId,
+                        ),
+                      )
+                    }
+                  >
+                    Supprimer l'invité
+                  </button>
+                </section>
+              </div>
+            ))}
+          </div>
+        </div>
+        <h3 className="modalEdition__content--underTitle">
+          {isEditEdition
+            ? 'valider/annuler modifications'
+            : 'valider/annuler création'}
+        </h3>
         <div className="modalEdition__buttonCreate">
           <button
             className="modalEdition__buttonCreate--create"
