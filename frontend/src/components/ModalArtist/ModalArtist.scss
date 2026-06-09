@@ -1,0 +1,49 @@
+.artist__modal {
+  border: 1px solid black;
+  width: 50%;
+  height: auto;
+  border-radius: 2%;
+
+  &--content {
+    padding: 10px;
+  }
+  &--section {
+    display: flex;
+    flex-direction: column;
+  }
+  &--label {
+    font-size: 22px;
+  }
+
+  &--input {
+    height: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  &--preview {
+    margin-top: 5px;
+    max-width: 30%;
+    max-height: 200px;
+  }
+}
+
+.artist__btn {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+
+  &--validate {
+    width: 20%;
+    height: auto;
+    background-color: green;
+  }
+
+  &--cancel {
+    width: 20%;
+    height: auto;
+    background-color: red;
+  }
+}
