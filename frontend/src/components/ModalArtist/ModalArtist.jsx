@@ -137,7 +137,7 @@ function ModalArtist({ data, onClose, onValidate }) {
                 </>
               )}
               {formData.mediaType === 'logo' && (
-                <div className="artist__modal--logo">
+                <div className="artist__modal--label">
                   <select
                     value={logoMode}
                     onChange={(e) => {

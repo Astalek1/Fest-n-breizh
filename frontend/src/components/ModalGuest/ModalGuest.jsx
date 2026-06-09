@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import './ModalGuest.scss'
 
 function ModalGuest({ data, onClose, onValidate }) {
   const [formData, setFormData] = useState({
@@ -7,6 +8,27 @@ function ModalGuest({ data, onClose, onValidate }) {
     mediaType: data?.mediaType || null,
     media: data?.media || '',
   })
+
+  const [logoMode, setLogoMode] = useState('upload')
+  const [logos, setLogos] = useState([])
+
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const response = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos',
+        )
+
+        const data = await response.json()
+        setLogos(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchLogos()
+  }, [])
+
   return (
     <div className="guest__modal">
       <div className="guest__modal--content">
@@ -16,9 +38,10 @@ function ModalGuest({ data, onClose, onValidate }) {
             onValidate(formData)
           }}
         >
-          <label>
-            nom
+          <section className="guest__modal--section">
+            <label className="guest__modal--label">nom</label>
             <input
+              className="guest__modal--input"
               type="text"
               value={formData.name}
               onChange={(e) =>
@@ -28,11 +51,11 @@ function ModalGuest({ data, onClose, onValidate }) {
                 })
               }
             />
-          </label>
-
-          <label>
-            déscription
-            <input
+          </section>
+          <section className="guest__modal--section">
+            <label className="guest__modal--label">déscription </label>
+            <textarea
+              className="guest__modal--input"
               type="text"
               value={formData.description}
               onChange={(e) =>
@@ -42,11 +65,11 @@ function ModalGuest({ data, onClose, onValidate }) {
                 })
               }
             />
-          </label>
-
-          <label>
-            Type de média
+          </section>
+          <section className="guest__modal--section">
+            <label className="guest__modal--label">Type de média</label>
             <select
+              className="guest__modal--input"
               value={formData.mediaType}
               onChange={(e) =>
                 setFormData({
@@ -61,92 +84,158 @@ function ModalGuest({ data, onClose, onValidate }) {
               <option value="logo">Logo</option>
               <option value="video">Vidéo</option>
             </select>
-          </label>
 
-          <div className="guest__modal--media">
-            {formData.mediaType === 'photo' && (
-              <>
-                <input
-                  type="file"
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      media: e.target.files[0],
-                    })
-                  }
-                />
-
-                {formData.media && (
-                  <img
-                    className="guest__modal--preview"
-                    src={
-                      formData.media instanceof File
-                        ? URL.createObjectURL(formData.media)
-                        : formData.media
+            <div className="guest__modal--section">
+              {formData.mediaType === 'photo' && (
+                <>
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        media: e.target.files[0],
+                      })
                     }
-                    alt={formData.name || 'photo'}
                   />
-                )}
-              </>
-            )}
 
-            {formData.mediaType === 'video' && (
-              <>
-                <input
-                  type="text"
-                  placeholder="URL vidéo"
-                  value={formData.media || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      media: e.target.value,
-                    })
-                  }
-                />
-                <iframe
-                  className="guest__modal--preview"
-                  src={`https://www.youtube.com/embed/${
-                    formData.media.split('v=')[1]?.split('&')[0] ||
-                    formData.media.split('youtu.be/')[1]?.split('?')[0]
-                  }`}
-                  title={formData.name || 'video'}
-                  allowFullScreen
-                />
-              </>
-            )}
+                  {formData.media && (
+                    <img
+                      className="guest__modal--preview"
+                      src={
+                        formData.media instanceof File
+                          ? URL.createObjectURL(formData.media)
+                          : formData.media
+                      }
+                      alt={formData.name || 'photo'}
+                    />
+                  )}
+                </>
+              )}
 
-            {formData.mediaType === 'logo' && (
-              <>
-                <input
-                  type="file"
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      media: e.target.files[0],
-                    })
-                  }
-                />
-
-                {formData.media && (
-                  <img
-                    className="guest__modal--preview"
-                    src={
-                      formData.media instanceof File
-                        ? URL.createObjectURL(formData.media)
-                        : formData.media
+              {formData.mediaType === 'video' && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="URL vidéo"
+                    value={formData.media || ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        media: e.target.value,
+                      })
                     }
-                    alt={formData.name || 'logo'}
                   />
-                )}
-              </>
-            )}
-          </div>
+                  <iframe
+                    className="guest__modal--preview"
+                    src={`https://www.youtube.com/embed/${
+                      formData.media.split('v=')[1]?.split('&')[0] ||
+                      formData.media.split('youtu.be/')[1]?.split('?')[0]
+                    }`}
+                    title={formData.name || 'video'}
+                    allowFullScreen
+                  />
+                </>
+              )}
+              {formData.mediaType === 'logo' && (
+                <div className="guest__modal--label">
+                  <select
+                    value={logoMode}
+                    onChange={(e) => {
+                      setLogoMode(e.target.value)
+                      setFormData({
+                        ...formData,
+                        media: null,
+                      })
+                    }}
+                  >
+                    <option value="upload">Nouveau logo</option>
+                    <option value="existing">Logo déjà présent</option>
+                  </select>
 
-          <button type="submit">Valider</button>
+                  {logoMode === 'upload' && (
+                    <>
+                      <input
+                        type="file"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            media: e.target.files[0],
+                          })
+                        }
+                      />
 
-          <button type="button" onClick={onClose}>
-            Annuler
-          </button>
+                      {formData.media && (
+                        <img
+                          className="guest__modal--preview"
+                          src={
+                            formData.media instanceof File
+                              ? URL.createObjectURL(formData.media)
+                              : formData.media
+                          }
+                          alt={formData.name || 'logo'}
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {logoMode === 'existing' && (
+                    <>
+                      <select
+                        value={
+                          typeof formData.media === 'string'
+                            ? formData.media
+                            : ''
+                        }
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            media: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">Choisir un logo</option>
+
+                        {logos.map((logo) => (
+                          <option key={logo.fileId} value={logo.fileId}>
+                            {logo.name}
+                          </option>
+                        ))}
+                      </select>
+
+                      {typeof formData.media === 'string' && formData.media && (
+                        <img
+                          className="guest__modal--preview"
+                          src={
+                            logos.find((logo) => logo.fileId === formData.media)
+                              ?.url || ''
+                          }
+                          alt={formData.name || 'logo'}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+          <section className="guest__btn">
+            <button
+              className="guest__btn--validate"
+              title="valider"
+              type="submit"
+            >
+              Valider
+            </button>
+
+            <button
+              className="guest__btn--cancel"
+              title="annuler"
+              type="button"
+              onClick={onClose}
+            >
+              Annuler
+            </button>
+          </section>
         </form>
       </div>
     </div>

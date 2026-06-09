@@ -251,6 +251,35 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
               Ajouter un artiste
             </button>
 
+            {isArtistModalOpen && (
+              <ModalArtist
+                data={editingArtist}
+                onClose={() => {
+                  setEditingArtist(null)
+                  setIsArtistModalOpen(false)
+                }}
+                onValidate={(artist) => {
+                  if (editingArtist) {
+                    setArtistsDraft(
+                      artistsDraft.map((item) =>
+                        item.tempId === editingArtist.tempId
+                          ? { ...artist, tempId: editingArtist.tempId }
+                          : item,
+                      ),
+                    )
+                  } else {
+                    setArtistsDraft([
+                      ...artistsDraft,
+                      { ...artist, tempId: crypto.randomUUID() },
+                    ])
+                  }
+
+                  setEditingArtist(null)
+                  setIsArtistModalOpen(false)
+                }}
+              />
+            )}
+
             {artistsDraft.map((artist) => (
               <div className="modalEdition__info" key={artist.tempId}>
                 <p>{artist.name}</p>
@@ -340,6 +369,35 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             >
               Ajouter un invité
             </button>
+
+            {isGuestModalOpen && (
+              <ModalGuest
+                data={editingGuest}
+                onClose={() => {
+                  setEditingGuest(null)
+                  setIsGuestModalOpen(false)
+                }}
+                onValidate={(guest) => {
+                  if (editingGuest) {
+                    setGuestsDraft(
+                      guestsDraft.map((item) =>
+                        item.tempId === editingGuest.tempId
+                          ? { ...guest, tempId: editingGuest.tempId }
+                          : item,
+                      ),
+                    )
+                  } else {
+                    setGuestsDraft([
+                      ...guestsDraft,
+                      { ...guest, tempId: crypto.randomUUID() },
+                    ])
+                  }
+
+                  setEditingGuest(null)
+                  setIsGuestModalOpen(false)
+                }}
+              />
+            )}
 
             {guestsDraft.map((guest) => (
               <div className="modalEdition__info" key={guest.tempId}>
@@ -449,64 +507,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             {isEditEdition ? 'Annuler les modifications' : 'Annuler l’édition'}
           </button>
         </div>
-
-        {isArtistModalOpen && (
-          <ModalArtist
-            data={editingArtist}
-            onClose={() => {
-              setEditingArtist(null)
-              setIsArtistModalOpen(false)
-            }}
-            onValidate={(artist) => {
-              if (editingArtist) {
-                setArtistsDraft(
-                  artistsDraft.map((item) =>
-                    item.tempId === editingArtist.tempId
-                      ? { ...artist, tempId: editingArtist.tempId }
-                      : item,
-                  ),
-                )
-              } else {
-                setArtistsDraft([
-                  ...artistsDraft,
-                  { ...artist, tempId: crypto.randomUUID() },
-                ])
-              }
-
-              setEditingArtist(null)
-              setIsArtistModalOpen(false)
-            }}
-          />
-        )}
-
-        {isGuestModalOpen && (
-          <ModalGuest
-            data={editingGuest}
-            onClose={() => {
-              setEditingGuest(null)
-              setIsGuestModalOpen(false)
-            }}
-            onValidate={(guest) => {
-              if (editingGuest) {
-                setGuestsDraft(
-                  guestsDraft.map((item) =>
-                    item.tempId === editingGuest.tempId
-                      ? { ...guest, tempId: editingGuest.tempId }
-                      : item,
-                  ),
-                )
-              } else {
-                setGuestsDraft([
-                  ...guestsDraft,
-                  { ...guest, tempId: crypto.randomUUID() },
-                ])
-              }
-
-              setEditingGuest(null)
-              setIsGuestModalOpen(false)
-            }}
-          />
-        )}
       </div>
     </div>
   )
