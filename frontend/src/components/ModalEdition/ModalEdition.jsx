@@ -175,13 +175,12 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
         }),
       )
 
-      formData.append('editionId', editionId)
-
       if (guest.media instanceof File) {
         formData.append('media', guest.media)
       }
+
       const response = await fetch(
-        'https://fnb-backend.dokku.festnbreizh.bzh/api/guests',
+        `https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionId}/guests`,
         {
           method: 'POST',
           headers: {
@@ -195,7 +194,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
       console.log('add guest response', response.status, result)
     }
   }
-
   const handleValidateEdition = async () => {
     console.log('clic validation édition')
     console.log('canValidateEdition', canValidateEdition)

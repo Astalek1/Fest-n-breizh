@@ -89,8 +89,17 @@ export const createGuest = async (req, res, silent = false) => {
 
     if (silent) return doc;
     return res.status(201).json({ message: "Invité ajouté avec succès", guest: doc });
-  } catch (error) {
+  /*} catch (error) {
     if (!silent && res) res.status(500).json({ error: error.message });
+  }*/
+      } catch (error) {
+    console.error("Erreur createGuest:", error.message);
+
+    if (!silent && res) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    throw error;
   }
 };
 
