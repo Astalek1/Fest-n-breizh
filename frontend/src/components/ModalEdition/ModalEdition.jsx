@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import ModalArtist from '../ModalArtist/ModalArtist.jsx'
 import ModalGuest from '../ModalGuest/ModalGuest.jsx'
 import './ModalEdition.scss'
 
-function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
+function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
+  const navigate = useNavigate()
+
   const [editionDraft, setEditionDraft] = useState({
     year: '',
     description: '',
@@ -21,6 +24,12 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
   const [posters, setPosters] = useState([])
 
+  const canValidateEdition =
+    String(editionDraft.year || '').trim() !== '' &&
+    String(editionDraft.description || '').trim() !== '' &&
+    Boolean(editionDraft.poster?.fileId) &&
+    artistsDraft.length > 0
+
   useEffect(() => {
     const fetchPosters = async () => {
       try {
@@ -29,7 +38,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
         )
 
         const data = await response.json()
-
         setPosters(data)
       } catch (error) {
         console.error(error)
@@ -38,8 +46,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
     fetchPosters()
   }, [])
-
-  const canValidateEdition = artistsDraft.length > 0
 
   useEffect(() => {
     onPreviewChange({
@@ -67,9 +73,10 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${data.poster}`,
           )
 
-          const posterData = await responsePoster.json()
-
-          posterUrl = posterData.url
+          if (responsePoster.ok) {
+            const posterData = await responsePoster.json()
+            posterUrl = posterData.urlSmall || posterData.url || ''
+          }
         }
 
         setEditionDraft({
@@ -104,18 +111,120 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
     fetchEdition()
   }, [editionId, isEditEdition])
 
+  const formatEntity = (item) => ({
+    ...item,
+    media: item.media instanceof File ? null : item.media,
+  })
+
+  const appendFiles = (formData, artists, guests) => {
+    artists.forEach((artist) => {
+      if (artist.media instanceof File) {
+        formData.append('artistFiles', artist.media)
+      }
+    })
+
+    guests.forEach((guest) => {
+      if (guest.media instanceof File) {
+        formData.append('guestFiles', guest.media)
+      }
+    })
+  }
+
+  const addNewArtists = async (editionId, artists, token) => {
+    for (const artist of artists) {
+      const formData = new FormData()
+
+      formData.append(
+        'artist',
+        JSON.stringify({
+          name: artist.name,
+          description: artist.description,
+          mediaType: artist.mediaType,
+          media: artist.media instanceof File ? null : artist.media,
+        }),
+      )
+
+      if (artist.media instanceof File) {
+        formData.append('media', artist.media)
+      }
+
+      await fetch(
+        `https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionId}/artists`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      )
+    }
+  }
+
+  const addNewGuests = async (editionId, guests, token) => {
+    for (const guest of guests) {
+      const formData = new FormData()
+
+      formData.append(
+        'guest',
+        JSON.stringify({
+          name: guest.name,
+          description: guest.description,
+          mediaType: guest.mediaType,
+          media: guest.media instanceof File ? null : guest.media,
+        }),
+      )
+
+      formData.append('editionId', editionId)
+
+      if (guest.media instanceof File) {
+        formData.append('media', guest.media)
+      }
+      const response = await fetch(
+        'https://fnb-backend.dokku.festnbreizh.bzh/api/guests',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      )
+
+      const result = await response.json()
+      console.log('add guest response', response.status, result)
+    }
+  }
+
   const handleValidateEdition = async () => {
+    console.log('clic validation édition')
+    console.log('canValidateEdition', canValidateEdition)
     if (!canValidateEdition) return
 
     try {
+      const token = sessionStorage.getItem('token')
       const formData = new FormData()
 
-      formData.append('year', editionDraft.year)
-      formData.append('description', editionDraft.description)
+      const existingArtists = artistsDraft.filter((artist) => artist._id)
+      const newArtists = artistsDraft.filter((artist) => !artist._id)
 
-      if (editionDraft.poster) {
-        formData.append('poster', editionDraft.poster.fileId)
+      const existingGuests = guestsDraft.filter((guest) => guest._id)
+      const newGuests = guestsDraft.filter((guest) => !guest._id)
+
+      const artistsToSend = isEditEdition ? existingArtists : artistsDraft
+      const guestsToSend = isEditEdition ? existingGuests : guestsDraft
+
+      const editionData = {
+        title: 'Edition',
+        year: editionDraft.year,
+        description: editionDraft.description,
+        poster: editionDraft.poster.fileId,
+        artists: artistsToSend.map(formatEntity),
+        guests: guestsToSend.map(formatEntity),
       }
+
+      formData.append('edition', JSON.stringify(editionData))
+      appendFiles(formData, artistsToSend, guestsToSend)
 
       const response = await fetch(
         isEditEdition
@@ -123,42 +232,28 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
           : 'https://fnb-backend.dokku.festnbreizh.bzh/api/editions',
         {
           method: isEditEdition ? 'PUT' : 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         },
       )
 
       const result = await response.json()
+
+      if (!response.ok) {
+        console.error(result)
+        return
+      }
+
       const finalEditionId = isEditEdition ? editionId : result.edition._id
 
-      for (const artist of artistsDraft) {
-        const artistFormData = new FormData()
-
-        artistFormData.append('name', artist.name)
-        artistFormData.append('description', artist.description)
-        artistFormData.append('mediaType', artist.mediaType)
-        artistFormData.append('media', artist.media)
-        artistFormData.append('editionId', finalEditionId)
-
-        await fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/artists', {
-          method: 'POST',
-          body: artistFormData,
-        })
+      if (isEditEdition) {
+        await addNewArtists(finalEditionId, newArtists, token)
+        await addNewGuests(finalEditionId, newGuests, token)
       }
 
-      for (const guest of guestsDraft) {
-        const guestFormData = new FormData()
-
-        guestFormData.append('name', guest.name)
-        guestFormData.append('description', guest.description)
-        guestFormData.append('mediaType', guest.mediaType)
-        guestFormData.append('media', guest.media)
-        guestFormData.append('editionId', finalEditionId)
-
-        await fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/guests', {
-          method: 'POST',
-          body: guestFormData,
-        })
-      }
+      navigate(`/Editions/${finalEditionId}`)
     } catch (error) {
       console.error(error)
     }
@@ -166,8 +261,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
   return (
     <div className="modalEdition">
-      {/*section des informations de l'édition*/}
-
       <div className="modalEdition__content">
         <h2 className="modalEdition__content--title">
           {isEditEdition ? 'Modifier l’édition' : 'Créer une nouvelle édition'}
@@ -199,12 +292,14 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             }
           />
         </label>
+
         <label className="modalEdition__content--label">Affiche</label>
+
         <select
           value={editionDraft.poster?.fileId || ''}
           onChange={(e) => {
             const selectedPoster = posters.find(
-              (poster) => poster.mediaFileIdSmall === e.target.value,
+              (poster) => poster._id === e.target.value,
             )
 
             setEditionDraft({
@@ -212,7 +307,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
               poster: selectedPoster
                 ? {
                     url: selectedPoster.urlSmall,
-                    fileId: selectedPoster.mediaFileIdSmall,
+                    fileId: selectedPoster._id,
                   }
                 : null,
             })
@@ -221,14 +316,12 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
           <option value="">Choisir une affiche</option>
 
           {posters.map((poster) => (
-            <option
-              key={poster.mediaFileIdSmall}
-              value={poster.mediaFileIdSmall}
-            >
+            <option key={poster._id} value={poster._id}>
               {poster.title || poster.name || 'Affiche'}
             </option>
           ))}
         </select>
+
         <section className="modalEdition__content--posterSection">
           {editionDraft.poster?.url && (
             <img
@@ -238,7 +331,6 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             />
           )}
         </section>
-        {/*section de choix et modification des artistes et des invitées*/}
 
         <div className="modalEdition__button">
           <div className="modalEdition__button--artistcolumn">
@@ -251,30 +343,16 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
               Ajouter un artiste
             </button>
 
-            {isArtistModalOpen && (
+            {isArtistModalOpen && !editingArtist && (
               <ModalArtist
-                data={editingArtist}
-                onClose={() => {
-                  setEditingArtist(null)
-                  setIsArtistModalOpen(false)
-                }}
+                data={null}
+                onClose={() => setIsArtistModalOpen(false)}
                 onValidate={(artist) => {
-                  if (editingArtist) {
-                    setArtistsDraft(
-                      artistsDraft.map((item) =>
-                        item.tempId === editingArtist.tempId
-                          ? { ...artist, tempId: editingArtist.tempId }
-                          : item,
-                      ),
-                    )
-                  } else {
-                    setArtistsDraft([
-                      ...artistsDraft,
-                      { ...artist, tempId: crypto.randomUUID() },
-                    ])
-                  }
+                  setArtistsDraft([
+                    ...artistsDraft,
+                    { ...artist, tempId: crypto.randomUUID() },
+                  ])
 
-                  setEditingArtist(null)
                   setIsArtistModalOpen(false)
                 }}
               />
@@ -282,84 +360,105 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
             {artistsDraft.map((artist) => (
               <div className="modalEdition__info" key={artist.tempId}>
-                <p>{artist.name}</p>
-                <p>{artist.description}</p>
-
-                {/* IMAGE */}
-                {artist.mediaType === 'image' && (
-                  <img
-                    src={artist.media}
-                    alt={artist.name}
-                    className="modalEdition__media--img"
-                  />
-                )}
-
-                {/* LOGO (nouveau) */}
-                {artist.mediaType === 'logo' && (
-                  <img
-                    src={artist.logo}
-                    alt={artist.name}
-                    className="modalEdition__media--logo"
-                  />
-                )}
-
-                {/* LOGO ancien (stocké dans media sans mediaType) */}
-                {!artist.mediaType && artist.media && (
-                  <img
-                    src={artist.media}
-                    alt={artist.name}
-                    className="ModalEdition__media--logo"
-                  />
-                )}
-
-                {artist.mediaType === 'video' &&
-                  artist.media &&
-                  (artist.media.includes('youtube') ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${new URL(
-                        artist.media,
-                      ).searchParams.get('v')}`}
-                      title={artist.name}
-                      allowFullScreen
-                      className="modalEdition__media--video"
-                    />
-                  ) : (
-                    <video controls className="modalEdition__media--video">
-                      <source src={artist.media} />
-                    </video>
-                  ))}
-
-                <section className="modalEdition__button--EditSup">
-                  <button
-                    className="modalEdition__button--edit"
-                    type="button"
-                    title="modifier l'artiste"
-                    onClick={() => {
-                      setEditingArtist(artist)
-                      setIsArtistModalOpen(true)
+                {editingArtist?.tempId === artist.tempId ? (
+                  <ModalArtist
+                    data={editingArtist}
+                    onClose={() => {
+                      setEditingArtist(null)
+                      setIsArtistModalOpen(false)
                     }}
-                  >
-                    Modifier l'artiste
-                  </button>
-
-                  <button
-                    className="modalEdition__button--sup"
-                    type="button"
-                    title="suprimer l'artiste"
-                    onClick={() =>
+                    onValidate={(updatedArtist) => {
                       setArtistsDraft(
-                        artistsDraft.filter(
-                          (item) => item.tempId !== artist.tempId,
+                        artistsDraft.map((item) =>
+                          item.tempId === editingArtist.tempId
+                            ? { ...updatedArtist, tempId: editingArtist.tempId }
+                            : item,
                         ),
                       )
-                    }
-                  >
-                    Supprimer l'artiste
-                  </button>
-                </section>
+
+                      setEditingArtist(null)
+                      setIsArtistModalOpen(false)
+                    }}
+                  />
+                ) : (
+                  <>
+                    <p>{artist.name}</p>
+                    <p>{artist.description}</p>
+
+                    {artist.mediaType === 'image' && artist.media && (
+                      <img
+                        src={
+                          artist.media instanceof File
+                            ? URL.createObjectURL(artist.media)
+                            : artist.media
+                        }
+                        alt={artist.name}
+                        className="modalEdition__media--img"
+                      />
+                    )}
+
+                    {(artist.logo ||
+                      (typeof artist.media === 'string' &&
+                        artist.media.includes('/logos/'))) && (
+                      <img
+                        src={artist.logo || artist.media}
+                        alt={artist.name}
+                        className="modalEdition__media--logo"
+                      />
+                    )}
+
+                    {artist.mediaType === 'video' &&
+                      typeof artist.media === 'string' &&
+                      artist.media &&
+                      (artist.media.includes('youtube') ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${new URL(
+                            artist.media,
+                          ).searchParams.get('v')}`}
+                          title={artist.name}
+                          allowFullScreen
+                          className="modalEdition__media--video"
+                        />
+                      ) : (
+                        <video controls className="modalEdition__media--video">
+                          <source src={artist.media} />
+                        </video>
+                      ))}
+
+                    <section className="modalEdition__button--EditSup">
+                      <button
+                        className="modalEdition__button--edit"
+                        type="button"
+                        title="modifier l'artiste"
+                        onClick={() => {
+                          setEditingArtist(artist)
+                          setIsArtistModalOpen(true)
+                        }}
+                      >
+                        Modifier l'artiste
+                      </button>
+
+                      <button
+                        className="modalEdition__button--sup"
+                        type="button"
+                        title="suprimer l'artiste"
+                        onClick={() =>
+                          setArtistsDraft(
+                            artistsDraft.filter(
+                              (item) => item.tempId !== artist.tempId,
+                            ),
+                          )
+                        }
+                      >
+                        Supprimer l'artiste
+                      </button>
+                    </section>
+                  </>
+                )}
               </div>
             ))}
           </div>
+
           <div className="modalEdition__button--guestcolumn">
             <button
               className="modalEdition__button--guest"
@@ -370,30 +469,16 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
               Ajouter un invité
             </button>
 
-            {isGuestModalOpen && (
+            {isGuestModalOpen && !editingGuest && (
               <ModalGuest
-                data={editingGuest}
-                onClose={() => {
-                  setEditingGuest(null)
-                  setIsGuestModalOpen(false)
-                }}
+                data={null}
+                onClose={() => setIsGuestModalOpen(false)}
                 onValidate={(guest) => {
-                  if (editingGuest) {
-                    setGuestsDraft(
-                      guestsDraft.map((item) =>
-                        item.tempId === editingGuest.tempId
-                          ? { ...guest, tempId: editingGuest.tempId }
-                          : item,
-                      ),
-                    )
-                  } else {
-                    setGuestsDraft([
-                      ...guestsDraft,
-                      { ...guest, tempId: crypto.randomUUID() },
-                    ])
-                  }
+                  setGuestsDraft([
+                    ...guestsDraft,
+                    { ...guest, tempId: crypto.randomUUID() },
+                  ])
 
-                  setEditingGuest(null)
                   setIsGuestModalOpen(false)
                 }}
               />
@@ -401,92 +486,112 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
 
             {guestsDraft.map((guest) => (
               <div className="modalEdition__info" key={guest.tempId}>
-                <p>{guest.name}</p>
-                <p>{guest.description}</p>
-
-                {/* IMAGE */}
-                {guest.mediaType === 'image' && (
-                  <img
-                    src={guest.media}
-                    alt={guest.name}
-                    className="modalEdition__media--img"
-                  />
-                )}
-
-                {/* LOGO (nouveau) */}
-                {guest.mediaType === 'logo' && (
-                  <img
-                    src={guest.logo}
-                    alt={guest.name}
-                    className="modalEdition__media--logo"
-                  />
-                )}
-
-                {/* LOGO ancien (stocké dans media sans mediaType) */}
-                {!guest.mediaType && guest.media && (
-                  <img
-                    src={guest.media}
-                    alt={guest.name}
-                    className="ModalEdition__media--logo"
-                  />
-                )}
-
-                {guest.mediaType === 'video' &&
-                  guest.media &&
-                  (guest.media.includes('youtube') ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${new URL(
-                        guest.media,
-                      ).searchParams.get('v')}`}
-                      title={guest.name}
-                      allowFullScreen
-                      className="ModalEdition__media--video"
-                    />
-                  ) : (
-                    <video controls className="modalEdition__media--video">
-                      <source src={guest.media} />
-                    </video>
-                  ))}
-                <section className="modalEdition__button--EditSup">
-                  <button
-                    className="modalEdition__button--edit"
-                    type="button"
-                    title="modifier l'invité"
-                    onClick={() => {
-                      setEditingGuest(guest)
-                      setIsGuestModalOpen(true)
+                {editingGuest?.tempId === guest.tempId ? (
+                  <ModalGuest
+                    data={editingGuest}
+                    onClose={() => {
+                      setEditingGuest(null)
+                      setIsGuestModalOpen(false)
                     }}
-                  >
-                    Modifier l'invité
-                  </button>
-
-                  <button
-                    className="modalEdition__button--sup"
-                    type="button"
-                    title="suprimer l'invité"
-                    onClick={() =>
+                    onValidate={(updatedGuest) => {
                       setGuestsDraft(
-                        guestsDraft.filter(
-                          (item) => item.tempId !== guest.tempId,
+                        guestsDraft.map((item) =>
+                          item.tempId === editingGuest.tempId
+                            ? { ...updatedGuest, tempId: editingGuest.tempId }
+                            : item,
                         ),
                       )
-                    }
-                  >
-                    Supprimer l'invité
-                  </button>
-                </section>
+
+                      setEditingGuest(null)
+                      setIsGuestModalOpen(false)
+                    }}
+                  />
+                ) : (
+                  <>
+                    <p>{guest.name}</p>
+                    <p>{guest.description}</p>
+
+                    {guest.mediaType === 'image' && guest.media && (
+                      <img
+                        src={
+                          guest.media instanceof File
+                            ? URL.createObjectURL(guest.media)
+                            : guest.media
+                        }
+                        alt={guest.name}
+                        className="modalEdition__media--img"
+                      />
+                    )}
+
+                    {(guest.logo ||
+                      (typeof guest.media === 'string' &&
+                        guest.media.includes('/logos/'))) && (
+                      <img
+                        src={guest.logo || guest.media}
+                        alt={guest.name}
+                        className="modalEdition__media--logo"
+                      />
+                    )}
+
+                    {guest.mediaType === 'video' &&
+                      typeof guest.media === 'string' &&
+                      guest.media &&
+                      (guest.media.includes('youtube') ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${new URL(
+                            guest.media,
+                          ).searchParams.get('v')}`}
+                          title={guest.name}
+                          allowFullScreen
+                          className="modalEdition__media--video"
+                        />
+                      ) : (
+                        <video controls className="modalEdition__media--video">
+                          <source src={guest.media} />
+                        </video>
+                      ))}
+
+                    <section className="modalEdition__button--EditSup">
+                      <button
+                        className="modalEdition__button--edit"
+                        type="button"
+                        title="modifier l'invité"
+                        onClick={() => {
+                          setEditingGuest(guest)
+                          setIsGuestModalOpen(true)
+                        }}
+                      >
+                        Modifier l'invité
+                      </button>
+
+                      <button
+                        className="modalEdition__button--sup"
+                        type="button"
+                        title="suprimer l'invité"
+                        onClick={() =>
+                          setGuestsDraft(
+                            guestsDraft.filter(
+                              (item) => item.tempId !== guest.tempId,
+                            ),
+                          )
+                        }
+                      >
+                        Supprimer l'invité
+                      </button>
+                    </section>
+                  </>
+                )}
               </div>
             ))}
           </div>
         </div>
-
-        {/*Section de validation de la modale*/}
 
         <span className="modalEdition__content--optiontionsvalidate">
           {isEditEdition
             ? 'valider/annuler modifications'
             : 'valider/annuler création'}
         </span>
+
         <div className="modalEdition__buttonCreate">
           <button
             className="modalEdition__buttonCreate--create"
@@ -502,7 +607,9 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange, onCancel }) {
             className="modalEdition__buttonCreate--cancel"
             type="button"
             title="annuler"
-            onClick={onCancel}
+            onClick={() =>
+              navigate(isEditEdition ? `/Editions/${editionId}` : '/Editions')
+            }
           >
             {isEditEdition ? 'Annuler les modifications' : 'Annuler l’édition'}
           </button>

@@ -120,7 +120,12 @@
   justify-content: space-between;
   width: 100%;
 
-  &--create {
+  &--create:disabled {
+    background-color: grey;
+    color: white;
+    cursor: not-allowed;
+  }
+  &--create:not(:disabled) {
     background-color: green;
     width: 15%;
     height: auto;

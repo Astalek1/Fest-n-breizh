@@ -7,6 +7,7 @@ function Editions({ isEditing }) {
   const navigate = useNavigate()
 
   const [editions, setEditions] = useState([])
+  const [editionToDelete, setEditionToDelete] = useState(null)
 
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
@@ -40,7 +41,38 @@ function Editions({ isEditing }) {
   }
 
   const handleDelete = (edition) => {
-    console.log('Suppression édition', edition)
+    setEditionToDelete(edition)
+  }
+
+  const confirmDeleteEdition = async () => {
+    const token = sessionStorage.getItem('token')
+
+    try {
+      const response = await fetch(
+        `https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionToDelete._id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      if (!response.ok) {
+        const error = await response.json()
+        console.error(error)
+        return
+      }
+
+      setEditions(
+        editions.filter((edition) => edition._id !== editionToDelete._id),
+      )
+
+      setEditionToDelete(null)
+      navigate('/Editions')
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -244,6 +276,23 @@ function Editions({ isEditing }) {
           </div>
         )}
       </div>
+      {editionToDelete && (
+        <div className="deleteEdition">
+          <div className="deleteEdition__content">
+            <p>
+              Voulez-vous vraiment supprimer l’édition {editionToDelete.year} ?
+            </p>
+
+            <button type="button" onClick={confirmDeleteEdition}>
+              Oui
+            </button>
+
+            <button type="button" onClick={() => setEditionToDelete(null)}>
+              Non
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

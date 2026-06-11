@@ -2,12 +2,19 @@ import { useState, useEffect } from 'react'
 import './ModalArtist.scss'
 
 function ModalArtist({ data, onClose, onValidate }) {
-  const [formData, setFormData] = useState({
+  const buildFormData = (data) => ({
     name: data?.name || '',
     description: data?.description || '',
-    mediaType: data?.mediaType || null,
+    mediaType:
+      data?.mediaType || (data?.media?.includes('/logos/') ? 'logo' : null),
     media: data?.media || '',
   })
+  const [formData, setFormData] = useState(buildFormData(data))
+
+  useEffect(() => {
+    if (!data) return
+    setFormData(buildFormData(data))
+  }, [data])
 
   const [logoMode, setLogoMode] = useState('upload')
   const [logos, setLogos] = useState([])
@@ -28,7 +35,6 @@ function ModalArtist({ data, onClose, onValidate }) {
 
     fetchLogos()
   }, [])
-
   return (
     <div className="artist__modal">
       <div className="artist__modal--content">
@@ -80,13 +86,14 @@ function ModalArtist({ data, onClose, onValidate }) {
               }
             >
               <option value="">Choisir un type</option>
-              <option value="photo">Image</option>
+              <option value="image">Image</option>
               <option value="logo">Logo</option>
               <option value="video">Vidéo</option>
             </select>
 
             <div className="artist__modal--section">
-              {formData.mediaType === 'photo' && (
+              {(formData.mediaType === 'photo' ||
+                formData.mediaType === 'image') && (
                 <>
                   <input
                     type="file"
