@@ -3,6 +3,7 @@ import './ModalGuest.scss'
 
 function ModalGuest({ data, onClose, onValidate }) {
   const buildFormData = (data) => ({
+    ...data,
     name: data?.name || '',
     description: data?.description || '',
     mediaType:
@@ -35,6 +36,7 @@ function ModalGuest({ data, onClose, onValidate }) {
 
     fetchLogos()
   }, [])
+
   return (
     <div className="guest__modal">
       <div className="guest__modal--content">
@@ -97,12 +99,15 @@ function ModalGuest({ data, onClose, onValidate }) {
                 <>
                   <input
                     type="file"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const file = e.target.files[0]
+
                       setFormData({
                         ...formData,
-                        media: e.target.files[0],
+                        media: file,
+                        fileName: file.name.replace(/\.[^/.]+$/, ''),
                       })
-                    }
+                    }}
                   />
 
                   {formData.media && (
@@ -163,12 +168,15 @@ function ModalGuest({ data, onClose, onValidate }) {
                     <>
                       <input
                         type="file"
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const file = e.target.files[0]
+
                           setFormData({
                             ...formData,
-                            media: e.target.files[0],
+                            media: file,
+                            fileName: file.name.replace(/\.[^/.]+$/, ''),
                           })
-                        }
+                        }}
                       />
 
                       {formData.media && (

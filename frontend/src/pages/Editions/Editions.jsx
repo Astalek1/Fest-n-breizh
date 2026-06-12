@@ -279,17 +279,26 @@ function Editions({ isEditing }) {
       {editionToDelete && (
         <div className="deleteEdition">
           <div className="deleteEdition__content">
-            <p>
+            <p className="deleteEdition__content--txt">
               Voulez-vous vraiment supprimer l’édition {editionToDelete.year} ?
             </p>
+            <div className="deleteEdition__content--buttons">
+              <button
+                className="deleteEdition__content--valid"
+                type="button"
+                onClick={confirmDeleteEdition}
+              >
+                Supprimer
+              </button>
 
-            <button type="button" onClick={confirmDeleteEdition}>
-              Oui
-            </button>
-
-            <button type="button" onClick={() => setEditionToDelete(null)}>
-              Non
-            </button>
+              <button
+                className="deleteEdition__content--close"
+                type="button"
+                onClick={() => setEditionToDelete(null)}
+              >
+                Annuler
+              </button>
+            </div>
           </div>
         </div>
       )}

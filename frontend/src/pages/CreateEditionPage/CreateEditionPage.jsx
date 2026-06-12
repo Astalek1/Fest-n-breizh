@@ -6,6 +6,7 @@ import './CreateEditionPage.scss'
 function CreateEditionPage({ isEditing }) {
   const { editionId } = useParams()
   const isEditEdition = Boolean(editionId)
+  const [logos, setLogos] = useState([])
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -21,6 +22,47 @@ function CreateEditionPage({ isEditing }) {
     artists: [],
     guests: [],
   })
+
+  const getMediaPreviewUrl = (media) => {
+    if (media instanceof File) {
+      return URL.createObjectURL(media)
+    }
+
+    return media || ''
+  }
+
+  const getLogoPreviewUrl = (item) => {
+    if (item.media instanceof File) {
+      return URL.createObjectURL(item.media)
+    }
+
+    if (item.logo) {
+      return item.logo
+    }
+
+    if (typeof item.media === 'string') {
+      return logos.find((logo) => logo.fileId === item.media)?.url || ''
+    }
+
+    return ''
+  }
+
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const response = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos',
+        )
+
+        const data = await response.json()
+        setLogos(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchLogos()
+  }, [])
 
   return (
     <main className="editionPage">
@@ -59,29 +101,21 @@ function CreateEditionPage({ isEditing }) {
                     {/* IMAGE */}
                     {artist.mediaType === 'image' && (
                       <img
-                        src={artist.media}
+                        src={getMediaPreviewUrl(artist.media)}
                         alt={artist.name}
                         className="editionPage__artist--img"
                       />
                     )}
 
                     {/* LOGO (nouveau) */}
-                    {artist.mediaType === 'logo' && (
-                      <img
-                        src={artist.logo}
-                        alt={artist.name}
-                        className="editionPage__artist--logo"
-                      />
-                    )}
-
-                    {/* LOGO ancien (stocké dans media sans mediaType) */}
-                    {!artist.mediaType && artist.media && (
-                      <img
-                        src={artist.media}
-                        alt={artist.name}
-                        className="editionPage__artist--logo"
-                      />
-                    )}
+                    {artist.mediaType === 'logo' &&
+                      getLogoPreviewUrl(artist) && (
+                        <img
+                          src={getLogoPreviewUrl(artist)}
+                          alt={artist.name}
+                          className="modalEdition__media--logo"
+                        />
+                      )}
 
                     {artist.mediaType === 'video' &&
                       artist.media &&
@@ -120,27 +154,17 @@ function CreateEditionPage({ isEditing }) {
                     {/* IMAGE */}
                     {guest.mediaType === 'image' && (
                       <img
-                        src={guest.media}
+                        src={getMediaPreviewUrl(guest.media)}
                         alt={guest.name}
                         className="editionPage__guest--img"
                       />
                     )}
 
-                    {/* LOGO (nouveau) */}
-                    {guest.mediaType === 'logo' && (
+                    {guest.mediaType === 'logo' && getLogoPreviewUrl(guest) && (
                       <img
-                        src={guest.logo}
+                        src={getLogoPreviewUrl(guest)}
                         alt={guest.name}
-                        className="editionPage__guest--logo"
-                      />
-                    )}
-
-                    {/* LOGO ancien (stocké dans media sans mediaType) */}
-                    {!guest.mediaType && guest.media && (
-                      <img
-                        src={guest.media}
-                        alt={guest.name}
-                        className="editionPage__guest--logo"
+                        className="modalEdition__media--logo"
                       />
                     )}
 

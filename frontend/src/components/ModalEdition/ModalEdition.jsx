@@ -22,7 +22,11 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
   const [isArtistModalOpen, setIsArtistModalOpen] = useState(false)
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false)
 
+  const [initialArtistIds, setInitialArtistIds] = useState([])
+  const [initialGuestIds, setInitialGuestIds] = useState([])
+
   const [posters, setPosters] = useState([])
+  const [logos, setLogos] = useState([])
 
   const canValidateEdition =
     String(editionDraft.year || '').trim() !== '' &&
@@ -45,6 +49,23 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
     }
 
     fetchPosters()
+  }, [])
+
+  useEffect(() => {
+    const fetchLogos = async () => {
+      try {
+        const response = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/files/logos',
+        )
+
+        const data = await response.json()
+        setLogos(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchLogos()
   }, [])
 
   useEffect(() => {
@@ -95,6 +116,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
             ...artist,
             tempId: artist._id,
           })),
+          setInitialArtistIds((data.artists || []).map((artist) => artist._id)),
         )
 
         setGuestsDraft(
@@ -102,6 +124,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
             ...guest,
             tempId: guest._id,
           })),
+          setInitialGuestIds((data.guests || []).map((guest) => guest._id)),
         )
       } catch (error) {
         console.error(error)
@@ -141,6 +164,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
           description: artist.description,
           mediaType: artist.mediaType,
           media: artist.media instanceof File ? null : artist.media,
+          fileName: artist.fileName,
         }),
       )
 
@@ -172,6 +196,7 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
           description: guest.description,
           mediaType: guest.mediaType,
           media: guest.media instanceof File ? null : guest.media,
+          fileName: guest.fileName,
         }),
       )
 
@@ -194,6 +219,47 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
       console.log('add guest response', response.status, result)
     }
   }
+
+  const deleteRemovedArtists = async (token) => {
+    const currentIds = artistsDraft
+      .filter((artist) => artist._id)
+      .map((artist) => artist._id)
+
+    const removedIds = initialArtistIds.filter((id) => !currentIds.includes(id))
+
+    for (const id of removedIds) {
+      await fetch(
+        `https://fnb-backend.dokku.festnbreizh.bzh/api/artists/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+    }
+  }
+
+  const deleteRemovedGuests = async (token) => {
+    const currentIds = guestsDraft
+      .filter((guest) => guest._id)
+      .map((guest) => guest._id)
+
+    const removedIds = initialGuestIds.filter((id) => !currentIds.includes(id))
+
+    for (const id of removedIds) {
+      await fetch(
+        `https://fnb-backend.dokku.festnbreizh.bzh/api/guests/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+    }
+  }
+
   const handleValidateEdition = async () => {
     console.log('clic validation édition')
     console.log('canValidateEdition', canValidateEdition)
@@ -247,6 +313,8 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
       const finalEditionId = isEditEdition ? editionId : result.edition._id
 
       if (isEditEdition) {
+        await deleteRemovedArtists(token)
+        await deleteRemovedGuests(token)
         await addNewArtists(finalEditionId, newArtists, token)
         await addNewGuests(finalEditionId, newGuests, token)
       }
@@ -255,6 +323,22 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const getLogoPreviewUrl = (item) => {
+    if (item.media instanceof File) {
+      return URL.createObjectURL(item.media)
+    }
+
+    if (item.logo) {
+      return item.logo
+    }
+
+    if (typeof item.media === 'string') {
+      return logos.find((logo) => logo.fileId === item.media)?.url || ''
+    }
+
+    return ''
   }
 
   return (
@@ -395,15 +479,14 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
                       />
                     )}
 
-                    {(artist.logo ||
-                      (typeof artist.media === 'string' &&
-                        artist.media.includes('/logos/'))) && (
-                      <img
-                        src={artist.logo || artist.media}
-                        alt={artist.name}
-                        className="modalEdition__media--logo"
-                      />
-                    )}
+                    {artist.mediaType === 'logo' &&
+                      getLogoPreviewUrl(artist) && (
+                        <img
+                          src={getLogoPreviewUrl(artist)}
+                          alt={artist.name}
+                          className="modalEdition__media--logo"
+                        />
+                      )}
 
                     {artist.mediaType === 'video' &&
                       typeof artist.media === 'string' &&
@@ -520,12 +603,9 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
                         className="modalEdition__media--img"
                       />
                     )}
-
-                    {(guest.logo ||
-                      (typeof guest.media === 'string' &&
-                        guest.media.includes('/logos/'))) && (
+                    {guest.mediaType === 'logo' && getLogoPreviewUrl(guest) && (
                       <img
-                        src={guest.logo || guest.media}
+                        src={getLogoPreviewUrl(guest)}
                         alt={guest.name}
                         className="modalEdition__media--logo"
                       />
