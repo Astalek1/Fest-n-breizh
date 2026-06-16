@@ -17,7 +17,7 @@
 }
 
 .site-background {
-  min-height: 100vh;
+  min-height: 150vh;
   background-image: url('https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Affiche-FNB%2024.webp');
   background-size: cover;
   background-position: center;
@@ -28,6 +28,7 @@
   width: 100%;
   height: 100%;
   z-index: -1;
+  filter: blur(4px) sepia(1);
 }
 
 //******mode Edition******//
@@ -37,15 +38,21 @@
   display: flex;
   width: 100%;
   flex-direction: row;
+  max-height: 70px;
+  height: auto;
   &--txt {
     display: flex;
-    width: 94%;
+    width: 96%;
+    margin-top: 10px;
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    text-align: center;
+    padding: 0 10px;
   }
   &--btn {
-    width: 5%;
+    width: 6%;
+    height: 4vh;
     margin: 10px;
   }
 }
@@ -87,14 +94,15 @@
 // *************************//
 
 .page__container {
-  min-height: 74vh; // prend tout l’écran
+  min-height: auto; // prend tout l’écran
   font-size: 80px;
   margin: $side-margin;
   background-color: $secondary-color;
-
   border-radius: 10px;
-
   flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 body,
@@ -102,14 +110,12 @@ body,
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  //overflow-x: hidden;
   background-color: $margin-color;
   font-family: $font-body;
-  //backdrop-filter: blur(5px);
 }
 
 h1 {
-  font-size: 50px;
+  font-size: 3rem;
   margin-bottom: 10px;
   font-family: $font-title;
   width: 95%;
@@ -118,23 +124,26 @@ h1 {
 }
 
 h2 {
-  font-size: 42px;
+  font-size: 2.5rem;
   margin-bottom: 10px;
   font-family: $font-title;
 }
 
 h3 {
-  font-size: 32px;
+  font-size: 2rem;
   margin-bottom: 10px;
   font-family: $font-title;
 }
 
 p {
-  font-size: 18px;
-  margin-bottom: 15px;
+  font-size: 1.3rem;
+  padding: 50px;
+  white-space: pre-wrap;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
 }
 
 img {
-  font-size: 14px;
+  font-size: 1rem;
   font-family: $font-body;
 }

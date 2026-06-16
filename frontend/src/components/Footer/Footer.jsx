@@ -5,14 +5,8 @@ function Footer({ isEditing }) {
   return (
     <footer>
       <div className="Footer">
-        <img
-          className="Footer__img"
-          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp"
-          alt="Logo Fest'n Breizh"
-        />
         <div className="Footer__txt">
           <h2 className="Footer__copyright">
-            {' '}
             Fest'n Breizh - 2026 - tous droits réservés
           </h2>
           <div className={`Footer__bottom ${isEditing ? 'edit-mode' : ''}`}>

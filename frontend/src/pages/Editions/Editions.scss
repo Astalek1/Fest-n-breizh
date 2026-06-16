@@ -136,7 +136,7 @@
   }
   &--video {
     width: 50%;
-    height: 200px;
+    max-height: 200px;
     border-radius: 20px;
     margin: 30px;
     margin-top: 0;
