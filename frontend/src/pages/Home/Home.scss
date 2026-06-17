@@ -12,6 +12,7 @@
 
   &__txt {
     margin-bottom: 50px;
+    padding: 50px;
   }
 }
 
@@ -90,6 +91,13 @@
   margin-top: 40px;
   margin-bottom: 40px;
   padding: 0 100px;
+
+  &__message {
+    font-size: 2.5rem;
+    &--txt {
+      padding: 30px 10px;
+    }
+  }
 }
 
 .announcement {
@@ -127,5 +135,8 @@
     width: 45%;
     height: auto;
     margin-bottom: 25px;
+  }
+  &__txt {
+    padding: 50px 30px;
   }
 }

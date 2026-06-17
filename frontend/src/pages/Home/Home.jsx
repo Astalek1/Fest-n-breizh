@@ -238,7 +238,7 @@ function Home({ isEditing }) {
           {announcements.length === 0 ? (
             <>
               <h2 className="announcements__message">
-                Aucune annonce pour le moment.
+                Aucune annonce pour le moment...
               </h2>
 
               <p className="announcements__message--txt">
@@ -267,7 +267,7 @@ function Home({ isEditing }) {
                   </div>
                 )}
                 <h2>{item.title}</h2>
-                <p>{item.text}</p>
+                <p className="announcement__txt">{item.text}</p>
 
                 {item.mediaType === 'photo' && (
                   <img
