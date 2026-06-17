@@ -2,24 +2,33 @@
 
 .page__title {
   margin: 15px;
+
+  &--txt {
+    padding: 50px 30px;
+  }
 }
 
 .poster__container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: center;
   padding: 60px;
 }
 .poster {
-  margin: 0 10px;
-  padding: 10px;
+  width: 260px;
+  margin: 10px 0;
   padding-bottom: 0;
   display: block;
   transition: transform 230ms ease-in-out;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   &__img {
-    width: 250px;
-    height: 350px;
+    width: 80%;
+    height: auto;
     object-fit: cover;
     border: 1px solid #00000065;
     margin: 0 15px;
@@ -32,8 +41,8 @@
     font-size: 16px;
     display: flex;
     position: relative;
-    bottom: 15px;
-    left: 20px;
+    bottom: -3px;
+    left: 50px;
     margin: 0;
   }
   &__title {
@@ -41,13 +50,12 @@
     font-size: 22px;
     display: flex;
     position: relative;
-    left: 20px;
   }
 }
 
 .poster:hover {
-  background-color: rgba(0, 0, 0, 0.082);
-  border-radius: 8px;
+  //background-color: rgba(0, 0, 0, 0.082);
+  //border-radius: 8px;
   cursor: pointer;
   transform: scale(1.05);
   transition: transform 100ms ease-in-out;
