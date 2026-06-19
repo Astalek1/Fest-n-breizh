@@ -2,6 +2,10 @@
 
 .page__title {
   margin: 15px;
+
+  &--txtphoto {
+    padding: 50px 40px;
+  }
 }
 
 .photo__container {
@@ -17,18 +21,19 @@
 
   &__img {
     width: auto;
-    height: 300px;
+    max-height: 20vh;
     border: 1px solid #00000065;
-    margin: 15px;
+    margin: 5px 15px;
     padding: 0;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
     display: block;
     border-radius: 5px;
   }
+
   &__caption {
     width: 100%;
     height: auto;
-    font-size: 14px;
+    font-size: 0.5vw;
     display: flex;
     position: relative;
     bottom: 15px;
@@ -38,16 +43,15 @@
   &__title {
     width: 100%;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 0.7vw;
     display: flex;
     position: relative;
     left: 20px;
-    padding-bottom: 5px;
+    padding-bottom: 8px;
   }
 }
 
 .photo:hover {
-  background-color: rgba(0, 0, 0, 0.082);
   border-radius: 8px;
   cursor: pointer;
   transform: scale(1.05);
@@ -71,7 +75,6 @@
   &--content {
     position: relative;
     display: inline-block;
-    margin-bottom: 3%;
   }
 
   &--img {

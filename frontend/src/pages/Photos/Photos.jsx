@@ -155,11 +155,11 @@ function Photos({ isEditing }) {
     <>
       <div className="page__title">
         <h1>les Photos</h1>
-        <p>
+        <p className="page__title--txtphoto">
           Voici quelques photos des différents événements. Nous remercions tous
           les photographes qui ont travaillé avec nous.
           <br />
-          <br /> cliquez sur la photo Pour la voir en plus grand.
+          cliquez sur la photo Pour la voir en plus grand.
         </p>
       </div>
       {isEditing && (

@@ -15,7 +15,7 @@ function Videos({ isEditing }) {
       label: 'Titre',
       require: true,
     },
-    { name: 'text', type: 'text', label: 'description', required: true },
+    { name: 'text', type: 'textarea', label: 'description', required: true },
   ]
 
   useEffect(() => {
@@ -158,9 +158,10 @@ function Videos({ isEditing }) {
 
         <p className="video__intro--txt">
           Fest’n Breizh, c’est aussi une diffusion de la musique bretonne hors
-          des parquets !<br /> À travers deux formats, notre association diffuse
-          sur les principales plateformes internet un échantillon de cet univers
-          musical riche.
+          des parquets !<br />
+          <br /> À travers deux formats, notre association diffuse sur les
+          principales plateformes internet un échantillon de cet univers musical
+          riche.
           <br /> Des digressions musicales d’abord donnent la parole aux
           artistes et musiciens, et cela passe aussi par le partage de leur
           culture commune, leurs inspirations parfois surprenantes et leur
@@ -168,14 +169,15 @@ function Videos({ isEditing }) {
           <br /> Ensuite, des captures de vidéos live donnent à voir les
           performances des artistes que nous programmons, nous et nos
           partenaires, et cela chaque année. <br />
+          <br />
           Transmettre cette culture hors de la scène est pour nous une mission
           d’importance pour populariser la musique à danser auprès d’un public
           de curieux qui ne foulent pas toujours le plancher.
           <br />
-          <br />
           cette page vous propose un échantillon de nos vidéos.
-          <br /> vous pouvez retrouver l'ensemble de notre contenu sur notre
-          chaîne YouTube
+          <br /> <br />
+          vous pouvez retrouver l'ensemble de notre contenu sur notre chaîne
+          YouTube
         </p>
         <a
           href="https://www.youtube.com/@festnbreizh2300"
