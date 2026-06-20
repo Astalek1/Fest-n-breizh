@@ -174,14 +174,15 @@ function Links({ isEditing }) {
           <br />
           <br /> Notre page HelloAsso vous permet de réserver vos places en
           prévente et de soutenir l'association grâce aux dons, qui contribuent
-          au développement et à la pérennité du festival. <br />
-          <br />
-          Vous pouvez également consulter notre page Wiki-Rennes pour en
-          apprendre davantage sur l'histoire de Fest'n Breizh et son évolution
-          au fil des éditions.
+          au développement et à la pérennité du festival. Vous pouvez également
+          consulter notre page Wiki-Rennes pour en apprendre davantage sur
+          l'histoire de Fest'n Breizh et son évolution au fil des éditions.
           <br /> <br />
           Ces différents espaces vous permettent de suivre et soutenir Fest'n
           Breizh tout au long de l'année.
+          <br />
+          <br />
+          Cliquez sur les logos pour découvrir nos contenus.
         </p>
 
         {isEditing && (
