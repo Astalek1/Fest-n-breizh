@@ -189,7 +189,7 @@ function Posters({ isEditing }) {
             }}
           >
             {isEditing && (
-              <div className="button__edit">
+              <div className="button__editposter">
                 <button
                   title="modifier"
                   className="button__edit--modif"

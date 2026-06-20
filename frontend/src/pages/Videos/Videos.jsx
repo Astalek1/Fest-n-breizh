@@ -194,7 +194,6 @@ function Videos({ isEditing }) {
       <div className="videos">
         {videos.map((item) => (
           <article className="videos__content" key={item._id}>
-            <h2 className="videos__title">{item.title}</h2>
             {isEditing && (
               <div className="button__edit">
                 <button
@@ -221,6 +220,7 @@ function Videos({ isEditing }) {
                 </button>
               </div>
             )}
+            <h2 className="videos__title">{item.title}</h2>
             <p className="videos__txt">{item.description}</p>
 
             <iframe

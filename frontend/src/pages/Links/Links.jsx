@@ -163,7 +163,26 @@ function Links({ isEditing }) {
       <div className="link__intro">
         <h1 className="link__intro--title">nos plateformes et réseaux.</h1>
 
-        <p className="link__intro--txt">texte a venir.</p>
+        <p className="link__intro--txt">
+          Retrouvez toute l'actualité de Fest'n Breizh sur nos différents
+          espaces en ligne. <br />
+          <br />
+          Nos réseaux sociaux vous permettent de suivre l'actualité du festival
+          au quotidien, de découvrir des contenus exclusifs et de rester informé
+          des temps forts de l'association. Notre chaîne YouTube vous permet de
+          retrouver des vidéos, interviews et contenus liés à l'événement.
+          <br />
+          <br /> Notre page HelloAsso vous permet de réserver vos places en
+          prévente et de soutenir l'association grâce aux dons, qui contribuent
+          au développement et à la pérennité du festival. <br />
+          <br />
+          Vous pouvez également consulter notre page Wiki-Rennes pour en
+          apprendre davantage sur l'histoire de Fest'n Breizh et son évolution
+          au fil des éditions.
+          <br /> <br />
+          Ces différents espaces vous permettent de suivre et soutenir Fest'n
+          Breizh tout au long de l'année.
+        </p>
 
         {isEditing && (
           <button

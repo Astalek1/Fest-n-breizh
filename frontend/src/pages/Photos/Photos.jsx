@@ -181,7 +181,7 @@ function Photos({ isEditing }) {
             }}
           >
             {isEditing && (
-              <div className="button__edit">
+              <div className="button__editphoto">
                 <button
                   title="modifier"
                   className="button__edit--modif"

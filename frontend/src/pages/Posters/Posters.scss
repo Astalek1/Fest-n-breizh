@@ -109,13 +109,9 @@
 
 //mode Edition
 
-.button__edit--gallery {
-  &--modif {
-    width: 40px;
-    height: 40px;
-  }
-  &--suprim {
-    width: 40px;
-    height: 40px;
-  }
+.button__editposter {
+  width: 80%;
+  display: flex;
+  justify-content: end;
+  gap: 20px;
 }

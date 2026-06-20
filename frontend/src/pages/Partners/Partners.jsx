@@ -158,7 +158,22 @@ function Partners({ isEditing }) {
       <div className="partner__intro">
         <h1 className="partner__intro--title">La liste de nos partenaires.</h1>
 
-        <p className="partner__intro--txt">texte a venir.</p>
+        <p className="partner__intro--txt">
+          Nos partenaires jouent un rôle essentiel dans la réalisation de nos
+          projets. Par leur soutien, ils contribuent au développement du
+          fest-noz et nous permettent de poursuivre nos actions tout au long de
+          l'année.
+          <br />
+          <br /> Depuis nos débuts, certains nous accompagnent fidèlement et
+          participent à l'évolution de nos événements année après année. Au fil
+          du temps, de nouveaux partenaires nous ont également rejoints,
+          apportant leur confiance, leurs compétences et leur soutien à nos
+          actions. Cette diversité de collaborations constitue une véritable
+          richesse et contribue à faire grandir nos projets.
+          <br />
+          <br /> Nous les remercions chaleureusement pour leur confiance, leur
+          engagement et leur présence à nos côtés.
+        </p>
         {isEditing && (
           <button
             title="créé"
