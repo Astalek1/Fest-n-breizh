@@ -153,13 +153,15 @@ function Photos({ isEditing }) {
 
   return (
     <>
-      <div className="page__title">
-        <h1>les Photos</h1>
-        <p className="page__title--txtphoto">
-          Voici quelques photos des différents événements. Nous remercions tous
-          les photographes qui ont travaillé avec nous.
+      <div className="page__titlePhoto">
+        <h1>Les Photos</h1>
+        <p className="page__titlePhoto--txt">
+          Voici quelques photos des différents événements. Nous remercions
+          chaleureusement toutes les personnes qui ont contribué à immortaliser
+          ces moments.
           <br />
-          cliquez sur la photo Pour la voir en plus grand.
+          <br />
+          Cliquez sur la photo pour l'agrandir.
         </p>
       </div>
       {isEditing && (
@@ -181,7 +183,7 @@ function Photos({ isEditing }) {
             }}
           >
             {isEditing && (
-              <div className="button__editphoto">
+              <div className="button__editPhoto">
                 <button
                   title="modifier"
                   className="button__edit--modif"

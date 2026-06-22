@@ -8,11 +8,13 @@
 
   &--title {
     margin: 25px 0px;
+    font-size: clamp(2rem, 5vw, 3rem);
   }
 
   &--txt {
     margin: 25px;
     padding: 25px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
 }
 
@@ -35,16 +37,17 @@
 
   &__title {
     margin: 25px;
+    font-size: clamp(1.2rem, 1.5vw, 1.4rem);
   }
 
   &__txt {
     margin: 25px;
     padding: 0 25px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
   }
 
   &__logo {
-    max-height: 200px;
-    width: 200px;
+    width: 10rem;
     height: auto;
     object-fit: cover;
     border-radius: 5px;

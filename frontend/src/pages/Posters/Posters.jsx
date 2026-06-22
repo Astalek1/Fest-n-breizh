@@ -162,12 +162,13 @@ function Posters({ isEditing }) {
 
   return (
     <>
-      <div className="page__title">
-        <h1>les Affiches</h1>
-        <p className="page__title--txt">
-          voici les affiches de toutes les éditions de Fest'n Brezh depuis son
-          Commencement en 2009. Cliquez sur l'affiche pour la voir en plus
-          grand.
+      <div className="page__titlePoster">
+        <h1>Les Affiches</h1>
+        <p className="page__titlePoster--txt">
+          Voici les affiches de toutes les éditions de Fest'n Brezh depuis son
+          Commencement en 2009.
+          <br />
+          <br /> Cliquez sur l'affiche pour l'agrandire.
         </p>
       </div>
       {isEditing && (
@@ -189,7 +190,7 @@ function Posters({ isEditing }) {
             }}
           >
             {isEditing && (
-              <div className="button__editposter">
+              <div className="button__editPoster">
                 <button
                   title="modifier"
                   className="button__edit--modif"

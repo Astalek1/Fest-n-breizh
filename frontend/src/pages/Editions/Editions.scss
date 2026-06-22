@@ -3,15 +3,17 @@
 .editions {
   &__menu {
     position: fixed;
-    right: 0;
+    right: 6%;
+    margin-top: 5px;
     display: flex;
+    flex-direction: row;
     justify-content: flex-start;
     flex-wrap: wrap;
     background-color: $main-color;
     padding: 10px;
     gap: 5px;
     border-radius: 20px;
-    width: 20%;
+    width: 22rem;
     height: auto;
     transition: transform 50ms ease-in-out;
   }
@@ -19,7 +21,7 @@
     font-size: 1.3rem;
     cursor: pointer;
     border-radius: 10px;
-    width: 49%;
+    width: 10rem;
     height: 40px;
     margin: 1px;
 
@@ -36,19 +38,24 @@
   margin: 0 5%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   &--title {
+    margin-top: 30px;
     padding: 1%;
+    font-size: clamp(2rem, 4vw, 2.4rem);
   }
 
   &--txt {
     padding: 2%;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
   &--img {
-    position: relative;
-    width: 30%;
+    margin-top: 30px;
+    width: 20rem;
     height: auto;
-    left: 35%;
+    mix-blend-mode: multiply;
   }
 }
 .edition {
@@ -57,6 +64,7 @@
     justify-content: center;
     margin-bottom: 50px;
     width: 100%;
+    font-size: clamp(2rem, 4vw, 2.4rem);
   }
 
   &__intro {
@@ -68,16 +76,18 @@
     padding: 2%;
     padding-bottom: 0;
     width: 60%;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
   }
   &__txt {
     padding: 1% 3%;
     width: 60%;
+    font-size: clamp(1.2rem, 1.2vw, 1.3rem);
   }
   &__img {
     position: absolute;
-    top: 0.5rem;
-    right: 15rem;
-    width: 20%;
+    top: 1rem;
+    right: 5rem;
+    width: 15rem;
     height: auto;
     border: 1px solid rgba(0, 0, 0, 0.493);
     box-shadow: 0px 12px 40px rgba(0, 0, 0, 0.5);
@@ -125,18 +135,29 @@
     margin-bottom: 50px;
     margin-top: 25px;
   }
+  &--title {
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    margin: 5px 10px;
+  }
+
+  &--txt {
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    margin: 15px 20px;
+  }
 
   &--media {
     width: 100%;
+    margin: 15px 20px;
   }
   &--logo {
-    width: 35%;
-    max-height: 40%;
+    width: 10rem;
     height: auto;
+    border: 1px solid black;
   }
   &--video {
-    width: 50%;
-    max-height: 200px;
+    width: 18rem;
+    aspect-ratio: 16 / 9;
+    height: auto;
     border-radius: 20px;
     margin: 30px;
     margin-top: 0;
@@ -145,8 +166,9 @@
   }
 
   &--img {
-    width: 45%;
-    max-width: 300px;
+    max-width: 17rem;
+    max-height: 20rem;
+    width: auto;
     height: auto;
     margin: 30px;
   }

@@ -115,9 +115,9 @@ function Editions({ isEditing }) {
               Bienvenue sur la page de sélection des éditions de Fest'n Breizh.
               <br />
               Les pages dédiées à chaque édition, depuis le début de l'événement
-              jusqu'à aujourd'hui, sont disponibles ici. <br /> Rendez-vous dans
-              le menu de sélection pour accéder à la programmation de l'édition
-              que vous souhaitez voir.
+              jusqu'à aujourd'hui, sont disponibles ici. <br />
+              <br /> Rendez-vous dans le menu de sélection pour accéder à la
+              programmation de l'édition que vous souhaitez voir.
             </p>
             <img
               className="main__editions--img"

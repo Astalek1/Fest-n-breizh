@@ -1,10 +1,13 @@
 @use '../../styles/variables' as *;
 
-.page__title {
-  margin: 15px;
+.page__titlePoster {
+  margin: 50px;
+  margin-bottom: 0;
+  font-size: clamp(1.6rem, 2vw, 1.8rem);
 
   &--txt {
     padding: 50px 40px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
 }
 
@@ -38,7 +41,7 @@
   &__figcaption {
     width: 300px;
     height: auto;
-    font-size: 16px;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
     display: flex;
     position: relative;
     bottom: -3px;
@@ -49,6 +52,7 @@
     text-decoration: none;
     display: flex;
     position: relative;
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
   }
 }
 
@@ -108,7 +112,7 @@
 
 //mode Edition
 
-.button__editposter {
+.button__editPoster {
   width: 80%;
   display: flex;
   justify-content: end;

@@ -161,7 +161,7 @@ function Links({ isEditing }) {
   return (
     <>
       <div className="link__intro">
-        <h1 className="link__intro--title">nos plateformes et réseaux.</h1>
+        <h1 className="link__intro--title">Nos plateformes et réseaux.</h1>
 
         <p className="link__intro--txt">
           Retrouvez toute l'actualité de Fest'n Breizh sur nos différents

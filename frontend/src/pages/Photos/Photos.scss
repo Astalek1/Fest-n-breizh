@@ -1,10 +1,12 @@
 @use '../../styles/variables' as *;
 
-.page__title {
+.page__titlePhoto {
   margin: 15px;
-
-  &--txtphoto {
+  font-size: clamp(1.6rem, 2vw, 1.8rem);
+  &--txt {
     padding: 50px 40px;
+    padding-bottom: 0;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
 }
 
@@ -18,11 +20,10 @@
 .photo {
   margin: 10px;
   transition: transform 230ms ease-in-out;
-  border: 1px solid red;
 
   &__img {
     width: auto;
-    max-height: 20vh;
+    max-height: 13rem;
     border: 1px solid #00000065;
     margin: 5px 15px;
     padding: 0;
@@ -40,6 +41,7 @@
     bottom: 15px;
     left: 20px;
     margin: 0;
+    font-size: clamp(0.4rem, 0.5vw, 0.6rem);
   }
   &__title {
     width: 100%;
@@ -48,6 +50,7 @@
     position: relative;
     left: 20px;
     padding-bottom: 8px;
+    font-size: clamp(0.7rem, 1vw, 0.9rem);
   }
 }
 
@@ -79,8 +82,7 @@
 
   &--img {
     display: block;
-    max-width: 90vw;
-    max-height: 90vh;
+    max-height: 90rem;
     width: auto;
     height: 90vh;
   }
@@ -100,7 +102,7 @@
   }
 }
 
-.button__editphoto {
+.button__editPhoto {
   width: 95%;
   gap: 10px;
   display: flex;

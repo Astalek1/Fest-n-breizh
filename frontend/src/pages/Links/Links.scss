@@ -8,11 +8,13 @@
 
   &--title {
     margin: 25px 0px;
+    font-size: clamp(2rem, 5vw, 3rem);
   }
 
   &--txt {
     margin: 25px;
     padding: 25px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
 }
 
@@ -33,24 +35,25 @@
 
   &__title {
     margin: 25px;
+    font-size: clamp(2rem, 3vw, 2.2rem);
   }
 
   &__txt {
-    margin: 25px;
-    padding: 25px;
+    margin: 20px 35px;
+    font-size: clamp(1.1rem, 1.2vw, 1.3rem);
   }
 
   &__logo {
-    max-height: 300px;
-    width: 300px;
+    width: 15rem;
     height: auto;
     object-fit: cover;
     box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(0, 0, 0, 0.158);
     border-radius: 5px;
     transition: transform 300ms ease-in-out;
-    margin-left: 45px;
+    margin-left: 35px;
     background-color: $secondary-color;
+    margin-top: 10px;
   }
 
   &__logo:hover {
