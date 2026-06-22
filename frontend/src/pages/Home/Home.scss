@@ -12,7 +12,11 @@
 
   &__txt {
     margin-bottom: 50px;
-    padding: 50px;
+    padding: 60px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+  }
+  &__title {
+    font-size: clamp(2rem, 4vw, 2.4rem);
   }
 }
 
@@ -58,17 +62,14 @@
   p {
     width: 100%;
     height: auto;
-
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     text-align: center;
     color: $secondary-color;
     font-size: 35px;
@@ -93,9 +94,10 @@
   padding: 0 100px;
 
   &__message {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.4rem);
     &--txt {
       padding: 30px 10px;
+      font-size: clamp(0.95rem, 1.2vw, 1rem);
     }
   }
 }
@@ -112,14 +114,14 @@
     margin-top: 25px;
   }
   &__logo {
-    width: 18%;
+    width: 10rem;
     height: auto;
     border-radius: 10px;
     margin-bottom: 25px;
     border: 1px solid black;
   }
   &__video {
-    width: 40%;
+    width: 25rem;
     aspect-ratio: 16 / 9;
     height: auto;
     border-radius: 20px;
@@ -132,11 +134,16 @@
   }
   &__photo {
     border-radius: 10px;
-    width: 45%;
+    width: 25rem;
     height: auto;
     margin-bottom: 25px;
   }
+
+  &__title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
   &__txt {
     padding: 50px 30px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
 }

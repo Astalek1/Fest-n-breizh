@@ -210,7 +210,7 @@ function Home({ isEditing }) {
 
       <div className="home">
         <div className="home__intro">
-          <h1 className="homme__title">
+          <h1 className="home__title">
             Les petites annonces de Fest’n Breizh!!!
           </h1>
 
@@ -266,7 +266,7 @@ function Home({ isEditing }) {
                     </button>
                   </div>
                 )}
-                <h2>{item.title}</h2>
+                <h2 className="announcement__title">{item.title}</h2>
                 <p className="announcement__txt">{item.text}</p>
 
                 {item.mediaType === 'photo' && (
