@@ -13,7 +13,7 @@ header {
   background-color: $main-color;
 
   &__img {
-    width: 9%;
+    width: 10rem;
     height: auto;
     max-height: 200px;
     margin-left: 10%;
@@ -35,7 +35,7 @@ header {
   &__link {
     color: $secondary-color;
     text-decoration: none;
-    font-size: 20px;
+    font-size: clamp(0.95rem, 1.2vw, 1rem);
     margin: 10px;
     background-color: $main-color;
 
@@ -62,7 +62,7 @@ header {
   &__span {
     color: $secondary-color;
     background-color: $main-color;
-    font-size: 20px;
+    font-size: clamp(0.95rem, 1.2vw, 1rem);
     margin: 3px;
     overflow: visible;
     padding: 3px;

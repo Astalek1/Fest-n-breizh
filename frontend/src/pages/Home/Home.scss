@@ -58,8 +58,7 @@
     background: rgba(0, 0, 0, 0.15);
   }
 
-  &__txt,
-  p {
+  &__txt {
     width: 100%;
     height: auto;
     position: absolute;
@@ -72,17 +71,15 @@
     justify-content: center;
     text-align: center;
     color: $secondary-color;
-    font-size: 35px;
     font-weight: 400;
     line-height: 1.4;
     background: rgba(0, 0, 0, 0.01);
-    font-size: clamp(1rem, 1.5vw, 1.2em);
+    font-size: clamp(1.5rem, 3vw, 2rem);
   }
 
   &__span {
     display: block;
-
-    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
     font-weight: 700;
     margin-bottom: 10px;
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
