@@ -154,7 +154,7 @@ function Photos({ isEditing }) {
   return (
     <>
       <div className="page__titlePhoto">
-        <h1>Les Photos</h1>
+        <h1>Photos</h1>
         <p className="page__titlePhoto--txt">
           Voici quelques photos des différents événements. Nous remercions
           chaleureusement toutes les personnes qui ont contribué à immortaliser

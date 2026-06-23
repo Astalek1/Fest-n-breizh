@@ -163,7 +163,7 @@ function Posters({ isEditing }) {
   return (
     <>
       <div className="page__titlePoster">
-        <h1>Les Affiches</h1>
+        <h1>Affiches</h1>
         <p className="page__titlePoster--txt">
           Voici les affiches de toutes les éditions de Fest'n Brezh depuis son
           Commencement en 2009.

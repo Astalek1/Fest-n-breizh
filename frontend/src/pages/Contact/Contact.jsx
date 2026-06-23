@@ -69,10 +69,10 @@ function Contact() {
     <section className="contact">
       <h1 className="contact__title">Contact</h1>
       <p className="contact__txt">
-        pour toute demande d'information ou pour tout autre sujet ( prise de
+        Pour toute demande d'information ou pour tout autre sujet ( prise de
         contact artistes, demande de bénévolat ou de partenariat), vous pouvez
-        nous envoyer un mail,
-        <br /> soit grâce au formulaire suivant ou directement à cette adresse :
+        nous envoyer un mail:
+        <br /> Soit grâce au formulaire suivant ou directement à cette adresse :
         contact@festnbreizh.bzh
       </p>
 
