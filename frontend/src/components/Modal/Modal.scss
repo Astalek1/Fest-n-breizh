@@ -11,10 +11,10 @@
 }
 
 .modal {
-  position: absolute;
+  position: relative;
   display: flex;
   background-color: burlywood;
-  width: 35%;
+  width: 45rem;
   height: auto;
   border-radius: 10px;
   flex-direction: column;
@@ -24,30 +24,32 @@
     display: flex;
     text-align: center;
     justify-content: center;
+    font-size: clamp(2rem, 2vw, 2.5rem);
   }
 
   &__body {
     font-size: 18px;
   }
   &__button {
+    width: 100%;
     display: flex;
     flex-direction: row;
     margin: 10px;
     &--close {
       background-color: red;
-      margin: 0 10px;
+
       display: flex;
       position: relative;
-      left: 58vh;
-      width: auto;
+      left: 35rem;
+      width: 5rem;
       height: auto;
     }
     &--valid {
       display: flex;
       position: relative;
-      right: 8vh;
+      right: 4rem;
       background-color: green;
-      width: auto;
+      width: 5rem;
       height: auto;
       &:disabled {
         background: #ccc;

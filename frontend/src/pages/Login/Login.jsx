@@ -73,7 +73,7 @@ function Login({ setIsEditing }) {
   }
 
   return (
-    <>
+    <div className="formulaire__page">
       <h1 className="title">connexion</h1>
       <p className="txt">
         Cette section est réservée à l'équipe de Fest'n breizh.
@@ -115,7 +115,7 @@ function Login({ setIsEditing }) {
           </div>
         )}
       </form>
-    </>
+    </div>
   )
 }
 
