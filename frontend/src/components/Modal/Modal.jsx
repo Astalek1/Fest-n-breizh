@@ -98,7 +98,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
         {mode !== 'delete' ? (
           <div className="modal__body">
             {fields.map((field) => (
-              <div key={field.name}>
+              <div className="modal__body--input" key={field.name}>
                 <label htmlFor={field.name}>{field.label || field.name}</label>
 
                 {/* TEXT */}
@@ -273,7 +273,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
             )}
           </div>
         ) : (
-          <p>Supprimer cet élément ?</p>
+          <p className="modal__txt--sup">Supprimer cet élément ?</p>
         )}
 
         {/* FOOTER */}

@@ -464,8 +464,10 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
                   />
                 ) : (
                   <>
-                    <p>{artist.name}</p>
-                    <p>{artist.description}</p>
+                    <p className="modalEdition__info--name">{artist.name}</p>
+                    <p className="modalEdition__info--description">
+                      {artist.description}
+                    </p>
 
                     {artist.mediaType === 'image' && artist.media && (
                       <img
@@ -589,8 +591,10 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
                   />
                 ) : (
                   <>
-                    <p>{guest.name}</p>
-                    <p>{guest.description}</p>
+                    <p className="modalEdition__info--name">{guest.name}</p>
+                    <p className="modalEdition__info--description">
+                      {guest.description}
+                    </p>
 
                     {guest.mediaType === 'image' && guest.media && (
                       <img

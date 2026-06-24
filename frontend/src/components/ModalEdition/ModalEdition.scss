@@ -21,7 +21,7 @@
   position: absolute;
   display: flex;
   background-color: burlywood;
-  width: 40%;
+  width: 45rem;
   height: auto;
   border-radius: 10px;
   flex-direction: column;
@@ -30,7 +30,11 @@
   overflow-y: auto;
 
   &--title {
-    font-size: 30px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    font-size: clamp(1.8rem, 2vw, 2.2rem);
+    margin-bottom: 20px;
   }
 
   &--label {
@@ -55,6 +59,20 @@
     font-size: 23px;
   }
 }
+
+.modalEdition__info {
+  &--name {
+    font-size: clamp(1.5rem, 2vw, 1.8rem);
+    margin-bottom: 10px;
+  }
+
+  &--description {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    padding: 2px;
+    margin-bottom: 10px;
+  }
+}
+
 .modalEdition__button {
   margin-top: 20px;
   padding: 20px;
@@ -66,7 +84,7 @@
 
   &--artist,
   &--guest {
-    width: 30%;
+    width: 7rem;
     height: auto;
   }
 
@@ -90,26 +108,27 @@
 
   &--edit {
     background-color: rgb(0, 81, 255);
+    width: 6rem;
   }
 
   &--sup {
     background-color: red;
+    width: 6rem;
   }
 }
 
 .modalEdition__media {
   &--img {
-    width: 50%;
+    width: 5rem;
     height: auto;
   }
   &--video {
-    width: 60%;
+    width: 12rem;
     border: 1px solid black;
   }
 
   &--logo {
-    max-height: 40%;
-    width: 40%;
+    width: 8rem;
     height: auto;
     object-fit: cover;
     border-radius: 5px;
@@ -128,15 +147,16 @@
     background-color: grey;
     color: white;
     cursor: not-allowed;
+    width: 7rem;
   }
   &--create:not(:disabled) {
     background-color: green;
-    width: 15%;
     height: auto;
+    width: 7rem;
   }
   &--cancel {
     background-color: red;
-    width: 15%;
+    width: 7rem;
     height: auto;
   }
 }
