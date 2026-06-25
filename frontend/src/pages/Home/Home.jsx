@@ -194,21 +194,21 @@ function Home({ isEditing }) {
 
   return (
     <>
-      <div className={`slideshow ${isEditing ? 'edit-mode' : ''}`}>
-        <div
-          className="slideshow__img"
-          style={{ backgroundImage: `url(${carouselImages[index]})` }}
-        ></div>
-
-        <div className="slideshow__overlay"></div>
-
-        <div className="slideshow__txt">
-          <span className="slideshow__span">Fest’n Breizh </span>
-          vous souhaite la bienvenue !
-        </div>
-      </div>
-
       <div className="home">
+        <div className={`slideshow ${isEditing ? 'edit-mode' : ''}`}>
+          <div
+            className="slideshow__img"
+            style={{ backgroundImage: `url(${carouselImages[index]})` }}
+          ></div>
+
+          <div className="slideshow__overlay"></div>
+
+          <div className="slideshow__txt">
+            <span className="slideshow__span">Fest’n Breizh </span>
+            vous souhaite la bienvenue !
+          </div>
+        </div>
+
         <div className="home__intro">
           <h1 className="home__title">
             Les petites annonces de Fest’n Breizh!!!

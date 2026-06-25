@@ -2,8 +2,8 @@
 
 .editions {
   &__menu {
-    position: fixed;
-    right: 6%;
+    position: relative;
+    left: 101%;
     margin-top: 5px;
     display: flex;
     flex-direction: row;
@@ -12,22 +12,28 @@
     background-color: $main-color;
     padding: 10px;
     gap: 5px;
-    border-radius: 20px;
-    width: 22rem;
+    border-radius: 15px;
+    width: 18rem;
     height: auto;
     transition: transform 50ms ease-in-out;
   }
   &__button {
-    font-size: 1.3rem;
+    font-size: 1rem;
     cursor: pointer;
     border-radius: 10px;
-    width: 10rem;
-    height: 40px;
+    width: 8rem;
+    height: 30px;
     margin: 1px;
 
     &:hover {
       transform: scale(1.05);
       transition: transform 100ms ease-in-out;
+    }
+    &--create {
+      background-color: rgb(0, 197, 0);
+      border: 1px solid black;
+      width: 17rem;
+      height: auto;
     }
   }
 }
@@ -42,12 +48,12 @@
   justify-content: center;
 
   &--title {
-    margin-top: 30px;
     padding: 1%;
     font-size: clamp(2rem, 4vw, 2.4rem);
   }
 
   &--txt {
+    margin-top: 15px;
     padding: 2%;
     font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
@@ -63,7 +69,6 @@
     width: 100%;
     font-size: clamp(2.3rem, 3vw, 2.5rem);
     font-weight: bold;
-    margin-top: 15rem;
     margin-bottom: 5rem;
     text-align: center;
   }
@@ -93,9 +98,9 @@
     font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
   &__img {
-    position: absolute;
-    top: 2rem;
-    right: 7rem;
+    position: relative;
+    top: -10rem;
+    right: -75%;
     width: 12rem;
     height: auto;
     border: 1px solid rgba(0, 0, 0, 0.493);
@@ -146,7 +151,7 @@
     margin-top: 30px;
   }
   &--logo {
-    width: 8rem;
+    width: 10rem;
     height: auto;
     border: 1px solid black;
   }
@@ -164,7 +169,6 @@
     border-radius: 5px;
     width: auto;
     height: auto;
-    border: 1px solid red;
   }
 }
 

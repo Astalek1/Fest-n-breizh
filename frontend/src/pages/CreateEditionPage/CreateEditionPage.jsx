@@ -92,7 +92,7 @@ function CreateEditionPage({ isEditing }) {
             <>
               <h2 className="editionPage__section">Artistes</h2>
               {previewEdition.artists.map((artist) => (
-                <div key={artist.tempId}>
+                <div className="editionPage__artist" key={artist.tempId}>
                   <h3 className="editionPage__artist--title">{artist.name}</h3>
                   <p className="editionPage__artist--txt">
                     {artist.description}
@@ -147,7 +147,7 @@ function CreateEditionPage({ isEditing }) {
             <>
               <h2 className="editionPage__section">Invités</h2>
               {previewEdition.guests.map((guest) => (
-                <div key={guest.tempId}>
+                <div className="editionPage__guest" key={guest.tempId}>
                   <h3 className="editionPage__guest--title">{guest.name}</h3>
                   <p className="editionPage__guest--txt">{guest.description}</p>
                   <div className="editionPage__guest--media">

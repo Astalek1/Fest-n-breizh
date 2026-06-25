@@ -94,7 +94,7 @@ function Editions({ isEditing }) {
           <button
             type="button"
             title="créer"
-            className="button__create"
+            className="editions__button--create"
             onClick={() => {
               navigate('/Editions/create')
             }}
