@@ -122,10 +122,9 @@ h1 {
   width: 95%;
   display: inline-flex;
   justify-content: center;
-
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.06em;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 h2 {
@@ -134,7 +133,7 @@ h2 {
 
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.04em;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 h3 {
@@ -142,7 +141,7 @@ h3 {
   font-family: $font-title;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.04em;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 p {
