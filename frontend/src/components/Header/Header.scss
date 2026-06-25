@@ -11,6 +11,7 @@ header {
   width: 100%;
   height: auto;
   background-color: $main-color;
+  padding-bottom: 15px;
 
   &__img {
     width: 10rem;
@@ -20,7 +21,7 @@ header {
   }
 
   &__nav {
-    width: 55%;
+    width: 70%;
     height: auto;
     display: flex;
     text-align: center;
@@ -37,8 +38,9 @@ header {
     text-decoration: none;
     font-size: clamp(0.95rem, 1.2vw, 1rem);
     margin: 10px;
-    background-color: $main-color;
+    padding: 5px;
 
+    background-color: $main-color;
     overflow: visible;
     transition:
       color 0.2s ease,
@@ -63,9 +65,9 @@ header {
     color: $secondary-color;
     background-color: $main-color;
     font-size: clamp(0.95rem, 1.2vw, 1rem);
-    margin: 3px;
+    margin-top: 7px;
     overflow: visible;
-    padding: 3px;
+    padding: 5px;
     cursor: pointer;
     transition:
       color 0.2s ease,

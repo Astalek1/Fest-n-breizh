@@ -22,15 +22,15 @@
 
 .slideshow {
   position: relative;
-  width: 100vw;
-  //max-width: 200.6%;
-  height: 58rem;
-  //max-height: 80vh;
+  width: 99.64vw;
+  aspect-ratio: 16 / 6;
+  height: clamp(30rem, 40vw, 60rem);
   left: 50%;
   right: 50%;
-  margin-left: -50vw;
+  margin-left: -50.1vw;
   margin-right: -50vw;
   border: 1px solid black;
+  background-size: cover;
 
   &.edit-mode {
     display: none;
@@ -42,7 +42,6 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    object-fit: cover; // se comporte comme background-size: cover
 
     transition:
       background-image 1.5s ease-in-out,

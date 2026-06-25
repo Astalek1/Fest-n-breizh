@@ -24,15 +24,17 @@
   flex-direction: row;
   justify-content: center;
   flex-wrap: wrap;
-
-  gap: 1px;
+  gap: 10px;
+  margin-bottom: 50px;
 
   &__content {
     display: flex;
     flex-direction: column;
-    width: 49%;
+    width: 47%;
     border: 1px solid black;
     border-radius: 5px;
+    margin: 5px;
+    padding: 10px;
   }
 
   &__title {
@@ -41,7 +43,7 @@
   }
 
   &__txt {
-    margin: 25px;
+    margin: 15px;
     padding: 0 25px;
     font-size: clamp(0.9rem, 2vw, 1rem);
   }
