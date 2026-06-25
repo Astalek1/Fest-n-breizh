@@ -225,6 +225,7 @@ function Home({ isEditing }) {
             title="créé"
             className="button__create"
             onClick={() => {
+              setSelectedItem(null)
               setModalMode('create')
               setIsModalOpen(true)
             }}

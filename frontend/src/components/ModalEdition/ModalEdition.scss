@@ -38,7 +38,8 @@
   }
 
   &--label {
-    font-size: 22px;
+    margin-top: 10px;
+    font-size: clamp(1rem, 2vw, 1.3rem);
   }
   &--posterSection {
     width: 100%;
@@ -78,6 +79,7 @@
   padding: 20px;
   display: flex;
   flex-direction: row;
+
   width: 100%;
   gap: 2rem;
   margin-top: 1rem;

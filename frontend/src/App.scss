@@ -76,17 +76,17 @@
     gap: 20px;
     &--modif {
       background-color: rgb(0, 47, 255);
-      font-size: 35px;
-      width: 55px;
-      height: 55px;
+      font-size: 30px;
+      width: 3rem;
+      height: 3rem;
       border: 1px solid black;
     }
 
     &--suprim {
       background-color: rgb(255, 0, 0);
-      font-size: 45px;
-      width: 55px;
-      height: 60px;
+      font-size: 40px;
+      width: 3rem;
+      height: 3rem;
       border: 1px solid black;
     }
   }
@@ -95,7 +95,6 @@
 
 .page__container {
   min-height: auto; // prend tout l’écran
-  font-size: 80px;
   margin: $side-margin;
   background-color: $secondary-color;
   border-radius: 10px;
@@ -103,7 +102,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: $body-color;
+  width: calc(100% - 4rem);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 body,
