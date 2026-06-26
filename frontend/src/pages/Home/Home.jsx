@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import './Home.scss'
 import Modal from '../../components/Modal/Modal'
 
-function Home({ isEditing }) {
-  const carouselImages = [
-    'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-1.webp?updatedAt=1765968510369',
-    'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-2.webp?updatedAt=1765968510579',
-    'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-3.webp?updatedAt=1765968510551',
-    'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-4.webp?updatedAt=1765968510586',
-  ]
+const carouselImages = [
+  'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-1.webp?updatedAt=1765968510369',
+  'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-2.webp?updatedAt=1765968510579',
+  'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-3.webp?updatedAt=1765968510551',
+  'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-4.webp?updatedAt=1765968510586',
+]
 
-  const [index, setIndex] = useState(0)
+function Home({ isEditing }) {
+  const [activeIndex, setActiveIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState(null)
   const [selectedMediaType, setSelectedMediaType] = useState('photo')
@@ -176,11 +176,11 @@ function Home({ isEditing }) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % carouselImages.length)
+      setActiveIndex((prev) => (prev + 1) % carouselImages.length)
     }, 5000)
 
     return () => clearInterval(timer)
-  }, [carouselImages.length])
+  }, [])
 
   const [announcements, setAnnouncements] = useState([])
 
@@ -191,15 +191,26 @@ function Home({ isEditing }) {
       .catch((err) => console.error(err))
     //setAnnouncements([])
   }, [])
+  console.log('render Home')
 
   return (
     <>
       <div className="home">
         <div className={`slideshow ${isEditing ? 'edit-mode' : ''}`}>
-          <div
-            className="slideshow__img"
-            style={{ backgroundImage: `url(${carouselImages[index]})` }}
-          ></div>
+          <div className="slideshow__images">
+            {carouselImages.map((image, i) => (
+              <img
+                key={i}
+                src={image}
+                alt=""
+                className={`slideshow__img ${
+                  activeIndex === i
+                    ? 'slideshow__img--visible'
+                    : 'slideshow__img--hidden'
+                }`}
+              />
+            ))}
+          </div>
 
           <div className="slideshow__overlay"></div>
 
