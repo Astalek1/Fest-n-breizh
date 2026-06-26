@@ -104,16 +104,17 @@ function Login({ setIsEditing }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <div className="formulaire__connexion--footer">
+          <button type="submit" className="formulaire__connexion--button">
+            Connexion
+          </button>
 
-        <button type="submit" className="formulaire__connexion--button">
-          Connexion
-        </button>
-
-        {errorMessage && (
-          <div className="formulaire__connexion--txt">
-            <p>{errorMessage}</p>
-          </div>
-        )}
+          {errorMessage && (
+            <div className="formulaire__connexion--txt">
+              <p>{errorMessage}</p>
+            </div>
+          )}
+        </div>
       </form>
     </div>
   )

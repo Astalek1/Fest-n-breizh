@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 
 .error {
-  min-height: 120vh;
+  min-height: 125vh;
   background-color: $secondary-color;
   width: 100%;
   height: auto;
@@ -41,7 +41,6 @@
 
   &__img--center {
     position: relative;
-
     width: 30rem;
     height: auto;
     position: absolute;
@@ -67,13 +66,13 @@
     height: auto;
     position: absolute;
     left: -2%;
-    bottom: -40%;
+    bottom: -29rem;
   }
   &__img--right {
     width: 35rem;
     height: auto;
     position: absolute;
-    right: -0%;
-    bottom: -40%;
+    right: 0%;
+    bottom: -29rem;
   }
 }
