@@ -9,7 +9,7 @@
     font-size: clamp(2rem, 4vw, 2.4rem);
     margin-top: 40px;
   }
-  &__text {
+  &__txt {
     margin: 50px 100px;
     font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
@@ -18,5 +18,23 @@
     height: auto;
     display: block;
     margin: 30px auto;
+  }
+}
+
+//tablette
+
+@media (max-width: 1024px) {
+  .about {
+    &__title {
+      font-size: clamp(1.8rem, 3vw, 2.2rem);
+    }
+
+    &__txt {
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+
+    &__img {
+      width: 30rem;
+    }
   }
 }

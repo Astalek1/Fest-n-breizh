@@ -4,7 +4,7 @@ function About() {
   return (
     <article className="about">
       <h1 className="about__title">À propos de Fest'n Breizh.</h1>
-      <p className="about__text">
+      <p className="about__txt">
         Fondé en 2009, Fest'n Breizh est un fest-noz annuel rennais. Cet
         événement se déroule généralement aux alentours du mois de mars et se
         situe soit à la salle de l’Étage du Liberté, soit à la salle de la Cité.
