@@ -173,8 +173,10 @@
 
 /* Tablette */
 @media (max-width: 1024px) {
+  .home {
+  }
   .slideshow {
-    width: 99.7vw;
-    height: clamp(25rem, 40vw, 50rem);
+    width: 100vw;
+    height: clamp(20rem, 30vw, 40rem);
   }
 }

@@ -87,7 +87,7 @@
 /* Tablette */
 @media (max-width: 1024px) {
   .Footer {
-    width: 99.5%;
+    width: 99.99%;
     &__txt {
       margin-left: 100px;
     }
@@ -100,6 +100,7 @@
 
     &__logo {
       width: 12rem;
+      margin: 10px;
     }
 
     &__portfolio,

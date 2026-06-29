@@ -154,3 +154,16 @@ img {
   font-size: 1rem;
   font-family: $font-body;
 }
+
+//tablette
+
+@media (max-width: 1024px) {
+  .site-background {
+    width: 100%;
+  }
+
+  body,
+  #root {
+    width: 99.9%;
+  }
+}
