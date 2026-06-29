@@ -112,3 +112,46 @@
 .no-scroll {
   overflow: hidden;
 }
+
+//tablette
+
+@media (max-width: 1024px) {
+  .page__titlePhoto {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+
+    &--txt {
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+  }
+
+  .photo {
+    margin: 10px;
+    transition: transform 230ms ease-in-out;
+
+    &__img {
+      width: auto;
+      max-height: 12rem;
+      margin: 5px 15px;
+    }
+    &__title {
+      left: 20px;
+      padding-bottom: 8px;
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+    }
+    &__caption {
+      font-size: clamp(0.6rem, 1vw, 0.8rem);
+      bottom: 15px;
+      left: 20px;
+    }
+  }
+
+  .modal__photo {
+    &--img {
+      display: block;
+      max-height: 50rem;
+      max-width: 48rem;
+      width: auto;
+      height: auto;
+    }
+  }
+}
