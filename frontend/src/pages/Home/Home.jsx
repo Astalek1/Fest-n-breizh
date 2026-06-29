@@ -191,7 +191,6 @@ function Home({ isEditing }) {
       .catch((err) => console.error(err))
     //setAnnouncements([])
   }, [])
-  console.log('render Home')
 
   return (
     <>

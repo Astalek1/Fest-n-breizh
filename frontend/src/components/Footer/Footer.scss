@@ -5,9 +5,8 @@
   bottom: 0;
   display: flex;
   justify-content: space-between;
-  width: 99.9%;
+  width: 100%;
   height: auto;
-  //max-height: 150px;
   background-color: $main-color;
   padding: 10px 0;
 
@@ -30,7 +29,7 @@
     margin-bottom: 1%;
     width: 100%;
     height: auto;
-    font-size: 22px;
+    font-size: clamp(1rem, 2vw, 1.3rem);
     text-decoration: none;
   }
 
@@ -82,5 +81,30 @@
 
   &__lien--logo:hover {
     transform: translateY(-10px);
+  }
+}
+
+/* Tablette */
+@media (max-width: 1024px) {
+  .Footer {
+    width: 99.5%;
+    &__txt {
+      margin-left: 100px;
+    }
+    &__copyright {
+      font-size: clamp(1rem, 2vw, 1.5rem);
+    }
+    &__login {
+      display: none;
+    }
+
+    &__logo {
+      width: 12rem;
+    }
+
+    &__portfolio,
+    &__contact {
+      margin: 10px 20px;
+    }
   }
 }

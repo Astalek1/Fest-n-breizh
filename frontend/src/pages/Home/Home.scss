@@ -22,7 +22,7 @@
 
 .slideshow {
   position: relative;
-  width: 99.64vw;
+  width: 99.73vw;
   aspect-ratio: 16 / 6;
   height: clamp(30rem, 40vw, 60rem);
   left: 50%;
@@ -168,5 +168,13 @@
   &__txt {
     padding: 50px 30px;
     font-size: clamp(1rem, 1.2vw, 1.1rem);
+  }
+}
+
+/* Tablette */
+@media (max-width: 1024px) {
+  .slideshow {
+    width: 99.7vw;
+    height: clamp(25rem, 40vw, 50rem);
   }
 }
