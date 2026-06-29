@@ -156,12 +156,15 @@ function Photos({ isEditing }) {
       <div className="page__titlePhoto">
         <h1>Photos</h1>
         <p className="page__titlePhoto--txt">
-          Voici quelques photos des différents événements. Nous remercions
-          chaleureusement toutes les personnes qui ont contribué à immortaliser
-          ces moments.
+          Retrouvez ici une sélection de photos des différentes éditions de
+          Fest'n Breizh. Elles témoignent des concerts, des rencontres et des
+          nombreux moments de convivialité qui font la richesse de l'événement.
+          <br />
+          Nous remercions chaleureusement toutes les personnes qui ont contribué
+          à capturer et à partager ces précieux souvenirs.
           <br />
           <br />
-          Cliquez sur la photo pour l'agrandir.
+          Cliquez sur une photo pour l'afficher.
         </p>
       </div>
       {isEditing && (

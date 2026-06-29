@@ -165,10 +165,13 @@ function Posters({ isEditing }) {
       <div className="page__titlePoster">
         <h1>Affiches</h1>
         <p className="page__titlePoster--txt">
-          Voici les affiches de toutes les éditions de Fest'n Brezh depuis son
-          Commencement en 2009.
+          Depuis 2009, chaque édition de Fest'n Breizh possède sa propre
+          affiche, symbole de son identité et de son époque.
+          <br /> Parcourez cette collection qui retrace l'histoire de
+          l'événement au fil des années et découvrez l'évolution de son univers
+          graphique.
           <br />
-          <br /> Cliquez sur l'affiche pour l'agrandire.
+          <br /> Cliquez sur une affiche pour l'agrandire.
         </p>
       </div>
       {isEditing && (

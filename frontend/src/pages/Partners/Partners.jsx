@@ -156,7 +156,7 @@ function Partners({ isEditing }) {
   return (
     <>
       <div className="partner__intro">
-        <h1 className="partner__intro--title">La liste de nos partenaires.</h1>
+        <h1 className="partner__intro--title"> Nos partenaires.</h1>
 
         <p className="partner__intro--txt">
           Nos partenaires jouent un rôle essentiel dans la réalisation de nos
