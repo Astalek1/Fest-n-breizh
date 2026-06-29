@@ -174,9 +174,47 @@
 /* Tablette */
 @media (max-width: 1024px) {
   .home {
+    &__title {
+      width: 100%;
+      font-size: clamp(1.8rem, 3vw, 2.2rem);
+    }
+    &__txt {
+      margin-bottom: 0px;
+      padding: 30px 60px;
+    }
   }
   .slideshow {
     width: 100vw;
     height: clamp(20rem, 30vw, 40rem);
+  }
+
+  .announcements {
+    &__message {
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      &--txt {
+        padding: 30px 10px;
+        font-size: clamp(1rem, 1.2vw, 1.1rem);
+      }
+    }
+  }
+
+  .announcement {
+    &__title {
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+    }
+    &__txt {
+      padding: 50px 0px;
+      font-size: clamp(1rem, 1.2vw, 1.1rem);
+    }
+
+    &__logo {
+      width: 8rem;
+    }
+    &__video {
+      width: 20rem;
+    }
+    &__photo {
+      width: 20rem;
+    }
   }
 }
