@@ -24,6 +24,7 @@ import CreateEditionPage from './pages/CreateEditionPage/CreateEditionPage.jsx'
 
 function App() {
   const location = useLocation()
+
   const knownPaths = [
     '/',
     '/About',
@@ -87,6 +88,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home isEditing={isEditing} />} />
           <Route path="/About" element={<About />} />
+
           <Route
             path="/Editions/"
             element={<Editions isEditing={isEditing} />}
@@ -105,6 +107,7 @@ function App() {
             path="/Editions/:editionId"
             element={<Editions isEditing={isEditing} />}
           />
+
           <Route path="/Photos" element={<Photos isEditing={isEditing} />} />
           <Route path="/Posters" element={<Posters isEditing={isEditing} />} />
           <Route path="/Videos" element={<Videos isEditing={isEditing} />} />

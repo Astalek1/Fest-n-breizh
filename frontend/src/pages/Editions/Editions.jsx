@@ -77,35 +77,11 @@ function Editions({ isEditing }) {
 
   return (
     <div className="editions">
-      {/* MENU DYNAMIQUE */}
-
-      <div className="editions__menu">
-        {editions.map((edition) => (
-          <button
-            className="editions__button"
-            key={edition._id}
-            onClick={() => navigate(`/Editions/${edition._id}`)}
-          >
-            {`${edition.title} ${edition.year}`}
-          </button>
-        ))}
-
-        {isEditing && (
-          <button
-            type="button"
-            title="créer"
-            className="editions__button--create"
-            onClick={() => {
-              navigate('/Editions/create')
-            }}
-          >
-            Créer une édition
-          </button>
-        )}
-      </div>
-
       {/* CONTENU */}
       <div className="editions__container">
+        {/* MENU DYNAMIQUE */}
+        <button className="editions__burger">&#9776;</button>
+
         {!editionId && (
           <div className="main__editions">
             <h1 className="main__editions--title">
@@ -275,6 +251,30 @@ function Editions({ isEditing }) {
             </div>
           </div>
         )}
+        <div className="editions__menu">
+          {editions.map((edition) => (
+            <button
+              className="editions__button"
+              key={edition._id}
+              onClick={() => navigate(`/Editions/${edition._id}`)}
+            >
+              {`${edition.title} ${edition.year}`}
+            </button>
+          ))}
+
+          {isEditing && (
+            <button
+              type="button"
+              title="créer"
+              className="editions__button--create"
+              onClick={() => {
+                navigate('/Editions/create')
+              }}
+            >
+              Créer une édition
+            </button>
+          )}
+        </div>
       </div>
       {editionToDelete && (
         <div className="deleteEdition">
