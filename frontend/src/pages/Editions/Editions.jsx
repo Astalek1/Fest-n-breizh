@@ -1,6 +1,7 @@
 import './Editions.scss'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import MenuEdition from '../../components/MenuEdition/MenuEdition.jsx'
 
 function Editions({ isEditing }) {
   const { editionId } = useParams()
@@ -79,9 +80,7 @@ function Editions({ isEditing }) {
     <div className="editions">
       {/* CONTENU */}
       <div className="editions__container">
-        {/* MENU DYNAMIQUE */}
-        <button className="editions__burger">&#9776;</button>
-
+        <MenuEdition editions={editions} isEditing={isEditing} />
         {!editionId && (
           <div className="main__editions">
             <h1 className="main__editions--title">
@@ -123,6 +122,7 @@ function Editions({ isEditing }) {
                 </button>
               </div>
             )}
+
             <div className="edition__intro">
               <h1 className="edition__title">
                 {`${selectedEdition.title} ${selectedEdition.year}`}
@@ -251,31 +251,8 @@ function Editions({ isEditing }) {
             </div>
           </div>
         )}
-        <div className="editions__menu">
-          {editions.map((edition) => (
-            <button
-              className="editions__button"
-              key={edition._id}
-              onClick={() => navigate(`/Editions/${edition._id}`)}
-            >
-              {`${edition.title} ${edition.year}`}
-            </button>
-          ))}
-
-          {isEditing && (
-            <button
-              type="button"
-              title="créer"
-              className="editions__button--create"
-              onClick={() => {
-                navigate('/Editions/create')
-              }}
-            >
-              Créer une édition
-            </button>
-          )}
-        </div>
       </div>
+
       {editionToDelete && (
         <div className="deleteEdition">
           <div className="deleteEdition__content">

@@ -5,59 +5,20 @@
   justify-content: center;
   flex-direction: column;
   height: auto;
-  border: 1px solid red;
   width: clamp(40rem, 72vw, 75rem);
-  &__burger {
-    display: none;
-  }
+
   &__container {
     position: relative;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-  }
-  &__menu {
-    position: absolute;
-    left: calc(100% + 10px);
-    margin-top: 2px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    background-color: $main-color;
-    padding: 10px;
-    gap: 5px;
-    border-radius: 15px;
-    width: 100%;
-    max-width: 18rem;
-    height: auto;
-    transition: transform 50ms ease-in-out;
-  }
-  &__button {
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 10px;
-    width: 8rem;
-    height: 30px;
-    margin: 1px;
-
-    &:hover {
-      transform: scale(1.05);
-      transition: transform 100ms ease-in-out;
-    }
-    &--create {
-      background-color: rgb(0, 197, 0);
-      border: 1px solid black;
-      width: 17rem;
-      height: auto;
-    }
+    border: 1px solid red;
   }
 }
 
 .main__editions {
   width: clamp(40rem, 72vw, 75rem);
-  border: 1px solid blue;
   width: 100%;
   height: auto;
   display: flex;
@@ -243,6 +204,14 @@
       position: relative;
       width: 6rem;
       height: auto;
+    }
+  }
+}
+
+@media (max-width: 1025px) {
+  .editions {
+    &__container {
+      width: calc(100% - 2rem);
     }
   }
 }

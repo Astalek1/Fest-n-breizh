@@ -42,6 +42,7 @@ function App() {
     !location.pathname.startsWith('/Editions/')
 
   const [isEditing, setIsEditing] = useState(false)
+  const isEditionsPage = location.pathname.startsWith('/Editions')
 
   const handleLogout = () => {
     const token = sessionStorage.getItem('token')
@@ -61,11 +62,9 @@ function App() {
       })
   }
 
-  const { pathname } = useLocation()
-
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [pathname])
+  }, [location.pathname])
 
   return (
     <>
@@ -83,7 +82,11 @@ function App() {
       </div>
       <PingManager isEditing={isEditing} />
       <div
-        className={`${isError ? '' : 'page__container'} ${isEditing ? 'edit-mode' : ''}`}
+        className={`
+    ${isError ? '' : 'page__container'}
+    ${isEditionsPage ? 'page__container--edition' : ''}
+    ${isEditing ? 'edit-mode' : ''}
+  `}
       >
         <Routes>
           <Route path="/" element={<Home isEditing={isEditing} />} />

@@ -94,7 +94,7 @@
 // *************************//
 
 .page__container {
-  //min-height: auto; // prend tout l’écran
+  min-height: auto; // prend tout l’écran
   margin: $side-margin;
   background-color: $body-color;
   border-radius: 10px;
@@ -104,6 +104,10 @@
   flex-direction: column;
   width: calc(100% - 4rem);
   max-width: 1200px;
+  &--edition {
+    width: clamp(40rem, 72vw, 75rem);
+    max-width: none;
+  }
 }
 
 body,
