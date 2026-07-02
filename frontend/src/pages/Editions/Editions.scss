@@ -9,7 +9,7 @@
 
   &__container {
     position: relative;
-    width: 100%;
+    width: clamp(40rem, 70vw, 75rem);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

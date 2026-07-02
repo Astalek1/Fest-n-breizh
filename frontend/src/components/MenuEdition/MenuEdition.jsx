@@ -14,7 +14,7 @@ function MenuEdition({ editions, isEditing }) {
             key={edition._id}
             onClick={() => navigate(`/Editions/${edition._id}`)}
           >
-            {`${edition.title} ${edition.year}`}
+            <p className="MenuEdition__button--txt">{`${edition.title} ${edition.year}`}</p>
           </button>
         ))}
 
