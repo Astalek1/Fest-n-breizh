@@ -10,10 +10,9 @@
     padding: 10px;
     gap: 5px;
     border-radius: 15px;
-    width: clamp(9rem, 15vw, 18rem);
+    width: clamp(9rem, 14vw, 18rem);
     height: auto;
     transition: transform 50ms ease-in-out;
-    border: 1px solid red;
     grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
   }
   &__burger {
