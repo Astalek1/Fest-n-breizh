@@ -14,6 +14,7 @@
     height: auto;
     transition: transform 50ms ease-in-out;
     grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+    z-index: 30;
   }
   &__burger {
     display: none;
@@ -37,8 +38,48 @@
     &--create {
       background-color: rgb(0, 197, 0);
       border: 1px solid black;
-      width: 17rem;
-      height: auto;
+      width: 8rem;
+      height: 40px;
+    }
+  }
+}
+
+//tablette
+@media (max-width: 1024px) {
+  .MenuEdition {
+    &__menu {
+      display: none;
+      padding-top: 50px;
+      top: 0;
+      left: 82.5%;
+      width: 9rem;
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s ease;
+
+      &--open {
+        display: flex;
+        flex-direction: column;
+        transform: scaleY(1);
+      }
+    }
+    &__burger {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      font-size: 30px;
+      border: 1px solid black;
+      position: relative;
+      z-index: 50;
+      margin: 5px;
+      position: absolute;
+      top: 0;
+      right: -30px;
+
+      &:hover {
+        transform: scale(1.05);
+        transition: transform 100ms ease-in-out;
+      }
     }
   }
 }

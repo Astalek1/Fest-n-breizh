@@ -1,13 +1,25 @@
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import './MenuEdition.scss'
+
 function MenuEdition({ editions, isEditing }) {
   const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
     <div className="MenuEdition">
-      <button className="MenuEdition__burger">&#9776;</button>
+      <button
+        className="MenuEdition__burger"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        &#9776;
+      </button>
 
-      <div className="MenuEdition__menu">
+      <div
+        className={`MenuEdition__menu ${
+          isMenuOpen ? 'MenuEdition__menu--open' : ''
+        }`}
+      >
         {editions.map((edition) => (
           <button
             className="MenuEdition__button"
