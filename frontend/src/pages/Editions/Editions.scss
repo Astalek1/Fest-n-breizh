@@ -5,7 +5,7 @@
   justify-content: center;
   flex-direction: column;
   height: auto;
-  width: clamp(40rem, 72vw, 75rem);
+  width: clamp(40rem, 70vw, 75rem);
 
   &__container {
     position: relative;
@@ -17,7 +17,7 @@
 }
 
 .main__editions {
-  width: clamp(40rem, 72vw, 75rem);
+  width: clamp(40rem, 70vw, 75rem);
   width: 100%;
   height: auto;
   display: flex;
@@ -210,20 +210,16 @@
   }
 }
 
-@media (max-width: 1025px) {
-  .editions {
-    &__container {
-      width: calc(100% - 2rem);
-    }
-  }
-}
-
 //tablette
 
 @media (max-width: 1024px) {
   .editions {
     width: 100%;
     height: auto;
+
+    &__container {
+      width: clamp(40rem, 70vw, 75rem);
+    }
 
     &__menu {
       z-index: 1;
@@ -260,6 +256,42 @@
     &--img {
       margin-top: 10px;
       width: 15rem;
+    }
+  }
+
+  .edition {
+    &__intro {
+      width: 100%;
+      position: relative;
+    }
+
+    &__prog {
+      font-size: clamp(2rem, 3vw, 2.5rem);
+    }
+
+    &__section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      width: 100%;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+    }
+
+    &__columns {
+      margin: px;
+      display: flex;
+      flex-direction: row;
+      justify-content: end;
+      align-items: flex-start;
+    }
+
+    &__columns > .edition__content {
+      flex: 1; // 50% / 50%
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
     }
   }
 }
