@@ -16,7 +16,7 @@
     padding: 30px 40px;
   }
   &__form {
-    width: 50rem;
+    width: clamp(45rem, 50vw, 50rem);
     height: auto;
     border: 1px solid #0000002f;
     background-color: $main-color;
@@ -61,7 +61,7 @@ textarea {
   padding: 12px 15px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
   font-family: inherit;
   transition: border 0.2s ease;
 
@@ -96,4 +96,28 @@ button {
     transform: scale(1.08);
     transition: transform 100ms ease-in-out;
   }
+}
+
+//tablette
+
+@media (max-width: 1024px) {
+  .contact {
+    &__title {
+      font-size: clamp(1.8rem, 3vw, 2.2rem);
+      margin: 2%;
+    }
+    &__txt {
+      margin: 2%;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+      padding: 15px 30px;
+    }
+    &__form {
+      width: clamp(40rem, 50vw, 45rem);
+      gap: 15px;
+    }
+  }
+}
+
+button {
+  width: 11%;
 }

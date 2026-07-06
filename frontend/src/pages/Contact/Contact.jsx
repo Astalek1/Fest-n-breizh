@@ -71,7 +71,7 @@ function Contact() {
       <p className="contact__txt">
         Pour toute demande d'information ou pour tout autre sujet ( prise de
         contact artistes, demande de bénévolat ou de partenariat), vous pouvez
-        nous envoyer un mail:
+        nous envoyer un mail,
         <br /> Soit grâce au formulaire suivant ou directement à cette adresse :
         contact@festnbreizh.bzh
       </p>
