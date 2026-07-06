@@ -71,3 +71,43 @@
     }
   }
 }
+
+//tablette
+
+@media (max-width: 1024px) {
+  .video__intro {
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 0 50px;
+
+    &--title {
+      margin: 20px 0px;
+      font-size: clamp(1.8rem, 3vw, 2.3rem);
+    }
+    &--txt {
+      margin: 0px;
+      padding: 25px 30px;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+    &--logo {
+      width: 15rem;
+    }
+  }
+
+  .videos {
+    &__title {
+      margin: 25px;
+      font-size: clamp(1.6rem, 3vw, 1.2rem);
+    }
+    &__txt {
+      margin: 25px;
+      padding: 10px 20px;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+    &__windows {
+      width: 20rem;
+      margin: 10px 50px;
+    }
+  }
+}

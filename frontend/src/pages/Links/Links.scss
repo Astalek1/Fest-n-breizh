@@ -26,7 +26,7 @@
   &__content {
     display: flex;
     flex-direction: column;
-    width: 50rem;
+    width: clamp(45rem, 55vw, 50rem);
     border: 1px solid black;
     border-radius: 5px;
     padding: 10px;
@@ -60,5 +60,49 @@
   &__logo:hover {
     transform: scale(1.05);
     transition: transform 100ms ease-in-out;
+  }
+}
+
+//tablette
+
+@media (max-width: 1024px) {
+  .link__intro {
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 0 30px;
+
+    &--title {
+      margin: 25px 0px;
+      font-size: clamp(1.8rem, 3vw, 2.3rem);
+    }
+
+    &--txt {
+      margin: 0 25px;
+      padding: 25px;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+  }
+
+  .links {
+    margin-bottom: 50px;
+    &__content {
+      width: clamp(40rem, 50vw, 45rem);
+    }
+
+    &__title {
+      margin: 0 25px;
+      font-size: clamp(1.3rem, 2vw, 1.6rem);
+    }
+
+    &__txt {
+      margin: 15px 35px;
+      margin-bottom: 0;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+
+    &__logo {
+      width: 13rem;
+    }
   }
 }
