@@ -24,7 +24,10 @@ function MenuEdition({ editions, isEditing }) {
           <button
             className="MenuEdition__button"
             key={edition._id}
-            onClick={() => navigate(`/Editions/${edition._id}`)}
+            onClick={() => {
+              setIsMenuOpen(false)
+              navigate(`/Editions/${edition._id}`)
+            }}
           >
             <p className="MenuEdition__button--txt">{`${edition.title} ${edition.year}`}</p>
           </button>

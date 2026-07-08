@@ -15,6 +15,9 @@
     transition: transform 50ms ease-in-out;
     grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
     z-index: 30;
+
+    overflow-y: auto;
+    max-height: calc(100vh - 120px);
   }
   &__burger {
     display: none;
@@ -38,7 +41,7 @@
     &--create {
       background-color: rgb(0, 197, 0);
       border: 1px solid black;
-      width: 8rem;
+      width: 7rem;
       height: 40px;
     }
   }
