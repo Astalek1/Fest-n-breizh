@@ -170,3 +170,15 @@ img {
     width: 99.9%;
   }
 }
+
+//téléphone
+
+@media (max-width: 768px) {
+  .page__container {
+    width: 100%;
+  }
+
+  .site-background {
+    //display: none;
+  }
+}

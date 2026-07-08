@@ -23,6 +23,8 @@ function Header({ isEditing }) {
     setOpen(!open)
   }
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
     <header>
       <div className="Header">
@@ -31,7 +33,12 @@ function Header({ isEditing }) {
           src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp"
           alt="Logo Fest'n Breizh"
         />
-
+        <button
+          className="Header__burger"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          &#9776;
+        </button>
         <nav className="Header__nav">
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}

@@ -20,6 +20,10 @@ header {
     margin-left: 10%;
   }
 
+  &__burger {
+    display: none;
+  }
+
   &__nav {
     width: 70%;
     height: auto;
@@ -142,6 +146,29 @@ header {
 
       margin-top: 6px;
       padding: 5px 0;
+    }
+  }
+}
+
+//Téléphone
+
+@media (max-width: 768px) {
+  .Header {
+    &__burger {
+      display: flex;
+      width: 60px;
+      height: 60px;
+      font-size: 40px;
+      border: 1px solid black;
+      position: relative;
+      z-index: 50;
+      margin: 5px;
+      position: absolute;
+      top: 0;
+      right: 0px;
+    }
+    &__nav {
+      display: none;
     }
   }
 }

@@ -9,10 +9,11 @@ function Footer({ isEditing }) {
           <h2 className="Footer__copyright">
             Fest'n Breizh - 2026 - tous droits réservés
           </h2>
-          <div className={`Footer__bottom ${isEditing ? 'edit-mode' : ''}`}>
+          <div className={`Footer__infos ${isEditing ? 'edit-mode' : ''}`}>
             <Link className="Footer__contact" to="/Contact">
               Contact
             </Link>
+            <p className="Footer__contact--mail">contact@festnbreizh.bzh</p>
             <a
               className="Footer__portfolio"
               target="_blank"
