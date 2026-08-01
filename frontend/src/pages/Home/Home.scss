@@ -227,9 +227,12 @@
       display: flex;
       align-items: center;
       margin: 20px 0;
+      font-size: 2rem;
+      margin-bottom: 50px;
+      margin-top: 50px;
     }
     &__txt {
-      font-size: clamp(1.3rem, 2vw, 1.5rem);
+      font-size: 1.3rem;
       padding: 10px;
     }
   }
@@ -286,7 +289,7 @@
     }
 
     &__title {
-      font-size: clamp(1.9rem, 3vw, 2rem);
+      font-size: 2rem;
       display: flex;
       justify-content: center;
       align-items: center;
