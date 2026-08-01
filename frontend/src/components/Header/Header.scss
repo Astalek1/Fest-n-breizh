@@ -18,6 +18,7 @@ header {
     height: auto;
     max-height: 200px;
     margin-left: 10%;
+    z-index: 11;
   }
 
   &__burger {
@@ -155,6 +156,7 @@ header {
 @media (max-width: 768px) {
   .Header {
     width: 100%;
+    position: relative;
     &__burger {
       display: flex;
       width: 60px;
@@ -162,7 +164,7 @@ header {
       font-size: 40px;
       border: 1px solid black;
       position: relative;
-      z-index: 1;
+      z-index: 11;
       margin: 5px;
       position: absolute;
       top: 0;
@@ -170,25 +172,47 @@ header {
     }
     &__link {
       font-size: 1.4rem;
-      z-index: 10;
       width: 99%;
       margin: 0;
       padding: 20px;
       height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     &__nav {
-      display: none;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+
+      position: absolute;
+      top: 50px;
+      right: -15px;
+
+      width: 80%;
+      gap: 10px;
+      padding: 10px;
+
+      background-color: black;
+
+      border-radius: 5px;
+
+      transform: scaleY(0);
+      transform-origin: top;
+      opacity: 0;
+      pointer-events: none;
+
+      transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
 
       &--open {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        height: 350px;
-        margin: 0;
-        margin-top: 60px;
-        border: 1px solid white;
-        border-radius: 5px;
-        background-color: black;
+        transform: scaleY(1);
+        opacity: 1;
+        pointer-events: auto;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
       }
     }
     &__dropdown {
