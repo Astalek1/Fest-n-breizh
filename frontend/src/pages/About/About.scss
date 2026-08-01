@@ -38,3 +38,20 @@
     }
   }
 }
+
+//téléphone
+
+@media (max-width: 768px) {
+  .about {
+    &__title {
+      font-size: 1.8rem;
+    }
+    &__txt {
+      font-size: 1.3rem;
+      margin: 10%;
+    }
+    &__img {
+      width: 100%;
+    }
+  }
+}

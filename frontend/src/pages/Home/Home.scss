@@ -226,16 +226,18 @@
     &__title {
       display: flex;
       align-items: center;
+      margin: 20px 0;
     }
     &__txt {
       font-size: clamp(1.3rem, 2vw, 1.5rem);
+      padding: 10px;
     }
   }
 
   .announcements {
     width: 100%;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin: 20px 0;
+
     padding: 0;
 
     &__message {
