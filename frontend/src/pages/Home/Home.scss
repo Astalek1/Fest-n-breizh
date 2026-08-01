@@ -222,6 +222,16 @@
 //téléphone
 
 @media (max-width: 768px) {
+  .home {
+    &__title {
+      display: flex;
+      align-items: center;
+    }
+    &__txt {
+      font-size: clamp(1.3rem, 2vw, 1.5rem);
+    }
+  }
+
   .announcements {
     width: 100%;
     margin-top: 40px;
@@ -229,7 +239,7 @@
     padding: 0;
 
     &__message {
-      font-size: clamp(2rem, 4vw, 2.4rem);
+      font-size: clamp(2rem, 3vw, 2.4rem);
       &--txt {
         padding: 30px 10px;
         font-size: clamp(0.95rem, 1.2vw, 1rem);
@@ -238,15 +248,21 @@
   }
 
   .announcement {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
     &__logo {
-      width: 10rem;
+      width: 50%;
       height: auto;
       border-radius: 10px;
       margin-bottom: 25px;
       border: 1px solid black;
     }
     &__video {
-      width: 19rem;
+      width: 90%;
       aspect-ratio: 16 / 9;
       height: auto;
       border-radius: 20px;
@@ -258,18 +274,25 @@
       }
     }
     &__photo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       border-radius: 10px;
-      width: 19rem;
+      width: 90%;
       height: auto;
       margin-bottom: 25px;
     }
 
     &__title {
-      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-size: clamp(1.9rem, 3vw, 2rem);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px;
     }
     &__txt {
       padding: 50px 30px;
-      font-size: clamp(1rem, 1.2vw, 1.1rem);
+      font-size: clamp(1.3rem, 1.5vw, 1.5rem);
     }
   }
 }
