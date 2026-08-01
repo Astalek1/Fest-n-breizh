@@ -39,16 +39,18 @@ function Header({ isEditing }) {
         >
           &#9776;
         </button>
-        <nav className="Header__nav">
+        <nav className={`Header__nav ${isMenuOpen ? 'Header__nav--open' : ''}`}>
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/"
+            onClick={() => setIsMenuOpen(false)}
           >
             Accueil
           </Link>
           <Link
             className={`Header__link about ${isEditing ? 'edit-mode' : ''}`}
             to="/About"
+            onClick={() => setIsMenuOpen(false)}
           >
             A-propos
           </Link>
@@ -80,24 +82,28 @@ function Header({ isEditing }) {
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Editions"
+            onClick={() => setIsMenuOpen(false)}
           >
             Les Editions
           </Link>
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Videos"
+            onClick={() => setIsMenuOpen(false)}
           >
             Nos Vidéos
           </Link>
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Links"
+            onClick={() => setIsMenuOpen(false)}
           >
             Nos Réseaux
           </Link>
           <Link
             className={`Header__link ${isEditing ? 'edit-mode' : ''}`}
             to="/Partners"
+            onClick={() => setIsMenuOpen(false)}
           >
             Nos Partenaires
           </Link>
