@@ -9,7 +9,9 @@ function MenuEdition({ editions, isEditing }) {
   return (
     <div className="MenuEdition">
       <button
-        className="MenuEdition__burger"
+        className={`MenuEdition__burger ${
+          isMenuOpen ? 'MenuEdition__burger--open' : ''
+        }`}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         &#9776;

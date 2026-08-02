@@ -297,3 +297,13 @@
     }
   }
 }
+
+//téléphone
+
+@media (max-width: 768px) {
+  .editions {
+    &__container {
+      width: clamp(28rem, 40vw, 40rem);
+    }
+  }
+}

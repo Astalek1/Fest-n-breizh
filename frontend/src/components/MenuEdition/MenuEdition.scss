@@ -103,3 +103,35 @@
     }
   }
 }
+
+//téléphone
+@media (max-width: 768px) {
+  .MenuEdition {
+    &__menu {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.856);
+      display: flex;
+      flex-direction: column;
+      padding-top: 90px;
+    }
+    &__button {
+      width: 100%;
+      height: 100px;
+    }
+    &__burger {
+      width: 80px;
+      height: 80px;
+      font-size: 60px;
+      color: $secondary-color;
+      background-color: $main-color;
+      border: 1px solid white;
+
+      &--open {
+        background-color: $secondary-color;
+        color: $main-color;
+        border: 1px solid black;
+      }
+    }
+  }
+}
