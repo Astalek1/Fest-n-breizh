@@ -109,7 +109,7 @@
   .MenuEdition {
     &__menu {
       width: 100%;
-      height: 100%;
+      height: auto;
       background-color: rgba(0, 0, 0, 0.856);
       display: flex;
       flex-direction: column;
