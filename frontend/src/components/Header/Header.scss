@@ -171,8 +171,9 @@ header {
       right: 0px;
     }
     &__link {
+      border: 1px solid white;
       font-size: 1.4rem;
-      width: 99%;
+      width: 85%;
       margin: 0;
       padding: 20px;
       height: 100px;
@@ -192,11 +193,8 @@ header {
       width: 80%;
       gap: 10px;
       padding: 10px;
-
       background-color: black;
-
       border-radius: 5px;
-
       transform: scaleY(0);
       transform-origin: top;
       opacity: 0;

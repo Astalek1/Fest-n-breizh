@@ -2,12 +2,12 @@
 
 @font-face {
   font-family: 'TitleFont';
-  src: url('../src/assets/fonts/TITRE-Doradani\ Bl.ttf');
+  src: url('./assets/fonts/TITRE-Doradani Bl.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'BodyFont';
-  src: url('../assets/fonts/EncodeSans-SemiBold.ttf');
+  src: url('./assets/fonts/EncodeSans-SemiBold.ttf') format('truetype');
 }
 
 * {
@@ -176,9 +176,5 @@ img {
 @media (max-width: 768px) {
   .page__container {
     width: 100%;
-  }
-
-  .site-background {
-    //display: none;
   }
 }

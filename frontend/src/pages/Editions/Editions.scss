@@ -7,7 +7,7 @@
 
   &__container {
     position: relative;
-    width: clamp(40rem, 70vw, 75rem);
+    width: clamp(30rem, 70vw, 75rem);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -58,6 +58,8 @@
   &__txt {
     padding: 1% 3%;
     width: 70%;
+
+    align-items: center;
     font-size: clamp(1rem, 1.2vw, 1.1rem);
   }
   &__img {
@@ -73,8 +75,8 @@
 
   &__prog {
     width: 100%;
+
     font-size: clamp(2.3rem, 3vw, 2.5rem);
-    font-weight: bold;
     margin-bottom: 5rem;
     text-align: center;
     padding: 30px;
@@ -88,6 +90,7 @@
     margin-bottom: 30px;
     width: 100%;
     font-size: clamp(1.8rem, 3vw, 2rem);
+    font-style: italic;
   }
 
   &__columns {
@@ -355,6 +358,7 @@
 
     &__prog {
       font-size: 2.5rem;
+      width: 80%;
       margin: 0;
     }
 

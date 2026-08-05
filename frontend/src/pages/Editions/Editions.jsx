@@ -135,7 +135,7 @@ function Editions({ isEditing }) {
                   alt={`affiche ${selectedEdition.title} ${selectedEdition.year}`}
                 />
               )}
-              <p className="edition__prog">La Programmation</p>
+              <h2 className="edition__prog">La Programmation</h2>
             </div>
             <div className="edition__columns">
               {/*CONTENU ARTISTES*/}
