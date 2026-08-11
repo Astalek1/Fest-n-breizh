@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import dns from "node:dns";
+import helmet from "helmet";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
