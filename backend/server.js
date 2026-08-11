@@ -23,6 +23,7 @@ import filesRoutes from './routes/files.js';
 dotenv.config();
 
 const app = express();
+app.use(helmet());
 
 // Middlewares
 app.use(express.json()); // permet de lire les données JSON envoyées au serveur
