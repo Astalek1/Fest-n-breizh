@@ -2,6 +2,7 @@ import './Editions.scss'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import MenuEdition from '../../components/MenuEdition/MenuEdition.jsx'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 function Editions({ isEditing }) {
   const { editionId } = useParams()
@@ -177,9 +178,7 @@ function Editions({ isEditing }) {
                         artist.media &&
                         (artist.media.includes('youtube') ? (
                           <iframe
-                            src={`https://www.youtube.com/embed/${new URL(
-                              artist.media,
-                            ).searchParams.get('v')}`}
+                            src={getYouTubeEmbedUrl(artist.media)}
                             title={artist.name}
                             allowFullScreen
                             className="edition__artist--video"
@@ -232,9 +231,7 @@ function Editions({ isEditing }) {
                         guest.media &&
                         (guest.media.includes('youtube') ? (
                           <iframe
-                            src={`https://www.youtube.com/embed/${new URL(
-                              guest.media,
-                            ).searchParams.get('v')}`}
+                            src={getYouTubeEmbedUrl(guest.media)}
                             title={guest.name}
                             allowFullScreen
                             className="edition__guest--video"

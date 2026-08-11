@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import ModalEdition from '../../components/ModalEdition/ModalEdition.jsx'
 import './CreateEditionPage.scss'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 function CreateEditionPage({ isEditing }) {
   const { editionId } = useParams()
@@ -121,9 +122,7 @@ function CreateEditionPage({ isEditing }) {
                       artist.media &&
                       (artist.media.includes('youtube') ? (
                         <iframe
-                          src={`https://www.youtube.com/embed/${new URL(
-                            artist.media,
-                          ).searchParams.get('v')}`}
+                          src={getYouTubeEmbedUrl(artist.media)}
                           title={artist.name}
                           allowFullScreen
                           className="editionPage__artist--video"
@@ -172,9 +171,7 @@ function CreateEditionPage({ isEditing }) {
                       guest.media &&
                       (guest.media.includes('youtube') ? (
                         <iframe
-                          src={`https://www.youtube.com/embed/${new URL(
-                            guest.media,
-                          ).searchParams.get('v')}`}
+                          src={getYouTubeEmbedUrl(guest.media)}
                           title={guest.name}
                           allowFullScreen
                           className="editionPage__guest--video"

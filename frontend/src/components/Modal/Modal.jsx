@@ -1,5 +1,6 @@
 import './Modal.scss'
 import { useState, useEffect } from 'react'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
   const [formData, setFormData] = useState({})
@@ -194,10 +195,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                   formData.media.includes('youtu.be') ? (
                     <iframe
                       className="modal__preview"
-                      src={`https://www.youtube.com/embed/${
-                        formData.media.split('v=')[1]?.split('&')[0] ||
-                        formData.media.split('youtu.be/')[1]?.split('?')[0]
-                      }`}
+                      src={getYouTubeEmbedUrl(formData.media)}
                       allowFullScreen
                       title={formData.title || 'video'}
                       aria-label={formData.title || 'video'}

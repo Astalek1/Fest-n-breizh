@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ModalArtist.scss'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 function ModalArtist({ data, onClose, onValidate }) {
   const buildFormData = (data) => ({
@@ -138,10 +139,7 @@ function ModalArtist({ data, onClose, onValidate }) {
                   />
                   <iframe
                     className="artist__modal--preview"
-                    src={`https://www.youtube.com/embed/${
-                      formData.media.split('v=')[1]?.split('&')[0] ||
-                      formData.media.split('youtu.be/')[1]?.split('?')[0]
-                    }`}
+                    src={getYouTubeEmbedUrl(formData.media)}
                     title={formData.name || 'video'}
                     allowFullScreen
                   />

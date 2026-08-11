@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './Home.scss'
 import Modal from '../../components/Modal/Modal'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 const carouselImages = [
   'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-1.webp?updatedAt=1765968510369',
@@ -299,9 +300,7 @@ function Home({ isEditing }) {
                   (item.media || item.url) &&
                   ((item.media || item.url).includes('youtube') ? (
                     <iframe
-                      src={`https://www.youtube.com/embed/${new URL(
-                        item.media || item.url,
-                      ).searchParams.get('v')}`}
+                      src={getYouTubeEmbedUrl(item.media || item.url)}
                       title={item.title}
                       allowFullScreen
                       className="announcement__video"

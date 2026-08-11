@@ -1,6 +1,7 @@
 import './Videos.scss'
 import { useState, useEffect } from 'react'
 import Modal from '../../components/Modal/Modal'
+import { getYouTubeEmbedUrl } from '../../utils/youtube'
 
 function Videos({ isEditing }) {
   const [videos, setVideos] = useState([])
@@ -225,10 +226,7 @@ function Videos({ isEditing }) {
 
             <iframe
               className="videos__windows"
-              src={`https://www.youtube.com/embed/${
-                item.url.split('v=')[1]?.split('&')[0] ||
-                item.url.split('youtu.be/')[1]?.split('?')[0]
-              }`}
+              src={getYouTubeEmbedUrl(item.url)}
               title={item.title}
               allowFullScreen
             />
