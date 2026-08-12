@@ -284,7 +284,7 @@ function Home({ isEditing }) {
                 {item.mediaType === 'photo' && (
                   <img
                     className="announcement__photo"
-                    src={item.media}
+                    src={`${item.media}?tr=w-400,f-webp,q-80`}
                     alt={item.title}
                   />
                 )}

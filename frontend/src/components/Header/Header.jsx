@@ -30,8 +30,10 @@ function Header({ isEditing }) {
       <div className="Header">
         <img
           className="Header__img"
-          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-Blanc.webp?tr=w-160,f-webp,q-80"
           alt="Logo Fest'n Breizh"
+          width="160"
+          height="115"
         />
         <button
           className="Header__burger"

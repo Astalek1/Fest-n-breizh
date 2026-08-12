@@ -77,9 +77,10 @@
     }
   }
   &__lien--logo {
-    width: 60%;
+    width: 3rem;
     margin: 15px;
     transition: transform 0.3s ease;
+    border: 1px solid red;
   }
 
   &__lien--logo:hover {
@@ -102,7 +103,7 @@
     }
 
     &__logo {
-      width: 12rem;
+      width: 15rem;
       margin: 10px;
     }
 
