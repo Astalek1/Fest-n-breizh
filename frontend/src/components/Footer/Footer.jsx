@@ -37,6 +37,8 @@ function Footer({ isEditing }) {
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/facebook-blanc.webp"
               alt="Logo Facebook"
+              width="48"
+              height="48"
               className="Footer__lien--logo"
             ></img>
           </a>
@@ -49,6 +51,8 @@ function Footer({ isEditing }) {
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/instagrame-blanc.webp"
               alt="Logo Instagram"
+              width="48"
+              height="48"
               className="Footer__lien--logo "
             ></img>
           </a>
@@ -61,6 +65,8 @@ function Footer({ isEditing }) {
             <img
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/youtube-rond-blanc%201.webp"
               alt="Logo Youtube"
+              width="48"
+              height="48"
               className="Footer__lien--logo Footer__lien--youtube"
             ></img>
           </a>

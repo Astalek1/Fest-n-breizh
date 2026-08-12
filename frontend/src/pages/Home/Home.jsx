@@ -201,8 +201,9 @@ function Home({ isEditing }) {
             {carouselImages.map((image, i) => (
               <img
                 key={i}
-                src={image}
+                src={`${image}?tr=w-1060,h-406,c-maintain_ratio,f-webp,q-70`}
                 alt=""
+                fetchPriority={i === 0 ? 'high' : 'auto'}
                 className={`slideshow__img ${
                   activeIndex === i
                     ? 'slideshow__img--visible'
@@ -284,16 +285,19 @@ function Home({ isEditing }) {
                 {item.mediaType === 'photo' && (
                   <img
                     className="announcement__photo"
-                    src={`${item.media}?tr=w-400,f-webp,q-80`}
+                    src={`${item.media}?tr=w-400,f-webp,q-60`}
                     alt={item.title}
+                    width="400"
                   />
                 )}
 
                 {item.mediaType === 'logo' && item.media && (
                   <img
                     className="announcement__logo"
-                    src={item.logo || item.media}
+                    src={`${item.logo || item.media}${(item.logo || item.media).includes('?') ? '&' : '?'}tr=w-160,f-webp,q-80`}
                     alt={`logo ${item.name}`}
+                    width="160"
+                    height="160"
                   />
                 )}
                 {item.mediaType === 'video' &&
