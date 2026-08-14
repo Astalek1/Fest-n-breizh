@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import './Home.scss'
-import Modal from '../../components/Modal/Modal'
 import { getYouTubeEmbedUrl } from '../../utils/youtube'
+
+const Modal = lazy(() => import('../../components/Modal/Modal'))
 
 const carouselImages = [
   'https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/carousel-1.webp?updatedAt=1765968510369',
@@ -203,7 +204,7 @@ function Home({ isEditing }) {
                 key={i}
                 src={`${image}?tr=w-1060,h-406,c-maintain_ratio,f-webp,q-70`}
                 alt=""
-                fetchPriority={i === 0 ? 'high' : 'auto'}
+                fetchpriority={i === 0 ? 'high' : 'auto'}
                 className={`slideshow__img ${
                   activeIndex === i
                     ? 'slideshow__img--visible'
@@ -319,21 +320,25 @@ function Home({ isEditing }) {
           )}
         </div>
       </div>
-      <Modal
-        key={selectedMediaType + isModalOpen}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        mode={modalMode}
-        fields={fields}
-        onChangeField={(name, value) => {
-          if (name === 'mediaType') {
-            setSelectedMediaType(value)
-          }
-        }}
-        data={selectedItem}
-        entityName="une annonce"
-        onSubmit={handleSubmit}
-      />
+      <Suspense fallback={null}>
+        {isModalOpen && (
+          <Modal
+            key={selectedMediaType + isModalOpen}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            mode={modalMode}
+            fields={fields}
+            onChangeField={(name, value) => {
+              if (name === 'mediaType') {
+                setSelectedMediaType(value)
+              }
+            }}
+            data={selectedItem}
+            entityName="une annonce"
+            onSubmit={handleSubmit}
+          />
+        )}
+      </Suspense>
     </>
   )
 }
