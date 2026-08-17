@@ -32,6 +32,7 @@
     padding: 10px;
     margin: 10px;
     transition: transform 100ms ease-in-out;
+    background: $card-color;
     &:hover {
       transform: scale(1.05);
       transition: transform 150ms ease-in-out;

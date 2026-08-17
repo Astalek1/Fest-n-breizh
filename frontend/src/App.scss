@@ -96,7 +96,7 @@
 .page__container {
   min-height: auto; // prend tout l’écran
   margin: $side-margin;
-  background-color: $body-color;
+  background: $body-color;
   border-radius: 10px;
   flex: 1;
   min-height: 80vh;

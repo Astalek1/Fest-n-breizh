@@ -4,4 +4,25 @@ $margin-color: rgba(255, 255, 255, 0.048);
 $side-margin: 0 auto;
 $font-title: 'TitleFont', sans-serif;
 $font-body: 'BodyFont', sans-serif;
-$body-color: #f6eee3;
+$body-color: linear-gradient(
+  136deg,
+  rgba(246, 238, 227, 1) 18%,
+  rgb(250, 221, 183) 81%
+);
+
+$card-color: linear-gradient(
+  162deg,
+  rgba(123, 94, 125, 0.808) 2%,
+  rgba(227, 187, 130, 0.808) 56%,
+  rgba(221, 145, 143, 0.808) 99%
+    /* 
+  135deg,
+  #f8f2ea 0%,
+  #d8b998 50%,
+  #a67c52 100% 
+
+  135deg,
+  #f6eee3 0%,
+  #c98c6a 55%,
+  #8a5a44 100%*/
+);
