@@ -112,3 +112,30 @@
     }
   }
 }
+
+//téléphone
+
+@media (max-width: 768px) {
+  .error {
+    &__title {
+      font-size: 15rem;
+    }
+    &__txt {
+      font-size: 2rem;
+    }
+    &__link {
+      font-size: 4rem;
+    }
+
+    &__img--center {
+      display: none;
+    }
+
+    &__img--left {
+      display: none;
+    }
+    &__img--right {
+      display: none;
+    }
+  }
+}
