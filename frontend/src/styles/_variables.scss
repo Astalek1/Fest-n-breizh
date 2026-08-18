@@ -4,7 +4,7 @@ $margin-color: rgba(255, 255, 255, 0.048);
 $side-margin: 0 auto;
 $font-title: 'TitleFont', sans-serif;
 $font-body: 'BodyFont', sans-serif;
-$body-color: linear-gradient(
+$body-color: #f6eee3; /*linear-gradient(
   136deg,
   rgba(246, 238, 227, 1) 18%,
   rgb(250, 221, 183) 81%
@@ -24,5 +24,5 @@ $card-color: linear-gradient(
   135deg,
   #f6eee3 0%,
   #c98c6a 55%,
-  #8a5a44 100%*/
-);
+  #8a5a44 100%
+);*/
