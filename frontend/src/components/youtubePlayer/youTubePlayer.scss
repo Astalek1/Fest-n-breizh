@@ -1,0 +1,44 @@
+.youtube-player {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.youtube-player img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.youtube-player__play {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 80px;
+  height: 56px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: rgba(255, 0, 0, 0.9);
+
+  color: white;
+  font-size: 34px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.2s;
+}
+
+.youtube-player__play:hover {
+  background: rgb(255, 0, 0);
+  transform: translate(-50%, -50%) scale(1.1);
+}
