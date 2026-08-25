@@ -12,6 +12,7 @@
 
 .youtube-player__play {
   position: absolute;
+  pointer-events: none;
 
   top: 50%;
   left: 50%;
