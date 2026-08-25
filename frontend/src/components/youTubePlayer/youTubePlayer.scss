@@ -24,7 +24,7 @@
   border: none;
   border-radius: 14px;
 
-  background: rgba(255, 0, 0, 0.9);
+  background: rgba(255, 0, 0);
 
   color: white;
   font-size: 34px;
@@ -36,9 +36,4 @@
   justify-content: center;
 
   transition: 0.2s;
-}
-
-.youtube-player__play:hover {
-  background: rgb(255, 0, 0);
-  transform: translate(-50%, -50%) scale(1.1);
 }
