@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import './Home.scss'
-import { getYouTubeEmbedUrl } from '../../utils/youtube'
+import YouTubePlayer from '../../components/YouTubePlayer/YouTubePlayer'
 
 const Modal = lazy(() => import('../../components/Modal/Modal'))
 
@@ -301,20 +301,13 @@ function Home({ isEditing }) {
                     height="160"
                   />
                 )}
-                {item.mediaType === 'video' &&
-                  (item.media || item.url) &&
-                  ((item.media || item.url).includes('youtube') ? (
-                    <iframe
-                      src={getYouTubeEmbedUrl(item.media || item.url)}
-                      title={item.title}
-                      allowFullScreen
-                      className="announcement__video"
-                    />
-                  ) : (
-                    <video controls className="announcement__video">
-                      <source src={item.media || item.url} />
-                    </video>
-                  ))}
+                {item.mediaType === 'video' && (item.media || item.url) && (
+                  <YouTubePlayer
+                    url={item.media || item.url}
+                    title={item.title}
+                    className="announcement__video"
+                  />
+                )}
               </article>
             ))
           )}

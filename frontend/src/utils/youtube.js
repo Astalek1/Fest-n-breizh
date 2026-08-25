@@ -1,4 +1,4 @@
-export function getYouTubeEmbedUrl(url) {
+function getYouTubeVideoId(url) {
   if (!url) return ''
 
   if (
@@ -6,25 +6,39 @@ export function getYouTubeEmbedUrl(url) {
     !url.includes('youtu.be') &&
     !url.includes('youtube-nocookie.com')
   ) {
-    return url
+    return ''
   }
-
-  let videoId = ''
 
   // Format : https://www.youtube.com/watch?v=...
   if (url.includes('watch?v=')) {
-    videoId = url.split('watch?v=')[1].split('&')[0]
+    return url.split('watch?v=')[1].split('&')[0]
   }
 
   // Format : https://youtu.be/...
   else if (url.includes('youtu.be/')) {
-    videoId = url.split('youtu.be/')[1].split('?')[0]
+    return url.split('youtu.be/')[1].split('?')[0]
   }
 
   // Format : https://www.youtube.com/embed/... ou youtube-nocookie.com/embed/...
   else if (url.includes('/embed/')) {
-    videoId = url.split('/embed/')[1].split('?')[0]
+    return url.split('/embed/')[1].split('?')[0]
   }
 
+  return ''
+}
+
+export function getYouTubeEmbedUrl(url) {
+  const videoId = getYouTubeVideoId(url)
+
+  if (!videoId) return url
+
   return `https://www.youtube-nocookie.com/embed/${videoId}`
+}
+
+export function getYouTubeThumbnail(url) {
+  const videoId = getYouTubeVideoId(url)
+
+  if (!videoId) return ''
+
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
 }

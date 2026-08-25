@@ -26,31 +26,12 @@ const app = express();
 app.use(helmet());
 
 // Middlewares
-
-app.use(express.json()) // permet de lire les données JSON envoyées au serveur
-
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.CORS_ORIGIN,
-]
-
+app.use(express.json()); // permet de lire les données JSON envoyées au serveur
 app.use(
   cors({
-    origin(origin, callback) {
-      // Autorise les requêtes sans origine (Postman, curl...)
-      if (!origin) {
-        return callback(null, true)
-      }
-
-      // Autorise les origines de la liste
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true)
-      }
-
-      return callback(new Error('Origine non autorisée par CORS'))
-    },
-  }),
-)
+    origin: process.env.CORS_ORIGIN || "*", // autorise les requêtes du frontendP
+  })
+);
 
 // Brancher les routes
 app.use("/api/auth", userRoutes);
