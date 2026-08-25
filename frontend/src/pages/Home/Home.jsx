@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import './Home.scss'
-import YouTubePlayer from '../../components/youtubePlayer/youTubePlayer'
+import YouTubePlayer from '../../components/youTubePlayer'
 
 const Modal = lazy(() => import('../../components/Modal/Modal'))
 

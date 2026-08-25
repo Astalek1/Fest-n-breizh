@@ -1,4 +1,4 @@
-import './YouTubePlayer.scss'
+import './youTubePlayer.scss'
 import { useState } from 'react'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '../../utils/youtube'
 
