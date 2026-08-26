@@ -62,7 +62,11 @@ res.status(200).json({
 });
  
   } catch (error) {
-    res.status(500).json({ error });
+   console.error("Erreur login :", error)
+
+  res.status(500).json({
+    error: error.message
+  })
   }
 };
 
