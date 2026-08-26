@@ -1,7 +1,7 @@
 import './Videos.scss'
 import { useState, useEffect } from 'react'
 import Modal from '../../components/Modal/Modal'
-import { getYouTubeEmbedUrl } from '../../utils/youtube'
+import YouTubePlayer from '../../components/youTubePlayer/youTubePlayer.jsx'
 
 function Videos({ isEditing }) {
   const [videos, setVideos] = useState([])
@@ -224,11 +224,10 @@ function Videos({ isEditing }) {
             <h2 className="videos__title">{item.title}</h2>
             <p className="videos__txt">{item.description}</p>
 
-            <iframe
-              className="videos__windows"
-              src={getYouTubeEmbedUrl(item.url)}
+            <YouTubePlayer
+              url={item.media || item.url}
               title={item.title}
-              allowFullScreen
+              className="announcement__video"
             />
           </article>
         ))}

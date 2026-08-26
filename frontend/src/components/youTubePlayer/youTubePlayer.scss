@@ -6,7 +6,6 @@
 
 .youtube-player img {
   display: block;
-  width: 100%;
   height: auto;
   object-fit: cover;
 }
@@ -14,7 +13,6 @@
 .youtube-player__play {
   position: absolute;
   pointer-events: none;
-  transform: translate(-50%, -50%);
 
   top: 50%;
   left: 50%;
@@ -30,13 +28,16 @@
   background: rgba(255, 0, 0);
 
   color: white;
-  font-size: 34px;
+  font-size: 40px;
 
   cursor: pointer;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.25s ease;
+}
 
-  transition: 0.2s;
+.youtube-player:hover .youtube-player__play {
+  transform: translate(-50%, -50%) scale(1.2);
 }

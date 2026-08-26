@@ -2,7 +2,7 @@ import './Editions.scss'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import MenuEdition from '../../components/MenuEdition/MenuEdition.jsx'
-import { getYouTubeEmbedUrl } from '../../utils/youtube'
+import YouTubePlayer from '../../components/youTubePlayer/youTubePlayer.jsx'
 
 function Editions({ isEditing }) {
   const { editionId } = useParams()
@@ -174,20 +174,13 @@ function Editions({ isEditing }) {
                         />
                       )}
 
-                      {artist.mediaType === 'video' &&
-                        artist.media &&
-                        (artist.media.includes('youtube') ? (
-                          <iframe
-                            src={getYouTubeEmbedUrl(artist.media)}
-                            title={artist.name}
-                            allowFullScreen
-                            className="edition__artist--video"
-                          />
-                        ) : (
-                          <video controls className="edition__artist--video">
-                            <source src={artist.media} />
-                          </video>
-                        ))}
+                      {artist.mediaType === 'video' && artist.media && (
+                        <YouTubePlayer
+                          url={artist.media}
+                          title={artist.name}
+                          className="edition__artist--video"
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -227,20 +220,13 @@ function Editions({ isEditing }) {
                         />
                       )}
 
-                      {guest.mediaType === 'video' &&
-                        guest.media &&
-                        (guest.media.includes('youtube') ? (
-                          <iframe
-                            src={getYouTubeEmbedUrl(guest.media)}
-                            title={guest.name}
-                            allowFullScreen
-                            className="edition__guest--video"
-                          />
-                        ) : (
-                          <video controls className="edition__guest--video">
-                            <source src={guest.media} />
-                          </video>
-                        ))}
+                      {guest.mediaType === 'video' && guest.media && (
+                        <YouTubePlayer
+                          url={guest.media}
+                          title={guest.name}
+                          className="edition__guest--video"
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
