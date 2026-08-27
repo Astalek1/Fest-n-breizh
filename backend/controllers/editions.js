@@ -266,6 +266,11 @@ if (
         body: { guest: JSON.stringify(guest), mediaType: guest.mediaType },
         file,
       };
+      console.log({
+  guest: guest.name,
+  hasFile: !!file,
+  originalName: file?.originalname,
+});
 
       const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
 

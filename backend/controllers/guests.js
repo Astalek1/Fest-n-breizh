@@ -79,11 +79,7 @@ export const createGuest = async (req, res, silent = false) => {
       mediaName: up.fileName || baseName,
       mediaType,
     });
-console.log({
-  name: body.name,
-  media: up.url,
-  mediaFileId: up.fileId,
-});
+
     await doc.save();
 
     if (req.body.editionId) {
