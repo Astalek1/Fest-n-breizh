@@ -245,6 +245,11 @@ export const updateGuest = async (req, res, silent = false) => {
 });
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
+          console.log("DELETE EXECUTE", {
+    guest: existing.name,
+    oldImageId,
+    newImageId,
+  });
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si présent et plus utilisé
