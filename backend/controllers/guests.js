@@ -233,11 +233,13 @@ export const updateGuest = async (req, res, silent = false) => {
     try {
       if (mediaType === "video") {
         if (oldImageId) {
+    console.log("DELETE video image :", oldImageId);   
           await imagekit.deleteFile(oldImageId);
         }
         if (oldLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
+     console.log("DELETE video image :", oldImageId);
             await imagekit.deleteFile(oldLogoId);
           }
         }
@@ -247,12 +249,14 @@ export const updateGuest = async (req, res, silent = false) => {
       if (mediaType === "image") {
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
+      console.log("DELETE image :", oldImageId, "=>", newImageId);
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si présent et plus utilisé
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
+      console.log("DELETE image :", oldImageId, "=>", newImageId);
             await imagekit.deleteFile(oldLogoId);
           }
         }
@@ -262,12 +266,14 @@ export const updateGuest = async (req, res, silent = false) => {
       if (mediaType === "logo") {
         // Supprimer ancienne image si existante
         if (oldImageId && oldImageId !== newImageId) {
+    console.log("DELETE logo->image :", oldImageId, "=>", newImageId);
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si différent et non utilisé ailleurs
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
+      console.log("DELETE logo->image :", oldImageId, "=>", newImageId);
             await imagekit.deleteFile(oldLogoId);
           }
         }
