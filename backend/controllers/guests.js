@@ -158,7 +158,11 @@ export const updateGuest = async (req, res, silent = false) => {
     if (mediaType) {
   filtered.mediaType = mediaType;
 }
-    const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
+    //const sentNewMedia = !!req.file || !!body.media || mediaType === "video";
+    const sentNewMedia =
+  !!req.file ||
+  mediaType === "video" ||
+  (mediaType === "logo" && isFileId(body.media));
     const oldImageId = existing.mediaFileId || null;
     const oldLogoId = existing.logoFileId || null;
 
@@ -214,7 +218,7 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
-
+//test
     console.log({
   guest: existing.name,
   sentNewMedia,
