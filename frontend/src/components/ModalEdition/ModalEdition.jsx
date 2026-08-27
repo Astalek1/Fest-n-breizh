@@ -288,6 +288,23 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
       }
 
       formData.append('edition', JSON.stringify(editionData))
+      formData.append(
+        'guestFileIds',
+        JSON.stringify(
+          guestsToSend
+            .filter((guest) => guest.media instanceof File)
+            .map((guest) => guest._id),
+        ),
+      )
+
+      formData.append(
+        'artistFileIds',
+        JSON.stringify(
+          artistsToSend
+            .filter((artist) => artist.media instanceof File)
+            .map((artist) => artist._id),
+        ),
+      )
       appendFiles(formData, artistsToSend, guestsToSend)
 
       const response = await fetch(

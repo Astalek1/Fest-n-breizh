@@ -205,6 +205,8 @@ export const updateEdition = async (req, res) => {
   }
 
   try {
+    const guestFileIds = JSON.parse(req.body.guestFileIds || '[]')
+    const artistFileIds = JSON.parse(req.body.artistFileIds || '[]')
     const editionData = req.body.edition ? JSON.parse(req.body.edition) : req.body;
 
     const existingEdition = await Edition.findById(req.params.editionId || req.params.id);
@@ -236,10 +238,12 @@ if (
     for (const [index, artist] of (editionData.artists || []).entries()) {
       if (!artist._id) continue;
 
-      const file =
-        req.files?.artistFiles?.[index] ||
-        (req.files?.artistFiles || []).find((f) => f.originalname.includes(artist.fileName)) ||
-        null;
+     const fileIndex = artistFileIds.indexOf(artist._id)
+
+     const file =
+      fileIndex !== -1
+      ? req.files?.artistFiles?.[fileIndex]
+      : null
 
       const fakeReq = {
         params: { id: artist._id },
@@ -256,21 +260,19 @@ if (
     for (const [index, guest] of (editionData.guests || []).entries()) {
       if (!guest._id) continue;
 
-      const file =
-        req.files?.guestFiles?.[index] ||
-        (req.files?.guestFiles || []).find((f) => f.originalname.includes(guest.fileName)) ||
-        null;
+      const fileIndex = guestFileIds.indexOf(guest._id)
 
+      const file =
+        fileIndex !== -1
+         ? req.files?.guestFiles?.[fileIndex]
+          : null
+      
       const fakeReq = {
         params: { id: guest._id },
         body: { guest: JSON.stringify(guest), mediaType: guest.mediaType },
         file,
       };
-      console.log({
-  guest: guest.name,
-  hasFile: !!file,
-  originalName: file?.originalname,
-});
+ 
 
       const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
 
