@@ -145,12 +145,10 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
         formData.append('artistFiles', artist.media)
       }
     })
-    // test
+
     guests.forEach((guest) => {
       if (guest.media instanceof File) {
         formData.append('guestFiles', guest.media)
-      } else {
-        formData.append('guestFiles', new Blob([]), '')
       }
     })
   }
