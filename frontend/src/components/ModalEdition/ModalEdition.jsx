@@ -288,6 +288,15 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
       }
 
       formData.append('edition', JSON.stringify(editionData))
+      console.log(
+        guestsToSend
+          .filter((guest) => guest.media instanceof File)
+          .map((guest) => ({
+            id: guest._id,
+            name: guest.name,
+            file: guest.fileName,
+          })),
+      )
       formData.append(
         'guestFileIds',
         JSON.stringify(
@@ -304,6 +313,11 @@ function ModalEdition({ editionId, isEditEdition, onPreviewChange }) {
             .filter((artist) => artist.media instanceof File)
             .map((artist) => artist._id),
         ),
+      )
+      console.log(
+        guestsToSend
+          .filter((guest) => guest.media instanceof File)
+          .map((guest) => guest.media.name),
       )
       appendFiles(formData, artistsToSend, guestsToSend)
 
