@@ -214,6 +214,15 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
+
+    console.log({
+  guest: existing.name,
+  sentNewMedia,
+  hasFile: !!req.file,
+  bodyMedia: body.media,
+  oldImageId,
+  newImageId,
+});
     // ---SUPPRESSION ANCIENS MÉDIAS (tous cas) ---
 
     // === Cas 1 : passage à une vidéo ===
