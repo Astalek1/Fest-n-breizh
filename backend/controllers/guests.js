@@ -218,28 +218,19 @@ export const updateGuest = async (req, res, silent = false) => {
       runValidators: false,
     });
 
-//test
-    console.log({
-  guest: existing.name,
-  sentNewMedia,
-  hasFile: !!req.file,
-  bodyMedia: body.media,
-  oldImageId,
-  newImageId,
-});
     // ---SUPPRESSION ANCIENS MÉDIAS (tous cas) ---
 
     // === Cas 1 : passage à une vidéo ===
     try {
       if (mediaType === "video") {
         if (oldImageId) {
-    console.log("DELETE video image :", oldImageId);   
+     
           await imagekit.deleteFile(oldImageId);
         }
         if (oldLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
-     console.log("DELETE video image :", oldImageId);
+    
             await imagekit.deleteFile(oldLogoId);
           }
         }
@@ -247,16 +238,19 @@ export const updateGuest = async (req, res, silent = false) => {
 
       // === Cas 2 : nouvelle image (remplace une image ou un logo précédent) ===
       if (mediaType === "image") {
+        console.log("ENTREE CAS IMAGE", {
+  guest: existing.name,
+  sentNewMedia,
+  hasFile: !!req.file,
+});
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
-      console.log("DELETE image :", oldImageId, "=>", newImageId);
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si présent et plus utilisé
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
-      console.log("DELETE image :", oldImageId, "=>", newImageId);
             await imagekit.deleteFile(oldLogoId);
           }
         }
@@ -266,14 +260,14 @@ export const updateGuest = async (req, res, silent = false) => {
       if (mediaType === "logo") {
         // Supprimer ancienne image si existante
         if (oldImageId && oldImageId !== newImageId) {
-    console.log("DELETE logo->image :", oldImageId, "=>", newImageId);
+    
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si différent et non utilisé ailleurs
         if (oldLogoId && oldLogoId !== newLogoId) {
           const used = await isFileInUse(oldLogoId);
           if (!used) {
-      console.log("DELETE logo->image :", oldImageId, "=>", newImageId);
+  
             await imagekit.deleteFile(oldLogoId);
           }
         }

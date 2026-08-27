@@ -70,11 +70,7 @@ export const resolveMedia = async (media, file, folder, cleanName) => {
           fileName: `${cleanName}-${timestamp}.webp`,
           folder,
         });
-console.log("UPLOAD IMAGEKIT :", {
-  fileId: upload.fileId,
-  name: upload.name,
-  url: upload.url,
-});
+
         return {
           url: upload.url,
           urlSmall: null,

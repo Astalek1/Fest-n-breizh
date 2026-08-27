@@ -273,13 +273,7 @@ if (
         file,
       };
  
-      // test
       
-      console.log("guest :", guest.name)
-console.log("guest._id :", guest._id)
-console.log("guestFileIds :", guestFileIds)
-console.log("fileIndex :", fileIndex)
-console.log("file :", file?.originalname)
       const updated = await guestsCtrl.updateGuest(fakeReq, null, true);
 
       if (updated?._id) updatedGuests.push(updated._id);
