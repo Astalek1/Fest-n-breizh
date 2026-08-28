@@ -83,7 +83,9 @@ if (duplicate) {
       edition: newEdition,
     });
   } catch (error) {
-    res.status(500).json({ error: "Erreur serveur (createEdition)" });
+    // res.status(500).json({ error: "Erreur serveur (createEdition)" });
+    console.error("Erreur createEdition :", error);
+res.status(500).json({ error: error.message });
   }
 };
 
