@@ -238,18 +238,10 @@ export const updateGuest = async (req, res, silent = false) => {
 
       // === Cas 2 : nouvelle image (remplace une image ou un logo précédent) ===
    if (mediaType === "image" && sentNewMedia) {
-        console.log("ENTREE CAS IMAGE", {
-  guest: existing.name,
-  sentNewMedia,
-  hasFile: !!req.file,
-});
+     
         // Supprimer ancienne image si différente
         if (oldImageId && oldImageId !== newImageId) {
-          console.log("DELETE EXECUTE", {
-    guest: existing.name,
-    oldImageId,
-    newImageId,
-  });
+   
           await imagekit.deleteFile(oldImageId);
         }
         // Supprimer ancien logo si présent et plus utilisé
