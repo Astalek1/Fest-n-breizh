@@ -1,14 +1,14 @@
-import Artist from "../models/Artists.js";
-import Guest from "../models/Guests.js";
-import Link from "../models/Links.js";
-import Partner from "../models/Partners.js";
-import Announcement from "../models/Announcements.js";
-import Gallery from "../models/Gallery.js"
+import Artist from '../models/Artists.js'
+import Guest from '../models/Guests.js'
+import Link from '../models/Links.js'
+import Partner from '../models/Partners.js'
+import Announcement from '../models/Announcements.js'
+import Gallery from '../models/Gallery.js'
 
 export const isFileInUse = async (fileId) => {
-  console.log("isFileInUse check:", fileId);
+  console.log('isFileInUse check:', fileId)
 
-  if (!fileId) return false;
+  if (!fileId) return false
 
   const checks = await Promise.all([
     Artist.exists({ $or: [{ mediaFileId: fileId }, { logoFileId: fileId }] }),
@@ -16,12 +16,11 @@ export const isFileInUse = async (fileId) => {
     Link.exists({ logoFileId: fileId }),
     Partner.exists({ logoFileId: fileId }),
     Announcement.exists({
-      $and: [{ mediaFileId: fileId }, { mediaType: "logo" }],
+      $and: [{ mediaFileId: fileId }, { mediaType: 'logo' }],
     }),
-    Gallery.exists({mediaFileIdSmall: fileId}),
+    Gallery.exists({ mediaFileIdSmall: fileId }),
+  ])
+  console.log('isFileInUse results:', checks)
 
-  ]);
-  console.log("isFileInUse results:", checks);
-
-  return checks.some(Boolean);
-};
+  return checks.some(Boolean)
+}

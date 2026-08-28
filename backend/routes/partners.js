@@ -1,18 +1,30 @@
-import express from "express";
-import auth from "../middleware/auth.js";
-import multer from "../middleware/multer.js";
-import resizeImage from "../middleware/resizeImage.js";
-import * as partnersCtrl from "../controllers/partners.js";
+import express from 'express'
+import auth from '../middleware/auth.js'
+import multer from '../middleware/multer.js'
+import resizeImage from '../middleware/resizeImage.js'
+import * as partnersCtrl from '../controllers/partners.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/", partnersCtrl.getAllPartners);
-router.get("/:id", partnersCtrl.getOnePartner);
+router.get('/', partnersCtrl.getAllPartners)
+router.get('/:id', partnersCtrl.getOnePartner)
 
-router.post("/", auth, multer.single("file"), resizeImage, partnersCtrl.newPartner);
+router.post(
+  '/',
+  auth,
+  multer.single('file'),
+  resizeImage,
+  partnersCtrl.newPartner,
+)
 
-router.put("/:id", auth, multer.single("file"), resizeImage, partnersCtrl.updatePartner);
+router.put(
+  '/:id',
+  auth,
+  multer.single('file'),
+  resizeImage,
+  partnersCtrl.updatePartner,
+)
 
-router.delete("/:id", auth, partnersCtrl.deletePartner);
+router.delete('/:id', auth, partnersCtrl.deletePartner)
 
-export default router;
+export default router

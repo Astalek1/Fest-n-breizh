@@ -1,63 +1,63 @@
-import express from "express";
-import auth from "../middleware/auth.js";
-import upload from "../middleware/multer.js";
-import resizeImage from "../middleware/resizeImage.js";
-import * as editionsCtrl from "../controllers/editions.js";
-import * as artistsCtrl from "../controllers/artists.js";
-import * as guestsCtrl from "../controllers/guests.js";
+import express from 'express'
+import auth from '../middleware/auth.js'
+import upload from '../middleware/multer.js'
+import resizeImage from '../middleware/resizeImage.js'
+import * as editionsCtrl from '../controllers/editions.js'
+import * as artistsCtrl from '../controllers/artists.js'
+import * as guestsCtrl from '../controllers/guests.js'
 
-const router = express.Router();
+const router = express.Router()
 
 // === GESTION DES ÉDITIONS ===
-router.get("/", editionsCtrl.getAllEditions);
-router.get("/:id", editionsCtrl.getOneEdition);
+router.get('/', editionsCtrl.getAllEditions)
+router.get('/:id', editionsCtrl.getOneEdition)
 
 router.post(
-  "/",
+  '/',
   auth,
   upload.fields([
-    { name: "media", maxCount: 1 },
-    { name: "artistFiles", maxCount: 10 },
-    { name: "guestFiles", maxCount: 10 },
+    { name: 'media', maxCount: 1 },
+    { name: 'artistFiles', maxCount: 10 },
+    { name: 'guestFiles', maxCount: 10 },
   ]),
   resizeImage,
-  editionsCtrl.createEdition
-);
+  editionsCtrl.createEdition,
+)
 
 router.put(
-  "/:id",
+  '/:id',
   auth,
   upload.fields([
-    { name: "media", maxCount: 1 },
-    { name: "artistFiles", maxCount: 10 },
-    { name: "guestFiles", maxCount: 10 },
+    { name: 'media', maxCount: 1 },
+    { name: 'artistFiles', maxCount: 10 },
+    { name: 'guestFiles', maxCount: 10 },
   ]),
   resizeImage,
-  editionsCtrl.updateEdition
-);
+  editionsCtrl.updateEdition,
+)
 
-router.delete("/:id", auth, editionsCtrl.deleteEdition);
+router.delete('/:id', auth, editionsCtrl.deleteEdition)
 
 // === GESTION DES INVITÉS D'UNE ÉDITION ===
 router.post(
-  "/:editionId/guests",
+  '/:editionId/guests',
   auth,
-  upload.fields([{ name: "media", maxCount: 10 }]),
+  upload.fields([{ name: 'media', maxCount: 10 }]),
   resizeImage,
-  editionsCtrl.addGuestToEdition
-);
+  editionsCtrl.addGuestToEdition,
+)
 
-router.delete("/:editionId/guests/:guestId", auth, guestsCtrl.deleteGuest);
+router.delete('/:editionId/guests/:guestId', auth, guestsCtrl.deleteGuest)
 
 // === GESTION DES ARTISTES D'UNE ÉDITION ===
 router.post(
-  "/:editionId/artists",
+  '/:editionId/artists',
   auth,
-  upload.fields([{ name: "media", maxCount: 10 }]),
+  upload.fields([{ name: 'media', maxCount: 10 }]),
   resizeImage,
-  editionsCtrl.addArtistToEdition
-);
+  editionsCtrl.addArtistToEdition,
+)
 
-router.delete("/:editionId/artists/:artistId", auth, artistsCtrl.deleteArtist);
+router.delete('/:editionId/artists/:artistId', auth, artistsCtrl.deleteArtist)
 
-export default router;
+export default router

@@ -1,13 +1,13 @@
-import express from "express";
-import * as userCtrl from "../controllers/user.js";
-import auth from "../middleware/auth.js";
+import express from 'express'
+import * as userCtrl from '../controllers/user.js'
+import auth from '../middleware/auth.js'
 import { ping } from '../controllers/user.js'
 
-const router = express.Router();
+const router = express.Router()
 
-router.post("/signup", userCtrl.signup);
-router.post("/login", userCtrl.login);
-router.post("/logout", userCtrl.logout);
+router.post('/signup', userCtrl.signup)
+router.post('/login', userCtrl.login)
+router.post('/logout', userCtrl.logout)
 router.post('/ping', auth, ping)
 
-export default router;
+export default router

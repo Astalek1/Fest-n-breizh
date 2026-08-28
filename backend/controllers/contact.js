@@ -1,23 +1,22 @@
-import transporter from "../config/mailer.js";
+import transporter from '../config/mailer.js'
 
 export const sendContact = async (req, res) => {
-  const { name, email,subject, message } = req.body;
+  const { name, email, subject, message } = req.body
 
   if (!name || !email || !subject || !message) {
-    return res.status(400).json({ error: "Tous les champs sont requis." });
+    return res.status(400).json({ error: 'Tous les champs sont requis.' })
   }
-
 
   const allowedSubjects = [
     "Demande d'information",
-    "Contact artistes",
-    "Bénévolat",
-    "Partenariat"
-  ];
+    'Contact artistes',
+    'Bénévolat',
+    'Partenariat',
+  ]
 
   if (!allowedSubjects.includes(subject)) {
-  return res.status(400).json({ error: "Sujet invalide." });
-}
+    return res.status(400).json({ error: 'Sujet invalide.' })
+  }
 
   try {
     await transporter.sendMail({
@@ -32,16 +31,15 @@ Email : ${email}
 Message :
 ${message}
       `,
-    });
+    })
 
     return res.status(200).json({
-      message: "Message envoyé avec succès",
-    });
-
+      message: 'Message envoyé avec succès',
+    })
   } catch (error) {
-    console.error("Erreur SMTP :", error);
+    console.error('Erreur SMTP :', error)
     return res.status(500).json({
       error: "Erreur lors de l'envoi du message",
-    });
+    })
   }
-};
+}
