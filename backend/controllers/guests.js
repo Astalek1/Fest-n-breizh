@@ -237,7 +237,7 @@ export const updateGuest = async (req, res, silent = false) => {
       }
 
       // === Cas 2 : nouvelle image (remplace une image ou un logo précédent) ===
-      if (mediaType === "image") {
+   if (mediaType === "image" && sentNewMedia) {
         console.log("ENTREE CAS IMAGE", {
   guest: existing.name,
   sentNewMedia,
