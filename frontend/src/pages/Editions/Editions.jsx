@@ -99,6 +99,8 @@ function Editions({ isEditing }) {
               className="main__editions--img"
               src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/affiche-min.webp"
               alt="dansseurs noir et blanc"
+              whidth="3508"
+              height="4961"
             />
           </div>
         )}
