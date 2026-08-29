@@ -60,6 +60,8 @@ function About() {
         className="about__img"
         src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/equipefnb.webp"
         alt="photo des organisateurs "
+        width="2048"
+        height="1536"
       ></img>
     </article>
   )
