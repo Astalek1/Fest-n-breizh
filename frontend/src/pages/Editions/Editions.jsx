@@ -97,7 +97,7 @@ function Editions({ isEditing }) {
             </p>
             <img
               className="main__editions--img"
-              src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/affiche-min.webhttps://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/affiche-min%20(1).webp"
+              src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/affiche-min%20(1).webp"
               alt="dansseurs noir et blanc"
               whidth="320"
               height="453"
