@@ -217,13 +217,12 @@ function Partners({ isEditing }) {
             )}
             <h2 className="partners__title">{item.name}</h2>
             <p className="partners__txt">{item.description}</p>
-            <a href={item.url} target="_blank" rel="noopener noreferrer">
-              <img
-                className="partners__logo"
-                src={item.logo}
-                alt={`logo ${item.name}`}
-              />
-            </a>
+
+            <img
+              className="partners__logo"
+              src={item.logo}
+              alt={`logo ${item.name}`}
+            />
           </article>
         ))}
       </div>
