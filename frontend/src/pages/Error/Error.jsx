@@ -11,9 +11,9 @@ function Error() {
             src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/musiciennes1.webp"
             alt="musiciennes"
           />
-          <h2 className="error__title">404</h2>
+          <h1 className="error__title">404</h1>
         </div>
-        <p className="error__txt">site inaccessible</p>
+        <h2 className="error__txt">site inaccessible</h2>
         <Link className="error__link" to="/">
           Retour au site
         </Link>
@@ -21,13 +21,13 @@ function Error() {
       <img
         className="error__img--left"
         src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/groupe%20gauche.webp?updatedAt=1771707885390"
-        alt="dansseurs"
+        alt="dansseurs-gauche"
       />
 
       <img
         className="error__img--right"
         src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/groupe%20droit.webp?updatedAt=1771707885289"
-        alt="dansseurs"
+        alt="dansseurs-droite"
       />
     </div>
   )
