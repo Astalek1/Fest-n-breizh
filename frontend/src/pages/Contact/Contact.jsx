@@ -93,7 +93,11 @@ function Contact() {
           required
         />
 
-        <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+        <select
+          aria-label="Choisir une option"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
           <option>Demande d'information</option>
           <option>Contact artistes</option>
           <option>Bénévolat</option>
