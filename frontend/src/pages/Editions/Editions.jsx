@@ -20,7 +20,7 @@ function Editions({ isEditing }) {
 
         setTimeout(() => {
           setEditions(sorted)
-        }, 100)
+        }, 500)
       })
       .catch((err) => console.error(err))
   }, [])
