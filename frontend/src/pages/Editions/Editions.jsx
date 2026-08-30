@@ -34,7 +34,10 @@ function Editions({ isEditing }) {
       `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${selectedEdition.poster}`,
     )
       .then((res) => res.json())
-      .then((data) => setPoster(data))
+      //.then((data) => setPoster(data))
+      .then((data) => {
+        setTimeout(() => setPoster(data), 3000)
+      })
       .catch((err) => console.error(err))
   }, [selectedEdition?.poster])
 
