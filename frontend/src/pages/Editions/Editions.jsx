@@ -14,9 +14,17 @@ function Editions({ isEditing }) {
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
       .then((res) => res.json())
-      .then((data) => {
+      /*.then((data) => {
         const sorted = [...data].sort((a, b) => a.year - b.year)
         setEditions(sorted)
+      })*/
+
+      .then((data) => {
+        const sorted = [...data].sort((a, b) => a.year - b.year)
+
+        setTimeout(() => {
+          setEditions(sorted)
+        }, 3000)
       })
       .catch((err) => console.error(err))
   }, [])
@@ -34,7 +42,6 @@ function Editions({ isEditing }) {
       `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${selectedEdition.poster}`,
     )
       .then((res) => res.json())
-      //.then((data) => setPoster(data))
       .then((data) => {
         setTimeout(() => setPoster(data), 3000)
       })
