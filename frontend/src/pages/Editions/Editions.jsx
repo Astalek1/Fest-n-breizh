@@ -166,7 +166,7 @@ function Editions({ isEditing }) {
                           src={artist.logo}
                           alt={artist.name}
                           className="edition__artist--logo"
-                          whidth="158"
+                          width="158"
                           height="158"
                         />
                       )}
@@ -177,7 +177,7 @@ function Editions({ isEditing }) {
                           src={artist.media}
                           alt={artist.name}
                           className="edition__artist--logo"
-                          whidth="158"
+                          width="158"
                           height="158"
                         />
                       )}
@@ -216,7 +216,7 @@ function Editions({ isEditing }) {
                           src={guest.logo}
                           alt={guest.name}
                           className="edition__guest--logo"
-                          whidth="158"
+                          width="158"
                           height="158"
                         />
                       )}
@@ -227,7 +227,7 @@ function Editions({ isEditing }) {
                           src={guest.media}
                           alt={guest.name}
                           className="edition__guest--logo"
-                          whidth="158"
+                          width="158"
                           height="158"
                         />
                       )}
