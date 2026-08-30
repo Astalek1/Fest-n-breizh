@@ -107,6 +107,7 @@ function Contact() {
         </select>
 
         <textarea
+          aria-label="zone de texte"
           placeholder="Votre message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
