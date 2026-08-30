@@ -215,8 +215,8 @@ function Photos({ isEditing }) {
               src={item.urlSmall}
               alt={`photo ${item.title}`}
               className="photo__img"
-              width="1200"
-              height="800"
+              //width="1200"
+              //height="800"
             />
             <figcaption className="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
