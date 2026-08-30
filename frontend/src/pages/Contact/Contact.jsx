@@ -78,6 +78,7 @@ function Contact() {
 
       <form onSubmit={handleSubmit} className="contact__form">
         <input
+          aria-label="nom / Prénom"
           type="text"
           placeholder="Nom / Prénom"
           value={name}
@@ -86,6 +87,7 @@ function Contact() {
         />
 
         <input
+          aria-label="adresse email"
           type="email"
           placeholder="Adresse email"
           value={email}
@@ -111,7 +113,9 @@ function Contact() {
           required
         />
 
-        <button type="submit">Envoyer</button>
+        <button aria-label=" bouton envoyez" type="submit">
+          Envoyer
+        </button>
 
         {error && <div className="contact__error">{error}</div>}
         {success && <div className="contact__success">{success}</div>}
