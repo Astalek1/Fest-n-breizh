@@ -14,17 +14,9 @@ function Editions({ isEditing }) {
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
       .then((res) => res.json())
-      /*.then((data) => {
-        const sorted = [...data].sort((a, b) => a.year - b.year)
-        setEditions(sorted)
-      })*/
-
       .then((data) => {
         const sorted = [...data].sort((a, b) => a.year - b.year)
-
-        setTimeout(() => {
-          setEditions(sorted)
-        }, 300)
+        setEditions(sorted)
       })
       .catch((err) => console.error(err))
   }, [])
