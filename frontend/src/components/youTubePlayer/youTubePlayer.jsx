@@ -27,8 +27,8 @@ function YouTubePlayer({ url, title, className }) {
           src={getYouTubeThumbnail(url)}
           alt={title}
           className={className}
-          width="480"
-          height="360"
+          width="320"
+          height="180"
         />
 
         <button className="youtube-player__play" aria-label="Lire la vidéo">
