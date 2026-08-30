@@ -23,13 +23,7 @@ function YouTubePlayer({ url, title, className }) {
       />
     ) : (
       <div className="youtube-player" onClick={() => setIsPlaying(true)}>
-        <img
-          src={getYouTubeThumbnail(url)}
-          alt={title}
-          className={className}
-          width="320"
-          height="180"
-        />
+        <img src={getYouTubeThumbnail(url)} alt={title} className={className} />
 
         <button className="youtube-player__play" aria-label="Lire la vidéo">
           ▶

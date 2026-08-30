@@ -40,5 +40,5 @@ export function getYouTubeThumbnail(url) {
 
   if (!videoId) return ''
 
-  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+  return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
 }
