@@ -150,7 +150,7 @@ function Photos({ isEditing }) {
       handleDeletePhoto()
     }
   }
-
+  console.log(photos[0])
   return (
     <>
       <div className="page__titlePhoto">
