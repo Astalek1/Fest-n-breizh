@@ -16,7 +16,11 @@ function Editions({ isEditing }) {
       .then((res) => res.json())
       .then((data) => {
         const sorted = [...data].sort((a, b) => a.year - b.year)
-        setEditions(sorted)
+        //setEditions(sorted)
+
+        setTimeout(() => {
+          setEditions(sorted)
+        }, 100)
       })
       .catch((err) => console.error(err))
   }, [])
