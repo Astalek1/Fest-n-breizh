@@ -35,7 +35,7 @@ function Editions({ isEditing }) {
     )
       .then((res) => res.json())
       .then((data) => {
-        setTimeout(() => setPoster(data), 3000)
+        setTimeout(() => setPoster(data))
       })
       .catch((err) => console.error(err))
   }, [selectedEdition?.poster])
