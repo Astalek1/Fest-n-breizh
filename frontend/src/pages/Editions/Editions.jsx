@@ -136,6 +136,8 @@ function Editions({ isEditing }) {
                   className="edition__img"
                   src={poster.url}
                   alt={`affiche ${selectedEdition.title} ${selectedEdition.year}`}
+                  whidth="800"
+                  height="1157"
                 />
               )}
               <h2 className="edition__prog">La Programmation</h2>
