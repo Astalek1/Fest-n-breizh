@@ -175,7 +175,7 @@ function Editions({ isEditing }) {
                           className="edition__artist--logo"
                         />
                       )}
-
+                      {/* Video */}
                       {artist.mediaType === 'video' && artist.media && (
                         <YouTubePlayer
                           url={artist.media}
