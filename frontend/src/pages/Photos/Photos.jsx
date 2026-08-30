@@ -216,7 +216,7 @@ function Photos({ isEditing }) {
               alt={`photo ${item.title}`}
               className="photo__img"
               width="auto"
-              height=" 13rem"
+              height=" 800"
             />
             <figcaption className="photo__figcaption">
               <h2 className="photo__title">{item.title}</h2>
