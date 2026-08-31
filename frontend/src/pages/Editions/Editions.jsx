@@ -115,7 +115,7 @@ function Editions({ isEditing }) {
             />
           </div>
         )}
-        {editionId && !selectedEdition && <div className=" edition__loading" />}
+        {editionId && !selectedEdition && <div className="loading" />}
 
         {selectedEdition && (
           <div className="edition">

@@ -194,6 +194,7 @@ function Videos({ isEditing }) {
           />
         </a>
       </div>
+      {videos.length === 0 && <div className="loading" />}
       <div className="videos">
         {videos.map((item) => (
           <article className="videos__content" key={item._id}>
