@@ -24,10 +24,12 @@ function Editions({ isEditing }) {
   const selectedEdition = editions.find((e) => e._id === editionId)
 
   const [poster, setPoster] = useState(null)*/
-
   const [editions, setEditions] = useState([])
+  const [selectedEdition, setSelectedEdition] = useState(null)
   const [editionToDelete, setEditionToDelete] = useState(null)
+  const [poster, setPoster] = useState(null)
 
+  // Liste complète → uniquement pour le MenuEdition
   useEffect(() => {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
       .then((res) => res.json())
@@ -38,9 +40,18 @@ function Editions({ isEditing }) {
       .catch((err) => console.error(err))
   }, [])
 
-  const selectedEdition = editions.find((e) => e._id === editionId)
+  // Édition affichée → récupération directe par son ID
+  useEffect(() => {
+    if (!editionId) {
+      setSelectedEdition(null)
+      return
+    }
 
-  const [poster, setPoster] = useState(null)
+    fetch(`https://fnb-backend.dokku.festnbreizh.bzh/api/editions/${editionId}`)
+      .then((res) => res.json())
+      .then((data) => setSelectedEdition(data))
+      .catch((err) => console.error(err))
+  }, [editionId])
 
   useEffect(() => {
     if (!selectedEdition?.poster) return
