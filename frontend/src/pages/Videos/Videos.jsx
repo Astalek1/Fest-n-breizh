@@ -189,6 +189,8 @@ function Videos({ isEditing }) {
             src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/logo-youtube-1770820920343_O4sGrxN1J.webp"
             className="video__intro--logo"
             alt="logo youtube"
+            width="288"
+            height="129"
           />
         </a>
       </div>
