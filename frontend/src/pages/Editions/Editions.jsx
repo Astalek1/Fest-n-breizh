@@ -8,7 +8,7 @@ function Editions({ isEditing }) {
   const { editionId } = useParams()
   const navigate = useNavigate()
 
-  const [editions, setEditions] = useState([])
+  /* const [editions, setEditions] = useState([])
   const [editionToDelete, setEditionToDelete] = useState(null)
 
   useEffect(() => {
@@ -38,7 +38,48 @@ function Editions({ isEditing }) {
         setTimeout(() => setPoster(data))
       })
       .catch((err) => console.error(err))
-  }, [selectedEdition?.poster])
+  }, [selectedEdition?.poster])*/
+  const [editions, setEditions] = useState([])
+  const [selectedEdition, setSelectedEdition] = useState(null)
+  const [poster, setPoster] = useState(null)
+  const [editionToDelete, setEditionToDelete] = useState(null)
+
+  useEffect(() => {
+    const loadEdition = async () => {
+      try {
+        // 1. On récupère toutes les éditions
+        const editionsResponse = await fetch(
+          'https://fnb-backend.dokku.festnbreizh.bzh/api/editions',
+        )
+
+        const data = await editionsResponse.json()
+        const sorted = [...data].sort((a, b) => a.year - b.year)
+
+        // 2. On trouve l'édition demandée
+        const edition = sorted.find((e) => e._id === editionId)
+
+        // 3.  on récupère l'affiche
+        let posterData = null
+
+        if (edition?.poster) {
+          const posterResponse = await fetch(
+            `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${edition.poster}`,
+          )
+
+          posterData = await posterResponse.json()
+        }
+
+        // 4. On met à jour les données une fois les requêtes terminées
+        setEditions(sorted)
+        setPoster(posterData)
+        setSelectedEdition(edition || null)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    loadEdition()
+  }, [editionId])
 
   const handleEdit = (edition) => {
     navigate(`/Editions/edit/${edition._id}`)
