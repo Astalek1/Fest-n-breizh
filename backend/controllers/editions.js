@@ -1,4 +1,5 @@
 import Edition from '../models/Editions.js'
+import Gallery from '../models/Gallery.js'
 import * as artistsCtrl from './artists.js'
 import * as guestsCtrl from './guests.js'
 import mongoose from 'mongoose'
@@ -108,13 +109,38 @@ export const getAllEditions = async (req, res) => {
 }
 
 // === LIRE UNE ÉDITION ===
-export const getOneEdition = async (req, res) => {
+
+/*export const getOneEdition = async (req, res) => {
   try {
     const edition = await Edition.findById(req.params.id)
       .populate('artists')
       .populate('guests')
     if (!edition) return res.status(404).json('Édition non trouvée')
     res.status(200).json(edition)
+  } catch {
+    res.status(500).json('Erreur serveur, base de données inaccessible')
+  }
+}*/
+
+export const getOneEdition = async (req, res) => {
+  try {
+    const edition = await Edition.findById(req.params.id)
+      .populate('artists')
+      .populate('guests')
+
+    if (!edition) {
+      return res.status(404).json('Édition non trouvée')
+    }
+
+    const poster = await Gallery.findOne({
+      _id: edition.poster,
+      type: 'poster',
+    })
+
+    res.status(200).json({
+      ...edition.toObject(),
+      posterData: poster,
+    })
   } catch {
     res.status(500).json('Erreur serveur, base de données inaccessible')
   }

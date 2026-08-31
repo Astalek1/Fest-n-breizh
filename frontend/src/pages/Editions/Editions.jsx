@@ -7,23 +7,6 @@ import YouTubePlayer from '../../components/youTubePlayer/youTubePlayer.jsx'
 function Editions({ isEditing }) {
   const { editionId } = useParams()
   const navigate = useNavigate()
-
-  /* const [editions, setEditions] = useState([])
-  const [editionToDelete, setEditionToDelete] = useState(null)
-
-  useEffect(() => {
-    fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
-      .then((res) => res.json())
-      .then((data) => {
-        const sorted = [...data].sort((a, b) => a.year - b.year)
-        setEditions(sorted)
-      })
-      .catch((err) => console.error(err))
-  }, [])
-
-  const selectedEdition = editions.find((e) => e._id === editionId)
-
-  const [poster, setPoster] = useState(null)*/
   const [editions, setEditions] = useState([])
   const [selectedEdition, setSelectedEdition] = useState(null)
   const [editionToDelete, setEditionToDelete] = useState(null)
