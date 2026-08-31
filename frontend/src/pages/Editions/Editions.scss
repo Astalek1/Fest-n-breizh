@@ -43,6 +43,9 @@
 }
 .edition {
   width: 100%;
+  &__loading {
+    min-height: 1200px;
+  }
   &__intro {
     width: 100%;
     position: relative;

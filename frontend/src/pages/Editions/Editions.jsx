@@ -7,7 +7,6 @@ import YouTubePlayer from '../../components/youTubePlayer/youTubePlayer.jsx'
 function Editions({ isEditing }) {
   const { editionId } = useParams()
   const navigate = useNavigate()
-
   const [editions, setEditions] = useState([])
   const [selectedEdition, setSelectedEdition] = useState(null)
   const [editionToDelete, setEditionToDelete] = useState(null)
@@ -116,6 +115,7 @@ function Editions({ isEditing }) {
             />
           </div>
         )}
+        {editionId && !selectedEdition && <div className=" edition__loading" />}
 
         {selectedEdition && (
           <div className="edition">
