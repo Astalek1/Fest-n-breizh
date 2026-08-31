@@ -10,7 +10,7 @@ function Editions({ isEditing }) {
   const [editions, setEditions] = useState([])
   const [selectedEdition, setSelectedEdition] = useState(null)
   const [editionToDelete, setEditionToDelete] = useState(null)
-  const [poster, setPoster] = useState(null)
+  //const [poster, setPoster] = useState(null)
 
   // Liste complète → uniquement pour le MenuEdition
   useEffect(() => {
@@ -35,19 +35,6 @@ function Editions({ isEditing }) {
       .then((data) => setSelectedEdition(data))
       .catch((err) => console.error(err))
   }, [editionId])
-
-  useEffect(() => {
-    if (!selectedEdition?.poster) return
-
-    setPoster(null)
-
-    fetch(
-      `https://fnb-backend.dokku.festnbreizh.bzh/api/gallery/posters/${selectedEdition.poster}`,
-    )
-      .then((res) => res.json())
-      .then((data) => setPoster(data))
-      .catch((err) => console.error(err))
-  }, [selectedEdition?.poster])
 
   const handleEdit = (edition) => {
     navigate(`/Editions/edit/${edition._id}`)
@@ -142,10 +129,10 @@ function Editions({ isEditing }) {
                 {`${selectedEdition.title} ${selectedEdition.year}`}
               </h1>
               <p className="edition__txt">{selectedEdition.description}</p>
-              {poster && (
+              {selectedEdition.posterData && (
                 <img
                   className="edition__img"
-                  src={poster.url}
+                  src={selectedEdition.posterData.url}
                   alt={`affiche ${selectedEdition.title} ${selectedEdition.year}`}
                   width="800"
                   height="1157"
