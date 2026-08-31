@@ -41,3 +41,17 @@
 .youtube-player:hover .youtube-player__play {
   transform: translate(-50%, -50%) scale(1.2);
 }
+
+//téléphone
+
+@media (max-width: 768px) {
+  .youtube-player {
+    display: block;
+    width: 90%;
+  }
+
+  .youtube-player img {
+    width: 100%;
+    height: auto;
+  }
+}

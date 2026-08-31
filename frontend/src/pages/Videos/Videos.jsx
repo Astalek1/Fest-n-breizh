@@ -230,7 +230,7 @@ function Videos({ isEditing }) {
             <YouTubePlayer
               url={item.media || item.url}
               title={item.title}
-              className="announcement__video"
+              className="videos__windows"
             />
           </article>
         ))}
