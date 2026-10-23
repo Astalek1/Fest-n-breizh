@@ -27,7 +27,7 @@ function Partners({ isEditing }) {
     setSelectedItem({
       title: '',
       text: '',
-      logo: null,
+      media: null,
       mediaType: 'logo',
     })
 

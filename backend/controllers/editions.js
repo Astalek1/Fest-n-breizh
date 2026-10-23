@@ -110,18 +110,6 @@ export const getAllEditions = async (req, res) => {
 
 // === LIRE UNE ÉDITION ===
 
-/*export const getOneEdition = async (req, res) => {
-  try {
-    const edition = await Edition.findById(req.params.id)
-      .populate('artists')
-      .populate('guests')
-    if (!edition) return res.status(404).json('Édition non trouvée')
-    res.status(200).json(edition)
-  } catch {
-    res.status(500).json('Erreur serveur, base de données inaccessible')
-  }
-}*/
-
 export const getOneEdition = async (req, res) => {
   try {
     const edition = await Edition.findById(req.params.id)
