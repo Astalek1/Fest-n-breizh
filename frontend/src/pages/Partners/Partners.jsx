@@ -47,7 +47,7 @@ function Partners({ isEditing }) {
       file: formData.media, // ← IMPORTANT pour existing logo
     }
 
-    formDataToSend.append('fileName', formData.title)
+    // formDataToSend.append('fileName', formData.title)
     formDataToSend.append('partner', JSON.stringify(partnerData))
 
     const token = sessionStorage.getItem('token')
@@ -182,7 +182,7 @@ function Partners({ isEditing }) {
           >
             ajouter un nouveaux
             <br />
-            Partenaire
+            partenaire
           </button>
         )}
       </div>

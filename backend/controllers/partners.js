@@ -104,7 +104,9 @@ export const updatePartner = async (req, res) => {
     const baseName = (
       req.body.fileName ||
       body.fileName ||
-      existing.logoName ||
+      (req.file
+        ? req.file.originalname.replace(/\.[^/.]+$/, '')
+        : existing.logoName) ||
       'logo-partner'
     )
       .trim()
