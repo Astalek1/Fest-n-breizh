@@ -17,7 +17,7 @@ function Editions({ isEditing }) {
     fetch('https://fnb-backend.dokku.festnbreizh.bzh/api/editions')
       .then((res) => res.json())
       .then((data) => {
-        const sorted = [...data].sort((a, b) => a.year - b.year)
+        const sorted = [...data].sort((a, b) => b.year - a.year)
         setEditions(sorted)
       })
       .catch((err) => console.error(err))
