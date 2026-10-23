@@ -182,7 +182,7 @@ function Partners({ isEditing }) {
           >
             ajouter une nouvelle
             <br />
-            affiche
+            Partenaire
           </button>
         )}
       </div>
