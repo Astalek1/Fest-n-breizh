@@ -180,7 +180,7 @@ function Partners({ isEditing }) {
             className="button__create"
             onClick={handleCreate}
           >
-            ajouter une nouvelle
+            ajouter un nouveaux
             <br />
             Partenaire
           </button>

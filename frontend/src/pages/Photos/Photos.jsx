@@ -171,7 +171,7 @@ function Photos({ isEditing }) {
         <button title="créé" className="button__create" onClick={handleCreate}>
           ajouter une nouvelle
           <br />
-          affiche
+          photo
         </button>
       )}
 

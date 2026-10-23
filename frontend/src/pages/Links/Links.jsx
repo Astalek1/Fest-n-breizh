@@ -191,9 +191,9 @@ function Links({ isEditing }) {
             className="button__create"
             onClick={handleCreate}
           >
-            ajouter une nouvelle
+            ajouter un nouveaux
             <br />
-            affiche
+            réseau
           </button>
         )}
       </div>
