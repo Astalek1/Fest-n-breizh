@@ -241,6 +241,7 @@ function Modal({ isOpen, onClose, mode, fields, entityName, onSubmit, data }) {
                   <div>
                     <select
                       className="modal__select--existing"
+                      size={5}
                       onChange={(e) => handleChange('media', e.target.value)}
                     >
                       <option value="">Choisir un logo</option>
