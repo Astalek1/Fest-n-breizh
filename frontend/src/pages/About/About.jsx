@@ -62,6 +62,13 @@ function About() {
         piloté par la ville de Rennes, pour promouvoir la culture par et pour
         les jeunes rennais (étudiants comme actifs). <br />
         <br />
+        <img
+          className="about__img"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Mur%20Festn%20breizh.webp"
+          alt="photo FestnBreizh sur le mur "
+          width="2048"
+          height="1536"
+        ></img>
         En 2021, Fest'n Breizh a évolué en une association à part entière,
         concentrant ses efforts sur la promotion du fest-noz et sur une nouvelle
         initiative visant à valoriser la parole des artistes traditionnels et
