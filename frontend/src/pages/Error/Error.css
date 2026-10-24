@@ -1,0 +1,137 @@
+/*linear-gradient(
+  136deg,
+  rgba(246, 238, 227, 1) 18%,
+  rgb(250, 221, 183) 81%
+);
+
+$card-color: linear-gradient(
+  162deg,
+  rgba(123, 94, 125, 0.808) 2%,
+  rgba(227, 187, 130, 0.808) 56%,
+  rgba(221, 145, 143, 0.808) 99%
+    /* 
+  135deg,
+  #f8f2ea 0%,
+  #d8b998 50%,
+  #a67c52 100% 
+
+  135deg,
+  #f6eee3 0%,
+  #c98c6a 55%,
+  #8a5a44 100%
+);*/
+.error {
+  min-height: 125vh;
+  background-color: white;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.error__container {
+  width: 100%;
+  height: 120vh;
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.error__container--titleZone {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+}
+.error__title {
+  width: auto;
+  text-decoration: none;
+  font-size: clamp(20rem, 24vw, 22rem);
+  z-index: 20;
+}
+.error__txt {
+  margin-top: -3%;
+  font-size: clamp(2.5rem, 4vw, 3rem);
+  position: relative;
+  z-index: 19;
+}
+.error__img--center {
+  position: relative;
+  width: clamp(28rem, 35vw, 30rem);
+  height: auto;
+  position: absolute;
+  right: 15rem;
+  top: 5%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.error__link {
+  margin-top: 3%;
+  text-decoration: none;
+  color: black;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  z-index: 18;
+}
+.error__link:hover {
+  color: red;
+}
+.error__img--left {
+  width: 23rem;
+  height: auto;
+  position: absolute;
+  left: -3%;
+  bottom: -27rem;
+}
+.error__img--right {
+  width: 32rem;
+  height: auto;
+  position: absolute;
+  right: 0;
+  bottom: -27rem;
+}
+
+@media (max-width: 1024px) {
+  .error__title {
+    font-size: clamp(18rem, 22vw, 20rem);
+  }
+  .error__txt {
+    font-size: clamp(2.2rem, 3vw, 2.6rem);
+  }
+  .error__img--center {
+    width: clamp(26rem, 28vw, 28rem);
+    right: 13rem;
+  }
+  .error__link {
+    margin-top: 3%;
+    font-size: clamp(1.5rem, 2vw, 2rem);
+  }
+  .error__img--left {
+    width: 20rem;
+    left: -3%;
+    bottom: -27rem;
+  }
+  .error__img--right {
+    width: 28rem;
+  }
+}
+@media (max-width: 768px) {
+  .error__title {
+    font-size: 15rem;
+  }
+  .error__txt {
+    font-size: 2rem;
+  }
+  .error__link {
+    font-size: 4rem;
+  }
+  .error__img--center {
+    display: none;
+  }
+  .error__img--left {
+    display: none;
+  }
+  .error__img--right {
+    display: none;
+  }
+}/*# sourceMappingURL=Error.css.map */

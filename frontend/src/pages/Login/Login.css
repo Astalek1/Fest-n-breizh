@@ -1,0 +1,55 @@
+.formulaire__page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  margin: 2%;
+  font-size: clamp(3rem, 3vw, 3.5rem);
+}
+
+.txt {
+  margin: 2%;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+.formulaire__connexion {
+  background-color: black;
+  margin: 2%;
+  padding: 15px 20px;
+  border-radius: 15px;
+  width: 45rem;
+}
+.formulaire__connexion--label {
+  width: 50%;
+  color: white;
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+}
+.formulaire__connexion--user {
+  width: 100%;
+  margin: 10px 0;
+}
+.formulaire__connexion--login {
+  width: 100%;
+  margin: 5px 0;
+}
+.formulaire__connexion--footer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.formulaire__connexion--button {
+  margin: 30px 0;
+  font-size: clamp(0.95rem, 1.2vw, 1rem);
+  width: 15%;
+}
+.formulaire__connexion--txt {
+  width: 80%;
+  color: red;
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}/*# sourceMappingURL=Login.css.map */

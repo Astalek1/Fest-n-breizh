@@ -1,0 +1,44 @@
+.artist__modal {
+  border: 1px solid black;
+  width: 100%;
+  height: auto;
+  border-radius: 2%;
+}
+.artist__modal--content {
+  padding: 10px;
+}
+.artist__modal--section {
+  display: flex;
+  flex-direction: column;
+}
+.artist__modal--label {
+  font-size: 22px;
+}
+.artist__modal--input {
+  height: auto;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.artist__modal--preview {
+  margin-top: 5px;
+  width: 9rem;
+  max-height: 200px;
+}
+
+.artist__btn {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.artist__btn--validate {
+  width: 5rem;
+  height: auto;
+  background-color: green;
+}
+.artist__btn--cancel {
+  width: 5rem;
+  height: auto;
+  background-color: red;
+}/*# sourceMappingURL=ModalArtist.css.map */

@@ -6,7 +6,7 @@ function About() {
       <h1 className="about__title">À propos de Fest'n Breizh.</h1>
       <p className="about__txt">
         Fondé en 2009, Fest'n Breizh est un fest-noz annuel rennais. Cet
-        événement se déroule généralement aux alentours du mois de mars et se
+        événement se déroule généralement aux alentours du mois de mai et se
         situe soit à la salle de l’Étage du Liberté, soit à la salle de la Cité.
         Fruit d'une collaboration entre l'association Grain de Sel (association
         de la formation IUT Carrières Sociales de l'Université de Rennes 1) et
@@ -16,6 +16,13 @@ function About() {
         jeune public rennais de non-initié aux richesses des musique
         traditionnels contemporaine. <br />
         <br />
+        <img
+          className="about__img"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/innitiation%20avec%20enfants.webp"
+          alt="Enfants qui danssent "
+          width="2048"
+          height="1536"
+        ></img>
         Dès ses premières années le fest-noz se lie avec d'autres association
         étudiantes rennaise.
         <br /> La première année avec l'associations des résidents de Beaulieu :
@@ -33,6 +40,13 @@ function About() {
         gratuit pour tous) et contribuera grandement au développement du
         fest-noz.
         <br />
+        <img
+          className="about__img"
+          src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/dansseurs-FestnBreizh.webp"
+          alt="photo des dansseurs "
+          width="2048"
+          height="1536"
+        ></img>
         <br /> Le fest-noz est initialement fondé par Marina Noël, qui a lancé
         l'événement avec l'association Grain de Sel et le Cercle Celtique de
         Rennes dans le cadre d'un projet pédagogique de fin d'étude. Les années

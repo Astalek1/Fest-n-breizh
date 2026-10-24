@@ -1,0 +1,210 @@
+/*linear-gradient(
+  136deg,
+  rgba(246, 238, 227, 1) 18%,
+  rgb(250, 221, 183) 81%
+);
+
+$card-color: linear-gradient(
+  162deg,
+  rgba(123, 94, 125, 0.808) 2%,
+  rgba(227, 187, 130, 0.808) 56%,
+  rgba(221, 145, 143, 0.808) 99%
+    /* 
+  135deg,
+  #f8f2ea 0%,
+  #d8b998 50%,
+  #a67c52 100% 
+
+  135deg,
+  #f6eee3 0%,
+  #c98c6a 55%,
+  #8a5a44 100%
+);*/
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: auto;
+  background-color: black;
+  padding-bottom: 15px;
+}
+.Header__img {
+  width: 10rem;
+  height: auto;
+  max-height: 200px;
+  margin-left: 10%;
+  z-index: 11;
+}
+.Header__burger {
+  display: none;
+}
+.Header__nav {
+  width: 70%;
+  height: auto;
+  display: flex;
+  text-align: center;
+  align-items: flex-start;
+  justify-content: end;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  margin-right: 5%;
+}
+.Header__link {
+  color: white;
+  text-decoration: none;
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  margin: 10px;
+  padding: 5px;
+  background-color: black;
+  overflow: visible;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+.Header__link:hover {
+  color: black;
+  background-color: white;
+  border-radius: 3px;
+  transform: scale(1.05);
+}
+.Header__link.edit-mode:hover {
+  background-color: red;
+}
+.Header .Header__link.about.edit-mode {
+  display: none;
+}
+.Header__span {
+  color: white;
+  background-color: black;
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  margin-top: 7px;
+  overflow: visible;
+  padding: 5px;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+.Header__span:hover {
+  color: black;
+  background-color: white;
+  border-radius: 3px;
+  transform: scale(1.05);
+}
+.Header__span.edit-mode:hover {
+  background-color: red;
+}
+.Header__dropdown {
+  display: flex;
+  align-items: center;
+  position: relative;
+  line-height: 1;
+  height: auto;
+  overflow: visible;
+  padding: 5px;
+}
+.Header__dropdown--content {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: -moz-max-content;
+  width: max-content;
+  white-space: nowrap;
+}
+.Header__dropdown--content .Header__link {
+  padding: 5px;
+  margin: 5px;
+}
+.Header .Header__dropdown--content.show {
+  display: flex;
+}
+
+/* Tablette */
+@media (max-width: 1024px) {
+  .Header {
+    width: 99.99%;
+    height: 120px;
+  }
+  .Header__img {
+    width: 8rem;
+    height: auto;
+    max-height: 150px;
+    margin-left: 3%;
+  }
+  .Header__nav {
+    width: 100%;
+    margin-right: 2%;
+  }
+  .Header__link {
+    font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+    padding: 5px 0;
+  }
+  .Header__span {
+    font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+    margin-top: 6px;
+    padding: 5px 0;
+  }
+}
+@media (max-width: 768px) {
+  .Header {
+    width: 100%;
+    position: relative;
+  }
+  .Header__burger {
+    display: flex;
+    width: 80px;
+    height: 80px;
+    font-size: 60px;
+    border: 1px solid black;
+    position: relative;
+    z-index: 11;
+    margin: 5px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+  }
+  .Header__link {
+    border: 1px solid white;
+    font-size: 1.4rem;
+    width: 85%;
+    margin: 0;
+    padding: 20px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .Header__nav {
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    position: absolute;
+    top: 50px;
+    right: -15px;
+    width: 80%;
+    gap: 10px;
+    padding: 10px;
+    background-color: black;
+    border-radius: 5px;
+    transform: scaleY(0);
+    transform-origin: top;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .Header__nav--open {
+    transform: scaleY(1);
+    opacity: 1;
+    pointer-events: auto;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .Header__dropdown {
+    display: none;
+  }
+}/*# sourceMappingURL=Header.css.map */
