@@ -9,12 +9,12 @@ function MenuEdition({ editions, isEditing }) {
   return (
     <div className="MenuEdition">
       <button
-        className={`MenuEdition__burger ${
-          isMenuOpen ? 'MenuEdition__burger--open' : ''
+        className={`MenuEdition__fleche ${
+          isMenuOpen ? 'MenuEdition__fleche--open' : ''
         }`}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
-        &#9776;
+        <span className="MenuEdition__flecheIcon">&#x25BE;</span>
       </button>
 
       <div

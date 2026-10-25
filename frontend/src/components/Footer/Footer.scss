@@ -124,8 +124,8 @@
       margin: 0;
     }
     &__copyright {
-      width: 100%;
-      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      width: 90%;
+      font-size: clamp(0.9rem, 1vw, 1.1rem);
       margin: 20px;
     }
     &__infos {
@@ -139,7 +139,7 @@
       display: none;
       &--mail {
         display: flex;
-        font-size: clamp(1.5rem, 2vw, 1.8rem);
+        font-size: clamp(1.2rem, 1.3vw, 1.5rem);
         margin-top: 20px;
       }
     }
@@ -147,7 +147,7 @@
     &__portfolio {
       width: 50%;
       margin: 0;
-      font-size: clamp(1.5rem, 2vw, 1.8rem);
+      font-size: clamp(1.2rem, 1vw, 1.5rem);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -164,8 +164,8 @@
 
     &__lien--logo {
       margin-top: 50px;
-      width: 90px;
-      height: 90px;
+      width: 80px;
+      height: 80px;
     }
   }
 }

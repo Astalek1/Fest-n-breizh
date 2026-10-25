@@ -125,11 +125,11 @@
       align-items: center;
       &--title {
         width: 100%;
-        font-size: 2rem;
+        font-size: 1.3rem;
         margin-bottom: 50px;
       }
       &--txt {
-        font-size: 1.3rem;
+        font-size: 1rem;
         margin: 0;
         padding: 5px;
       }
@@ -144,10 +144,11 @@
       margin: 25px;
     }
     &__title {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
     &__txt {
-      font-size: 1.3rem;
+      width: 100%;
+      font-size: 1rem;
       margin-bottom: 25px;
     }
     &__logo {

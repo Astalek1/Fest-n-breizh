@@ -7,15 +7,14 @@
     margin-top: 2px;
     display: grid;
     background-color: $main-color;
-    padding: 10px;
+    padding: 20px;
     gap: 5px;
     border-radius: 15px;
     width: clamp(9rem, 14vw, 18rem);
     height: auto;
     transition: transform 50ms ease-in-out;
-    grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(rem, 1fr));
     z-index: 30;
-
     overflow-y: auto;
     max-height: calc(100vh - 120px);
   }
@@ -83,7 +82,7 @@
       }
     }
 
-    &__burger {
+    &__fleche {
       display: flex;
       width: 40px;
       height: 40px;
@@ -114,24 +113,33 @@
       display: flex;
       flex-direction: column;
       padding-top: 90px;
+      margin-right: 5px;
     }
     &__button {
       width: 99%;
       height: 100px;
     }
-    &__burger {
-      width: 80px;
-      height: 80px;
+    &__fleche {
+      width: 60px;
+      height: 60px;
       font-size: 60px;
       color: $secondary-color;
       background-color: $main-color;
       border: 1px solid white;
-      right: 5px;
+      right: 15px;
 
+      &Icon {
+        display: inline-block;
+        transition: transform 0.3s ease;
+      }
       &--open {
         background-color: $secondary-color;
         color: $main-color;
         border: 1px solid black;
+
+        .MenuEdition__flecheIcon {
+          transform: rotate(180deg);
+        }
       }
     }
   }

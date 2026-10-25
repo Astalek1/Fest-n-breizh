@@ -167,16 +167,17 @@ header {
       z-index: 11;
       margin: 5px;
       position: absolute;
-      top: 0;
-      right: 0px;
+      top: 5px;
+      right: 15px;
     }
     &__link {
       border: 1px solid white;
-      font-size: 1.4rem;
-      width: 85%;
+      font-size: 1.2rem;
+      width: 7rem;
+      height: 100px;
       margin: 0;
       padding: 20px;
-      height: 100px;
+
       display: flex;
       justify-content: center;
       align-items: center;
@@ -187,9 +188,8 @@ header {
       grid-template-columns: repeat(2, 1fr);
 
       position: absolute;
-      top: 50px;
+      top: 80px;
       right: -15px;
-
       width: 80%;
       gap: 10px;
       padding: 10px;
