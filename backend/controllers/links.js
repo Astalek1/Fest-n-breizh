@@ -8,33 +8,37 @@ export const newLink = async (req, res) => {
   try {
     const linkData = JSON.parse(req.body.link || '{}')
 
+    const fileValue = linkData.file || null
+    const isExistingFileId = fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)
+
     let cleanName = req.body.fileName || linkData.fileName || null
 
     if (!cleanName && req.file) {
       cleanName = req.file.originalname.replace(/\.[^/.]+$/, '')
     }
 
-    if (!cleanName) {
+    if (!cleanName && !isExistingFileId) {
       return res
         .status(400)
         .json('Nom de fichier introuvable — fileName ou upload requis.')
     }
 
-    cleanName = cleanName.trim().replace(/\s+/g, '-').toLowerCase()
+    if (cleanName) {
+      cleanName = cleanName.trim().replace(/\s+/g, '-').toLowerCase()
+    }
 
-    const fileValue = linkData.file || null
     let mediaResult
 
     // file = fileId existant
-    if (fileValue && /^[a-zA-Z0-9]{8,}$/.test(fileValue)) {
+    if (isExistingFileId) {
       const details = await imagekit.getFileDetails(fileValue)
+
       mediaResult = {
         url: details.url,
         fileId: details.fileId,
         fileName: details.name.replace(/\.[^/.]+$/, ''),
       }
     } else {
-      // upload ou URL → resolveMedia comme avant
       mediaResult = await resolveMedia(
         fileValue,
         req.file,
