@@ -50,7 +50,7 @@ function Links({ isEditing }) {
       file: formData.media, // ← IMPORTANT pour existing logo
     }
 
-    formDataToSend.append('fileName', formData.title) //  FIX
+    //formDataToSend.append('fileName', formData.title) //  FIX
     formDataToSend.append('link', JSON.stringify(linkData))
 
     const token = sessionStorage.getItem('token')

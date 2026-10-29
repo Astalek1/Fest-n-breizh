@@ -105,18 +105,13 @@ export const updateLink = async (req, res) => {
 
     // Base du nom
     const baseName = (
-      req.body.fileName ||
-      body.fileName ||
-      existing.logoName ||
-      'logo-link'
+      req.file
+        ? req.file.originalname.replace(/\.[^/.]+$/, '')
+        : req.body.fileName || body.fileName || existing.logoName || 'logo-link'
     )
       .trim()
       .replace(/\s+/g, '-')
       .toLowerCase()
-
-    const oldFileId = existing.logoFileId
-    let newFileId = oldFileId
-    let didChangeFile = false
 
     // A) Renommage du logo existant
     if (!req.file && !body.file && existing.logoFileId) {
