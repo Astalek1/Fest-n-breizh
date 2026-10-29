@@ -113,6 +113,10 @@ export const updateLink = async (req, res) => {
       .replace(/\s+/g, '-')
       .toLowerCase()
 
+    const oldFileId = existing.logoFileId
+    let newFileId = oldFileId
+    let didChangeFile = false
+
     // A) Renommage du logo existant
     if (!req.file && !body.file && existing.logoFileId) {
       const ext = (existing.logo.split('.').pop() || 'webp').toLowerCase()
