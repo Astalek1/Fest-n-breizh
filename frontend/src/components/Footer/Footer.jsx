@@ -59,6 +59,20 @@ function Footer({ isEditing }) {
 
           <a
             target="_blank"
+            href="https://www.instagram.com/festnbreizh/"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://ik.imagekit.io/tzek55xr2j/festn_breizh/permanents/Tiktok%20fond%20blanc.webp"
+              alt="Logo TikTok"
+              width="48"
+              height="48"
+              className="Footer__lien--logo "
+            ></img>
+          </a>
+
+          <a
+            target="_blank"
             href="https://www.youtube.com/@festnbreizh2300/featured"
             rel="noopener noreferrer"
           >
