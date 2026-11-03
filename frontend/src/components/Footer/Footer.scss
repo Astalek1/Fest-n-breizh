@@ -33,6 +33,19 @@
     text-decoration: none;
   }
 
+  &__visits {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    color: $secondary-color;
+    margin-bottom: 10px;
+    margin-top: -10px;
+    font-size: clamp(1rem, 1vw, 1.1rem);
+    &--count {
+      color: $body-color;
+    }
+  }
+
   &__infos {
     display: flex;
     justify-content: space-between;
@@ -51,6 +64,7 @@
     margin: 0 12px;
     margin-bottom: 10px;
     text-decoration: none;
+    font-size: clamp(1rem, 1vw, 1.1rem);
   }
 
   &__login:hover,

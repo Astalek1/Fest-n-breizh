@@ -1,7 +1,53 @@
+import { useEffect, useState } from 'react'
 import './Footer.scss'
 import { Link } from 'react-router-dom'
 
 function Footer({ isEditing }) {
+  const [visits, setVisits] = useState(null)
+
+  useEffect(() => {
+    const apiUrl = 'https://fnb-backend.dokku.festnbreizh.bzh/api/visits'
+
+    const updateVisits = async () => {
+      try {
+        // Première visite de la session
+        if (!sessionStorage.getItem('festnbreizh_visit')) {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+          })
+
+          const data = await response.json()
+
+          setVisits(data.count)
+          sessionStorage.setItem('festnbreizh_visit', 'true')
+        } else {
+          // Session déjà comptabilisée : simple lecture
+          const response = await fetch(apiUrl)
+          const data = await response.json()
+
+          setVisits(data.count)
+        }
+      } catch (error) {
+        console.error('Erreur compteur de visites :', error)
+      }
+    }
+
+    updateVisits()
+
+    // Actualisation automatique du compteur toutes les 10 secondes
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(apiUrl)
+        const data = await response.json()
+
+        setVisits(data.count)
+      } catch (error) {
+        console.error('Erreur actualisation compteur :', error)
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [])
   return (
     <footer>
       <div className="Footer">
@@ -9,6 +55,12 @@ function Footer({ isEditing }) {
           <h2 className="Footer__copyright">
             Fest'n Breizh - 2026 - tous droits réservés
           </h2>
+          {visits !== null && (
+            <p className="Footer__visits">
+              Nombre de visites :{' '}
+              <span className="Footer__visits--count">{visits}</span>
+            </p>
+          )}
           <div className={`Footer__infos ${isEditing ? 'edit-mode' : ''}`}>
             <Link className="Footer__contact" to="/Contact">
               Contact
