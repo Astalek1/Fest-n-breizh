@@ -39,7 +39,7 @@
     justify-content: center;
     color: $secondary-color;
     margin-bottom: 10px;
-    margin-top: -10px;
+    margin-top: -5px;
     margin-left: 7%;
     font-size: clamp(1rem, 1vw, 1.1rem);
     &--count {
@@ -113,7 +113,11 @@
       margin-left: 100px;
     }
     &__copyright {
-      font-size: clamp(1rem, 2vw, 1.5rem);
+      font-size: clamp(0.9rem, 2vw, 1.5rem);
+    }
+    &__visits {
+      margin-top: 5px;
+      margin-bottom: -1px;
     }
     &__login {
       display: none;
@@ -159,16 +163,26 @@
         display: flex;
         font-size: clamp(1.2rem, 1.3vw, 1.5rem);
         margin-top: 20px;
+
+        width: 100%;
+        justify-content: center;
       }
     }
 
     &__portfolio {
-      width: 50%;
+      width: 100%;
       margin: 0;
+      margin-top: -3%;
       font-size: clamp(1.2rem, 1vw, 1.5rem);
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    &__visits {
+      margin: 0;
+      width: 90%;
+      margin-left: 5%;
+      font-size: clamp(0.9rem, 1vw, 1.1rem);
     }
 
     &__logo {
