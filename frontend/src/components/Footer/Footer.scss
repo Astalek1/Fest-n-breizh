@@ -40,11 +40,13 @@
     color: $secondary-color;
     margin-bottom: 10px;
     margin-top: -10px;
+    margin-left: 5%;
     font-size: clamp(1rem, 1vw, 1.1rem);
     &--count {
-      color: white;
-      border: 1px solid red;
-      width: 5%;
+      margin-left: 5px;
+      color: $secondary-color;
+      text-decoration: underline;
+      width: 7%;
     }
   }
 
