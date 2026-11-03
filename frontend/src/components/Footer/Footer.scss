@@ -42,7 +42,9 @@
     margin-top: -10px;
     font-size: clamp(1rem, 1vw, 1.1rem);
     &--count {
-      color: $body-color;
+      color: white;
+      border: 1px solid red;
+      width: 5%;
     }
   }
 
