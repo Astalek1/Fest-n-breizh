@@ -94,6 +94,7 @@ export const createEdition = async (req, res) => {
       edition: newEdition,
     })
   } catch (error) {
+    console.log('Erreur createEdition :', error)
     res.status(500).json({ error: 'Erreur serveur (createEdition)' })
   }
 }
