@@ -39,7 +39,10 @@ export const createEdition = async (req, res) => {
 
     for (const [index, artistData] of (editionData.artists || []).entries()) {
       const needsFile =
-        artistData.mediaType !== 'video' && !artistData.mediaFileId
+        artistData.mediaType !== 'video' &&
+        !artistData.mediaFileId &&
+        !(artistData.mediaType === 'logo' && artistData.media)
+
       const mediaFile = needsFile
         ? uploadedArtistFiles[fileCursor++] || null
         : null
@@ -64,7 +67,9 @@ export const createEdition = async (req, res) => {
 
     for (const [index, guestData] of (editionData.guests || []).entries()) {
       const needsFile =
-        guestData.mediaType !== 'video' && !guestData.mediaFileId
+        guestData.mediaType !== 'video' &&
+        !guestData.mediaFileId &&
+        !(guestData.mediaType === 'logo' && guestData.media)
       const mediaFile = needsFile
         ? uploadedGuestFiles[fileCursor++] || null
         : null
