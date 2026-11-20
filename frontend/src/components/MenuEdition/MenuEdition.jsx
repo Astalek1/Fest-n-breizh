@@ -22,19 +22,6 @@ function MenuEdition({ editions, isEditing }) {
           isMenuOpen ? 'MenuEdition__menu--open' : ''
         }`}
       >
-        {editions.map((edition) => (
-          <button
-            className="MenuEdition__button"
-            key={edition._id}
-            onClick={() => {
-              setIsMenuOpen(false)
-              navigate(`/Editions/${edition._id}`)
-            }}
-          >
-            <p className="MenuEdition__button--txt">{`${edition.title} ${edition.year}`}</p>
-          </button>
-        ))}
-
         {isEditing && (
           <button
             type="button"
@@ -47,6 +34,18 @@ function MenuEdition({ editions, isEditing }) {
             Créer une édition
           </button>
         )}
+        {editions.map((edition) => (
+          <button
+            className="MenuEdition__button"
+            key={edition._id}
+            onClick={() => {
+              setIsMenuOpen(false)
+              navigate(`/Editions/${edition._id}`)
+            }}
+          >
+            <p className="MenuEdition__button--txt">{`${edition.title} ${edition.year}`}</p>
+          </button>
+        ))}
       </div>
     </div>
   )
