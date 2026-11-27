@@ -32,6 +32,24 @@ function YouTubePlayer({ url, title, className }) {
     )
   }
 
+  // Cas d'une vidéo Dailymotion
+  if (url.includes('dailymotion.com') || url.includes('dai.ly')) {
+    const videoId = url.match(/(?:video\/|dai\.ly\/)([a-zA-Z0-9]+)/)?.[1]
+
+    if (!videoId) return null
+
+    return (
+      <iframe
+        src={`https://www.dailymotion.com/embed/video/${videoId}`}
+        title={title}
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin"
+        className={className}
+      />
+    )
+  }
+
   // Cas d'une vidéo uploadée
   return (
     <video controls className={className}>
