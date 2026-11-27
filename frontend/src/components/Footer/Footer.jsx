@@ -111,7 +111,7 @@ function Footer({ isEditing }) {
 
           <a
             target="_blank"
-            href="https://www.instagram.com/festnbreizh/"
+            href="https://www.tiktok.com/@festnbreizh"
             rel="noopener noreferrer"
           >
             <img
