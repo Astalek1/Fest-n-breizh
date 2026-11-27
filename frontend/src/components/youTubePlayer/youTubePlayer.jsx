@@ -39,14 +39,22 @@ function YouTubePlayer({ url, title, className }) {
     if (!videoId) return null
 
     return (
-      <iframe
-        src={`https://www.dailymotion.com/embed/video/${videoId}`}
-        title={title}
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
-        referrerPolicy="strict-origin-when-cross-origin"
-        className={className}
-      />
+      <a
+        href={url}
+        s
+        target="_blank"
+        rel="noopener noreferrer"
+        className="youtube-player"
+      >
+        <img
+          src={`https://www.dailymotion.com/thumbnail/video/${videoId}`}
+          alt={title}
+          className={className}
+          loading="lazy"
+        />
+
+        <span className="youtube-player__play dailymotion-player__play">▶</span>
+      </a>
     )
   }
 
